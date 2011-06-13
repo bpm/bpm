@@ -25,16 +25,13 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "rack", "~> 1.2.1"
 
-  #paths = `git submodule`.split("\n").map do |line|
-  #  path = line.gsub(/^ \w+ ([^\s]+) .+$/,'\1')
-  #  `cd #{path}; git ls-files`.split("\n").map { |p| File.join(path, p) }
-  #end
-  #paths << `git ls-files`.split("\n")
-  #s.files      = paths.flatten
-  #s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
-
-  s.files = Dir.glob("lib/**/*.rb")
-  s.test_files = Dir.glob("spec/**/*.rb")
+  paths = `git submodule`.split("\n").map do |line|
+    path = line.gsub(/^ \w+ ([^\s]+) .+$/,'\1')
+    `cd #{path}; git ls-files`.split("\n").map { |p| File.join(path, p) }
+  end
+  paths << `git ls-files`.split("\n")
+  s.files      = paths.flatten
+  s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
 
   s.executables        = ['spadepkg']
   s.require_paths      = ["lib"]
