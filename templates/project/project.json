@@ -1,0 +1,31 @@
+{
+  "name":         "<%= name %>",
+  "description":  "DESCRIPTION HERE",
+  "summary":      "SUMMARY HERE",
+  "keywords":     ["javascript"],
+  "author":       "YOUR NAME HERE",
+  "homepage":     "URL",
+  "version":      "0.0.1",
+  "licenses":     [{
+    "type": "MIT",
+    "url":  "http://www.opensource.org/licenses/mit-license.php"
+  }],
+
+  "engines": ["browser", "all"],
+
+  "directories": {
+    "lib":        "./lib",
+    "test":       "./tests"
+  },
+
+  "main": "./lib/main",
+
+  "bin": {
+    "cot": "./bin/cot"
+  },
+
+  "dependencies": {
+    "ivory":    "= 0.0.1",
+    "optparse": "= 1.0.1"
+  }
+}

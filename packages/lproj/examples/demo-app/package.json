@@ -1,0 +1,9 @@
+{
+  "name": "demo-app",
+  "description": "basic demo of the lproj project",
+  
+  "dependencies": {
+    "lproj": "0.5.0",
+    "jquery": "1.4.3"
+  }
+}

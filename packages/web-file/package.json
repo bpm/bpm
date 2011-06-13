@@ -1,0 +1,12 @@
+{
+  "name": "web-file",
+  "version": "0.0.1",
+  "summary": "HTML5 File API for Spade",
+  "description": "Implements the HTML5 [File](http://www.w3.org/TR/FileAPI/) specification in the spade CLI",
+  "author": "Charles Jolley",
+  "homepage": "http://github.com/charlesjolley",
+  "dependencies": {
+    "web-typed-array": "0.0.1"
+  },
+  "directories": { "lib": "lib" }
+}
