@@ -1,6 +1,6 @@
 require 'libgems/uninstaller'
 
-module Spade::Packager
+module BPM
   class Local < Repository
     def uninstall(package)
       LibGems::Uninstaller.new(package).uninstall
@@ -10,7 +10,7 @@ module Spade::Packager
     end
 
     def pack(path)
-      package = Spade::Packager::Package.new(creds.email)
+      package = BPM::Package.new(creds.email)
       package.json_path = path
       if package.valid?
         silence do
@@ -21,8 +21,8 @@ module Spade::Packager
     end
 
     def unpack(path, target)
-      package       = Spade::Packager::Package.new
-      package.spade = path
+      package       = BPM::Package.new
+      package.bpm = path
       unpack_dir    = File.expand_path(File.join(Dir.pwd, target, package.to_full_name))
       LibGems::Installer.new(path, :unpack => true).unpack unpack_dir
       package

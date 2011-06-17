@@ -1,19 +1,19 @@
 require "spec_helper"
 
-describe "spade installed" do
+describe "bpm installed" do
   before do
     goto_home
     set_host
     # TODO: Make this LibGems specific
-    env["GEM_HOME"] = spade_dir.to_s
-    env["GEM_PATH"] = spade_dir.to_s
+    env["GEM_HOME"] = bpm_dir.to_s
+    env["GEM_PATH"] = bpm_dir.to_s
     start_fake(FakeGemServer.new)
   end
 
-  it "lists installed spades" do
-    spade "package", "install", "rake"
+  it "lists installed packages" do
+    bpm "install", "rake"
     wait
-    spade "package", "installed"
+    bpm "installed"
 
     output = stdout.read
     output.should include("rake (0.8.7)")
@@ -23,23 +23,23 @@ describe "spade installed" do
     output.should_not include("highline")
   end
 
-  it "lists all installed spades from different versions" do
-    spade "package", "install", "rake"
+  it "lists all installed packages from different versions" do
+    bpm "install", "rake"
     wait
-    spade "package", "install", "rake", "-v", "0.8.6"
+    bpm "install", "rake", "-v", "0.8.6"
     wait
-    spade "package", "installed"
+    bpm "installed"
 
     output = stdout.read
     output.should include("rake (0.8.7, 0.8.6)")
   end
 
-  it "filters spades when given an argument" do
-    spade "package", "install", "rake"
+  it "filters packages when given an argument" do
+    bpm "install", "rake"
     wait
-    spade "package", "install", "builder"
+    bpm "install", "builder"
     wait
-    spade "package", "installed", "builder"
+    bpm "installed", "builder"
 
     output = stdout.read
     output.should_not include("rake")
@@ -47,7 +47,7 @@ describe "spade installed" do
   end
 
   it "says it couldn't find any if none found" do
-    spade "package", "installed", "rails", :track_stderr => true
+    bpm "installed", "rails", :track_stderr => true
 
     stderr.read.strip.should == 'No packages found matching "rails".'
     exit_status.should_not be_success

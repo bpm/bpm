@@ -1,9 +1,7 @@
-module Spade
-  module Packager
-    module CLI
-      autoload :Base,             'spade/packager/cli/base'
-      autoload :Owner,            'spade/packager/cli/owner'
-      autoload :ProjectGenerator, 'spade/packager/cli/project_generator'
-    end
+module BPM
+  module CLI
+    autoload :Base,             'bpm/cli/base'
+    autoload :Owner,            'bpm/cli/owner'
+    autoload :ProjectGenerator, 'bpm/cli/project_generator'
   end
 end

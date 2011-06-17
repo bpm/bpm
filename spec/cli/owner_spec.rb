@@ -1,8 +1,8 @@
 require "spec_helper"
 
-describe "spade owner" do
+describe "bpm owner" do
   let(:api_key) { "deadbeef" }
-  let(:creds)   { spade_dir("credentials") }
+  let(:creds)   { bpm_dir("credentials") }
 
   before do
     goto_home
@@ -16,19 +16,19 @@ describe "spade owner" do
     end
 
     it "registers new owners if package is owned" do
-      spade "package", "owner", "add", "rake", "geddy@example.com"
+      bpm "owner", "add", "rake", "geddy@example.com"
 
       stdout.read.should include("Owner added successfully.")
     end
 
     it "removes owners if package is owned" do
-      spade "package", "owner", "remove", "rake", "geddy@example.com"
+      bpm "owner", "remove", "rake", "geddy@example.com"
 
       stdout.read.should include("Owner removed successfully.")
     end
 
     it "lists owners for a gem" do
-      spade "package", "owner", "list", "rake"
+      bpm "owner", "list", "rake"
 
       stdout.read.should == <<EOF
 Owners for package: rake
@@ -44,26 +44,26 @@ EOF
     end
 
     it "shows rejection message for add if wrong api key is supplied" do
-      spade "package", "owner", "add", "rake", "geddy@example.com"
+      bpm "owner", "add", "rake", "geddy@example.com"
 
       stdout.read.should include("One cannot simply walk into Mordor!")
     end
 
     it "shows rejection message for remove if wrong api key is supplied" do
-      spade "package", "owner", "remove", "rake", "geddy@example.com"
+      bpm "owner", "remove", "rake", "geddy@example.com"
 
       stdout.read.should include("One cannot simply walk into Mordor!")
     end
 
     it "shows rejection message for list if wrong api key is supplied" do
-      spade "package", "owner", "list", "rake"
+      bpm "owner", "list", "rake"
 
       stdout.read.should include("One cannot simply walk into Mordor!")
     end
   end
 end
 
-describe "spade owner with wrong arguments" do
+describe "bpm owner with wrong arguments" do
   before do
     cd(home)
     env["HOME"] = home.to_s
@@ -71,43 +71,43 @@ describe "spade owner with wrong arguments" do
   end
 
   it "asks for login first if api key does not exist" do
-    spade "package", "owner", "add", "rake", "geddy@example.com", :track_stderr => true
+    bpm "owner", "add", "rake", "geddy@example.com", :track_stderr => true
 
-    stderr.read.should include("Please login first with `spade login`")
+    stderr.read.should include("Please login first with `bpm login`")
   end
 
   it "asks for login first if api key does not exist" do
-    spade "package", "owner", "remove", "rake", "geddy@example.com", :track_stderr => true
+    bpm "owner", "remove", "rake", "geddy@example.com", :track_stderr => true
 
-    stderr.read.should include("Please login first with `spade login`")
+    stderr.read.should include("Please login first with `bpm login`")
   end
 
   it "asks for login first if api key does not exist" do
-    spade "package", "owner", "list", "rake", :track_stderr => true
+    bpm "owner", "list", "rake", :track_stderr => true
 
-    stderr.read.should include("Please login first with `spade login`")
+    stderr.read.should include("Please login first with `bpm login`")
   end
 
   it "requires a package name for add" do
-    spade "package", "owner", "add", :track_stderr => true
+    bpm "owner", "add", :track_stderr => true
 
     stderr.read.should include("called incorrectly")
   end
 
   it "requires a package name for remove" do
-    spade "package", "owner", "remove", :track_stderr => true
+    bpm "owner", "remove", :track_stderr => true
 
     stderr.read.should include("called incorrectly")
   end
 
   it "requires a package name for list" do
-    spade "package", "owner", "list", :track_stderr => true
+    bpm "owner", "list", :track_stderr => true
 
     stderr.read.should include("called incorrectly")
   end
 
   it "requires a package name for list with default command" do
-    spade "package", "owner", :track_stderr => true
+    bpm "owner", :track_stderr => true
 
     stderr.read.should include("called incorrectly")
   end

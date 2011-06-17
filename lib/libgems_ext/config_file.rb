@@ -24,7 +24,7 @@ module LibGems
       end
 
     remove_const(:SYSTEM_WIDE_CONFIG_FILE)
-    SYSTEM_WIDE_CONFIG_FILE = File.join system_config_path, 'spaderc'
+    SYSTEM_WIDE_CONFIG_FILE = File.join system_config_path, 'bpmrc'
 
     def credentials_path
       File.join(LibGems.user_dir, "credentials")

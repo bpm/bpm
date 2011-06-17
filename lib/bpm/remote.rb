@@ -1,4 +1,4 @@
-module Spade::Packager
+module BPM
   class Remote < Repository
     include LibGems::UserInteraction
 

@@ -1,5 +1,5 @@
 require "spec_helper"
 
-describe "spade new" do
+describe "bpm new" do
   it "should be speced"
 end

@@ -2,11 +2,11 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'spade/packager/version'
+require 'bpm/version'
 
 Gem::Specification.new do |s|
-  s.name        = "spade-packager"
-  s.version     = Spade::Packager::VERSION
+  s.name        = "bpm"
+  s.version     = BPM::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Charles Jolley", "Peter Wagenet"]
   s.email       = ["charles@sproutcore.com", "peterw@strobecorp.com"]
@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.files      = paths.flatten
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
 
-  s.executables        = ['spadepkg']
+  s.executables        = ['bpm']
   s.require_paths      = ["lib"]
 end
 

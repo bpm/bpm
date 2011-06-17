@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Spade::Packager::Package, "#to_spec" do
+describe BPM::Package, "#to_spec" do
   let(:email) { "user@example.com" }
 
   before do
@@ -11,7 +11,7 @@ describe Spade::Packager::Package, "#to_spec" do
   end
 
   subject do
-    package = Spade::Packager::Package.new(email)
+    package = BPM::Package.new(email)
     package.json_path = fixtures("package.json")
     if spec = package.to_spec
       spec
@@ -86,15 +86,15 @@ describe Spade::Packager::Package, "#to_spec" do
   end
 
   it "sets the rubyforge_project to appease older versions of rubygems" do
-    subject.rubyforge_project.should == "spade"
+    subject.rubyforge_project.should == "bpm"
   end
 end
 
-describe Spade::Packager::Package, "#to_s" do
+describe BPM::Package, "#to_s" do
   let(:email) { "user@example.com" }
 
   subject do
-    package = Spade::Packager::Package.new
+    package = BPM::Package.new
     package.json_path = fixtures("package.json")
     package.valid?
     package
@@ -105,14 +105,14 @@ describe Spade::Packager::Package, "#to_s" do
   end
 end
 
-describe Spade::Packager::Package, "converting" do
+describe BPM::Package, "converting" do
   before do
     cd(home)
   end
 
   subject do
-    package = Spade::Packager::Package.new
-    package.spade = fixtures("core-test-0.4.3.spd")
+    package = BPM::Package.new
+    package.bpm = fixtures("core-test-0.4.3.spd")
     package.as_json
   end
 
@@ -121,12 +121,12 @@ describe Spade::Packager::Package, "converting" do
   end
 end
 
-describe Spade::Packager::Package, "validating" do
+describe BPM::Package, "validating" do
   before do
     cd(home)
   end
 
-  subject { Spade::Packager::Package.new }
+  subject { BPM::Package.new }
 
   shared_examples_for "a good parser" do
     it "had a problem parsing package.json" do
@@ -170,7 +170,7 @@ describe Spade::Packager::Package, "validating" do
 
 end
 
-describe Spade::Packager::Package, "validation errors" do
+describe BPM::Package, "validation errors" do
   let(:email) { "user@example.com" }
 
   before do
@@ -180,7 +180,7 @@ describe Spade::Packager::Package, "validation errors" do
   end
 
   subject do
-    Spade::Packager::Package.new(email)
+    BPM::Package.new(email)
   end
 
   def write_package

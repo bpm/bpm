@@ -1,6 +1,6 @@
 require 'json'
 
-module Spade::Packager
+module BPM
   class Package
     EXT      = "spd"
     METADATA = %w[keywords licenses engines main bin directories]
@@ -12,7 +12,7 @@ module Spade::Packager
       @email = email
     end
 
-    def spade=(path)
+    def bpm=(path)
       format = LibGems::Format.from_file_by_path(path)
       fill_from_gemspec(format.spec)
     end
@@ -32,7 +32,8 @@ module Spade::Packager
         spec.test_files        = glob_files(test_path) if test_path
         spec.bindir            = bin_path
         spec.executables       = bin_files.map{|p| File.basename(p) } if bin_path
-        spec.rubyforge_project = "spade"
+        # TODO: IS this right?
+        spec.rubyforge_project = "bpm"
         def spec.file_name
           "#{full_name}.#{EXT}"
         end

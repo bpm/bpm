@@ -2,7 +2,7 @@
 lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
 $:.unshift(lib) if File.exists?(lib)
 
-require 'spade/packager'
+require 'bpm'
 
-Spade::Packager::CLI::Base.start
+BPM::CLI::Base.start
 
