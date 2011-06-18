@@ -10,5 +10,4 @@ module BPM
   autoload :Repository,           'bpm/repository'
 end
 
-require 'libgems'
-require 'libgems_ext'
+require 'bpm/libgems_ext'
