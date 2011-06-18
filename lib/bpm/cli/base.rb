@@ -57,6 +57,25 @@ module BPM
         end
       end
 
+      # TODO: Options for versions and prerelease
+      desc "add [PACKAGE]", "Add package to project"
+      def add(name)
+        dep = LibGems::Dependency.new(name, LibGems::Requirement.default)
+        installed = LibGems.source_index.search(dep)
+        package = if installed.empty?
+          say "Installing from remote"
+          installed = BPM::Remote.new.install(name, '>= 0', false)
+          installed.find{|i| i.name == name }
+        else
+          installed.inject{|newest,current| newest.version > current.version ? newest : current }
+        end
+        if package
+          say "Added #{package.name} (#{package.version})"
+        else
+          say "Unable to find package to add"
+        end
+      end
+
       desc "login", "Log in with your BPM credentials"
       def login
         highline = HighLine.new
