@@ -1,6 +1,0 @@
-[submodule "packages/optparse"]
-	path = packages/optparse
-	url = https://github.com/qrush/optparse-js.git
-[submodule "packages/coffee-script"]
-	path = packages/coffee-script
-	url = https://github.com/charlesjolley/coffee-script.git

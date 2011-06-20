@@ -1,9 +1,0 @@
-{
-  "name": "text",
-  "version": "1.0.0",
-  "description": "format plugin to read plain text files",
-  
-  "plugin:formats": {
-    "txt": "text/main"
-  }
-}
