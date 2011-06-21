@@ -1,6 +1,7 @@
 {
   "name":         "<%= name %>",
   "version":      "0.0.1",
+  "bpm":          "<%= bpm_version %>",
 
   "description":  "DESCRIPTION HERE",
   "author":       "YOUR NAME HERE",
@@ -14,5 +15,4 @@
   "dependencies": {
     "spade":    "0.5.0"
   }
-  
 }

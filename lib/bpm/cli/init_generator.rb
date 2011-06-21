@@ -1,3 +1,5 @@
+require 'bpm/version'
+
 module BPM::CLI
   class InitGenerator < BPM::Generator
 
@@ -5,6 +7,10 @@ module BPM::CLI
 
     def name
       File.basename destination_root
+    end
+    
+    def bpm_version
+      BPM::VERSION
     end
     
     def run
