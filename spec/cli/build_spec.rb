@@ -17,11 +17,11 @@ describe "bpm build when logged in" do
 
     exit_status.should be_success
     output = stdout.read
-    output.should include("Successfully built package: core-test-0.4.3.spd")
+    output.should include("Successfully built package: core-test-0.4.9.spd")
 
-    package = LibGems::Format.from_file_by_path("core-test-0.4.3.spd")
+    package = LibGems::Format.from_file_by_path("core-test-0.4.9.spd")
     package.spec.name.should == "core-test"
-    package.spec.version.should == LibGems::Version.new("0.4.3")
+    package.spec.version.should == LibGems::Version.new("0.4.9")
     package.spec.email.should == email
   end
 end

@@ -108,7 +108,7 @@ describe "bpm install" do
 
     output = stdout.read
 
-    %w(ivory-0.0.1 optparse-1.0.1 core-test-0.4.3).each do |name|
+    %w(ivory-0.0.1 optparse-1.0.1 core-test-0.4.9).each do |name|
       output.should include("Successfully installed #{name}")
 
       name.should be_fetched

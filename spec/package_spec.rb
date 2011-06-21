@@ -21,12 +21,16 @@ describe BPM::Package, "#to_spec" do
     end
   end
 
+  def expand_sort(files)
+    files.map { |f| File.expand_path(f) }.sort
+  end
+
   it "transforms the name" do
     subject.name.should == "core-test"
   end
 
   it "transforms the version" do
-    subject.version.should == LibGems::Version.new("0.4.3")
+    subject.version.should == LibGems::Version.new("0.4.9")
   end
 
   it "transforms the author" do
@@ -65,10 +69,6 @@ describe BPM::Package, "#to_spec" do
     metadata["bin"].should == {"cot" => "./bin/cot"}
   end
 
-  def expand_sort(files)
-    files.map { |f| File.expand_path(f) }.sort
-  end
-
   it "expands paths from the directories" do
     others     = ["tmp/blah.js", "tmp/whee.txt"]
     files      = ["bin/cot", "lib/main.js", "lib/core.js", "lib/test.js", "package.json", "resources/additions.css", "resources/runner.css"]
@@ -82,7 +82,7 @@ describe BPM::Package, "#to_spec" do
   end
 
   it "hacks the file name to return .spd" do
-    subject.file_name.should == "core-test-0.4.3.spd"
+    subject.file_name.should == "core-test-0.4.9.spd"
   end
 
   it "sets the rubyforge_project to appease older versions of rubygems" do
@@ -101,7 +101,7 @@ describe BPM::Package, "#to_s" do
   end
 
   it "gives the name and version" do
-    subject.to_full_name.should == "core-test-0.4.3"
+    subject.to_full_name.should == "core-test-0.4.9"
   end
 end
 
@@ -112,7 +112,7 @@ describe BPM::Package, "converting" do
 
   subject do
     package = BPM::Package.new
-    package.bpm = fixtures("core-test-0.4.3.spd")
+    package.bpm = fixtures("core-test-0.4.9.spd")
     package.as_json
   end
 
@@ -221,7 +221,7 @@ describe BPM::Package, "validation errors" do
 
   it "is valid without specifying a test directory" do
     write_package do |package|
-      package["directories"].delete("test")
+      package["directories"].delete("tests")
     end
 
     subject.should be_valid
@@ -237,24 +237,7 @@ describe BPM::Package, "validation errors" do
     subject.to_spec.files.should == ["package.json"]
   end
 
-  %w[lib test].each do |dir|
-    it "is invalid without a #{dir} directory that exists" do
-      write_package do |package|
-        package["directories"][dir] = "nope"
-      end
-
-      subject.should have_error("'nope' specified for #{dir} directory, is not a directory")
-    end
-
-    it "is valid without a #{dir} directory that exists" do
-    FileUtils.mkdir_p(home("somewhere", "else"))
-      write_package do |package|
-        package["directories"][dir] = "./somewhere/else"
-      end
-
-      subject.should be_valid
-    end
-
+  %w(lib tests).each do |dir|
     it "is invalid if #{dir} points to a file" do
       FileUtils.touch(home("somefile"))
       write_package do |package|
@@ -262,6 +245,23 @@ describe BPM::Package, "validation errors" do
       end
 
       subject.should have_error("'./somefile' specified for #{dir} directory, is not a directory")
+    end
+
+    it "is invalid with a #{dir} directory that doesn't exist" do
+      write_package do |package|
+        package["directories"][dir] = "nope"
+      end
+
+      subject.should have_error("'nope' specified for #{dir} directory, is not a directory")
+    end
+
+    it "is valid with a #{dir} directory that exists" do
+      FileUtils.mkdir_p(home("somewhere", "else"))
+      write_package do |package|
+        package["directories"][dir] = "./somewhere/else"
+      end
+
+      subject.should be_valid
     end
   end
 end

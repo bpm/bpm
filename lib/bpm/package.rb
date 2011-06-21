@@ -5,7 +5,7 @@ module BPM
     EXT      = "spd"
     METADATA = %w[keywords licenses engines main bin directories]
     FIELDS   = %w[name version description author homepage summary]
-    attr_accessor :metadata, :lib_path, :test_path, :errors, :json_path, :attributes, :directories, :dependencies
+    attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories, :dependencies
     attr_accessor *FIELDS
 
     def initialize(email = "")
@@ -29,7 +29,7 @@ module BPM
         spec.description       = description
         spec.requirements      = [metadata.to_json]
         spec.files             = directory_files + ["package.json"]
-        spec.test_files        = glob_files(test_path) if test_path
+        spec.test_files        = glob_files(tests_path) if tests_path
         spec.bindir            = bin_path
         spec.executables       = bin_files.map{|p| File.basename(p) } if bin_path
         # TODO: IS this right?
@@ -71,7 +71,7 @@ module BPM
     private
 
     def directory_files
-      directories.values.map{|dir| glob_files(dir) }.flatten
+      directories.reject{|k,_| k == 'tests' }.values.map{|dir| glob_files(dir) }.flatten
     end
 
     def bin_files
@@ -87,11 +87,11 @@ module BPM
     end
 
     def lib_path
-      @directories["lib"]
+      @directories["lib"] || "lib"
     end
 
-    def test_path
-      @directories["test"]
+    def tests_path
+      @directories["tests"]
     end
 
     def parse
@@ -111,7 +111,7 @@ module BPM
     end
 
     def validate_paths
-      %w[lib test].all? do |directory|
+      %w[lib tests].all? do |directory|
         path = send("#{directory}_path")
         if path.nil? || File.directory?(File.join(Dir.pwd, path))
           true
