@@ -1,0 +1,36 @@
+PATH
+  remote: .
+  specs:
+    bpm (0.1.0)
+      gemcutter (~> 0.6.1)
+      highline (~> 1.6.1)
+      json_pure (~> 1.4.6)
+      libgems (~> 0.0.2)
+      thor (~> 0.14.3)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    diff-lcs (1.1.2)
+    gemcutter (0.6.1)
+    highline (1.6.2)
+    json_pure (1.4.6)
+    libgems (0.0.4)
+    rack (1.2.3)
+    rspec (2.6.0)
+      rspec-core (~> 2.6.0)
+      rspec-expectations (~> 2.6.0)
+      rspec-mocks (~> 2.6.0)
+    rspec-core (2.6.4)
+    rspec-expectations (2.6.0)
+      diff-lcs (~> 1.1.2)
+    rspec-mocks (2.6.0)
+    thor (0.14.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bpm!
+  rack (~> 1.2.1)
+  rspec
