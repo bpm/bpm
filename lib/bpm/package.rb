@@ -111,14 +111,25 @@ module BPM
     end
 
     def validate_paths
-      %w[lib tests].all? do |directory|
-        path = send("#{directory}_path")
-        if path.nil? || File.directory?(File.join(Dir.pwd, path))
-          true
-        else
-          add_error "'#{path}' specified for #{directory} directory, is not a directory"
+      success = true
+
+      if paths = [*lib_path]
+        non_dirs = paths.reject{|p| File.directory?(File.join(Dir.pwd, p)) }
+        if paths.empty?
+          add_error "A lib directory is required"
+          success = false
+        elsif !non_dirs.empty?
+          add_error "#{non_dirs.map{|p| "'#{p}'" }.join(", ")}, specified for lib directory, is not a directory"
+          success = false
         end
       end
+
+      unless tests_path.nil? || File.directory?(File.join(Dir.pwd, tests_path))
+        add_error "'#{tests_path}', specified for tests directory, is not a directory"
+        success = false
+      end
+
+      success
     end
 
     def validate_version

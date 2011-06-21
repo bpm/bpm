@@ -244,7 +244,7 @@ describe BPM::Package, "validation errors" do
         package["directories"][dir] = "./somefile"
       end
 
-      subject.should have_error("'./somefile' specified for #{dir} directory, is not a directory")
+      subject.should have_error("'./somefile', specified for #{dir} directory, is not a directory")
     end
 
     it "is invalid with a #{dir} directory that doesn't exist" do
@@ -252,7 +252,7 @@ describe BPM::Package, "validation errors" do
         package["directories"][dir] = "nope"
       end
 
-      subject.should have_error("'nope' specified for #{dir} directory, is not a directory")
+      subject.should have_error("'nope', specified for #{dir} directory, is not a directory")
     end
 
     it "is valid with a #{dir} directory that exists" do
@@ -264,4 +264,30 @@ describe BPM::Package, "validation errors" do
       subject.should be_valid
     end
   end
+
+  it "is valid with a lib directory array" do
+    FileUtils.mkdir_p(home("vendor/lib"))
+    write_package do |package|
+      package["directories"]["lib"] = ["./lib", "./vendor/lib"]
+    end
+
+    subject.should be_valid
+  end
+
+  it "is invalid if any lib directories don't exist" do
+    write_package do |package|
+      package["directories"]["lib"] = ["./lib", "./fake"]
+    end
+
+    subject.should have_error "'./fake', specified for lib directory, is not a directory"
+  end
+
+  it "is invalid if the lib directory array is empty" do
+    write_package do |package|
+      package["directories"]["lib"] = []
+    end
+
+    subject.should have_error("A lib directory is required")
+  end
+
 end
