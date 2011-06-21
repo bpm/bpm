@@ -1,6 +1,6 @@
 module BPM
   BPM_DIR = ".bpm"
-  TEMPLATES_DIR = File.expand_path("../../../templates", __FILE__)
+  TEMPLATES_DIR = File.expand_path("../../templates", __FILE__)
 
   autoload :CLI,                  'bpm/cli'
   autoload :Credentials,          'bpm/credentials'
@@ -8,6 +8,7 @@ module BPM
   autoload :Package,              'bpm/package'
   autoload :Remote,               'bpm/remote'
   autoload :Repository,           'bpm/repository'
+  autoload :Generator,            'bpm/generator'
 end
 
 require 'bpm/libgems_ext'

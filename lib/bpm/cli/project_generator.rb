@@ -1,16 +1,7 @@
 module BPM::CLI
-  class ProjectGenerator
-    include Thor::Actions
+  class ProjectGenerator < BPM::Generator
 
-    source_root File.join(TEMPLATES_DIR, 'project')
-
-    attr_reader :name
-
-    def initialize(thor, name, root)
-      @thor, @name, @root = thor, name, root
-
-      self.destination_root = root
-    end
+    source_root File.join(::BPM::TEMPLATES_DIR, 'project')
 
     def run
       empty_directory '.'
@@ -18,7 +9,6 @@ module BPM::CLI
 
       template "LICENSE"
       template "README.md"
-      template "project.json"
 
       empty_directory "lib"
       empty_directory "tests"
@@ -32,28 +22,6 @@ module BPM::CLI
       end
     end
 
-  private
-
-    def app_const
-      name.gsub(/\W|-/, '_').squeeze('_').gsub(/(?:^|_)(.)/) { $1.upcase }
-    end
-
-    def current_year
-      Time.now.year
-    end
-
-    def source_paths
-      [File.expand_path('../../templates/project', __FILE__)] +
-        @thor.source_paths
-    end
-
-    def respond_to?(*args)
-      super || @thor.respond_to?(*args)
-    end
-
-    def method_missing(name, *args, &blk)
-      @thor.send(name, *args, &blk)
-    end
   end
 end
 

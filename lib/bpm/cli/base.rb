@@ -146,8 +146,17 @@ module BPM
 
       desc "new [NAME]", "Generate a new project skeleton"
       def new(name)
-        ProjectGenerator.new(self,
-          name, File.expand_path(name)).run
+        path = File.expand_path name
+        ProjectGenerator.new(self, name, path).run
+        init(path)
+      end
+
+      desc "init [PATHS]", "Configure a project to use bpm for management"
+      def init(*paths)
+        paths = [Dir.pwd] if paths.size.zero?
+        paths.each do |path|
+          InitGenerator.new(self, path, path).run
+        end
       end
 
       desc "build", "Build a bpm package from a package.json"
