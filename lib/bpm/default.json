@@ -1,0 +1,9 @@
+{
+  "directories": {
+    "lib":        "./lib",
+    "test":       "./tests"
+  },
+  
+  "dependencies": {
+  }
+}

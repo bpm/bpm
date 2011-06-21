@@ -9,6 +9,7 @@ module BPM
   autoload :Remote,               'bpm/remote'
   autoload :Repository,           'bpm/repository'
   autoload :Generator,            'bpm/generator'
+  autoload :Project,              'bpm/project'
 end
 
 require 'bpm/libgems_ext'

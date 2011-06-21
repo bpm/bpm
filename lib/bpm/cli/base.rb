@@ -158,6 +158,21 @@ module BPM
           InitGenerator.new(self, path, path).run
         end
       end
+      
+      desc "compile [PATH]", "Build the bpm_package for development"
+      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
+      def compile(path=nil)
+        project = Project.nearest_project self, (path || Dir.pwd)
+        if project.nil?
+          if path.nil?
+            abort "You do not appear to be in a valid bpm project.  Maybe you are in the wrong working directory?"
+          else
+            abort "No bpm project could be found at #{File.expand_path path}"
+          end
+        else
+          project.compile(options[:mode], options[:verbose])
+        end
+      end
 
       desc "build", "Build a bpm package from a package.json"
       def build
