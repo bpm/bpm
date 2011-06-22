@@ -13,7 +13,7 @@ class FakeGemServer
         index("builder",   "3.0.0"),
         index("highline",  "1.6.1"),
         index("rake",      "0.8.7"),
-        index("core-test", "0.4.3"),
+        index("core-test", "0.4.9"),
         index("ivory",     "0.0.1"),
         index("optparse",  "1.0.1")
       ]
@@ -29,7 +29,7 @@ class FakeGemServer
         index("highline",  "1.6.1"),
         index("rake",      "0.8.7"),
         index("rake",      "0.8.6"),
-        index("core-test", "0.4.3"),
+        index("core-test", "0.4.9"),
         index("ivory",     "0.0.1"),
         index("optparse",  "1.0.1")
       ]

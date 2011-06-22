@@ -5,7 +5,7 @@
   "keywords": ["javascript", "testing"],
   "author": "Charles Jolley",
   "homepage": "https://github.com/strobecorp/core-test",
-  "version": "0.4.3",
+  "version": "0.4.9",
   "licenses":     [{
     "type":       "MIT",
     "url":        "https://github.com/strobecorp/core-test/raw/master/LICENSE"
@@ -14,7 +14,7 @@
   "directories": {
     "lib": "./lib",
     "resources": "./resources",
-    "test": "./tests"
+    "tests": "./tests"
   },
   "main": "./lib/main",
   "bin": {

@@ -1,13 +1,13 @@
 RSpec::Matchers.define :be_fetched do
   include SpecHelpers
   match do |name|
-    File.exist?(spade_dir("cache", "#{name}.gem")) == true
+    File.exist?(bpm_dir("cache", "#{name}.gem")) == true
   end
 end
 
 RSpec::Matchers.define :be_unpacked do
   match do |name|
-    File.directory?(spade_dir("gems", name)) == true
+    File.directory?(bpm_dir("gems", name)) == true
   end
 end
 

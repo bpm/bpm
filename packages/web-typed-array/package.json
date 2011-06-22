@@ -1,9 +1,0 @@
-{
-  "name": "web-typed-array",
-  "author": "Charles Jolley",
-  "homepage": "http://github.com/charlesjolley",
-  "summary": "web typed array",
-  "description": "a web typed array for javascript",
-  "version": "0.0.1",
-  "directories": { "lib": "lib" }
-}

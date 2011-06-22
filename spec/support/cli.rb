@@ -1,19 +1,14 @@
-require 'spade/packager/cli/base'
+require 'bpm/cli/base'
 
 module SpecHelpers
   attr_reader :stdin, :stdout, :stderr
-
-  # Dummy wrapper for testing
-  class CLI < Thor
-    desc "package", "Package commands"
-    subcommand "package", Spade::Packager::CLI::Base
-  end
 
   def env
     @env ||= {}
   end
 
-  def spade(*argv)
+
+  def bpm(*argv)
     opts = Hash === argv.last ? argv.pop : {}
 
     kill!
@@ -37,7 +32,7 @@ module SpecHelpers
         ENV[key] = val
       end
 
-      CLI.start(argv)
+      BPM::CLI::Base.start(argv)
     end
 
     @stdout_child.close
@@ -94,9 +89,9 @@ module SpecHelpers
   end
 
   def write_creds(email, api_key)
-    FileUtils.mkdir_p(spade_dir)
-    File.open(spade_dir("credentials"), "w") do |file|
-      file.write YAML.dump(:spade_api_key => api_key, :spade_email => email)
+    FileUtils.mkdir_p(bpm_dir)
+    File.open(bpm_dir("credentials"), "w") do |file|
+      file.write YAML.dump(:bpm_api_key => api_key, :bpm_email => email)
     end
   end
 end

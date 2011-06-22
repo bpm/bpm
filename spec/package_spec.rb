@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Spade::Packager::Package, "#to_spec" do
+describe BPM::Package, "#to_spec" do
   let(:email) { "user@example.com" }
 
   before do
@@ -11,7 +11,7 @@ describe Spade::Packager::Package, "#to_spec" do
   end
 
   subject do
-    package = Spade::Packager::Package.new(email)
+    package = BPM::Package.new(email)
     package.json_path = fixtures("package.json")
     if spec = package.to_spec
       spec
@@ -21,12 +21,16 @@ describe Spade::Packager::Package, "#to_spec" do
     end
   end
 
+  def expand_sort(files)
+    files.map { |f| File.expand_path(f) }.sort
+  end
+
   it "transforms the name" do
     subject.name.should == "core-test"
   end
 
   it "transforms the version" do
-    subject.version.should == LibGems::Version.new("0.4.3")
+    subject.version.should == LibGems::Version.new("0.4.9")
   end
 
   it "transforms the author" do
@@ -65,10 +69,6 @@ describe Spade::Packager::Package, "#to_spec" do
     metadata["bin"].should == {"cot" => "./bin/cot"}
   end
 
-  def expand_sort(files)
-    files.map { |f| File.expand_path(f) }.sort
-  end
-
   it "expands paths from the directories" do
     others     = ["tmp/blah.js", "tmp/whee.txt"]
     files      = ["bin/cot", "lib/main.js", "lib/core.js", "lib/test.js", "package.json", "resources/additions.css", "resources/runner.css"]
@@ -82,37 +82,37 @@ describe Spade::Packager::Package, "#to_spec" do
   end
 
   it "hacks the file name to return .spd" do
-    subject.file_name.should == "core-test-0.4.3.spd"
+    subject.file_name.should == "core-test-0.4.9.spd"
   end
 
   it "sets the rubyforge_project to appease older versions of rubygems" do
-    subject.rubyforge_project.should == "spade"
+    subject.rubyforge_project.should == "bpm"
   end
 end
 
-describe Spade::Packager::Package, "#to_s" do
+describe BPM::Package, "#to_s" do
   let(:email) { "user@example.com" }
 
   subject do
-    package = Spade::Packager::Package.new
+    package = BPM::Package.new
     package.json_path = fixtures("package.json")
     package.valid?
     package
   end
 
   it "gives the name and version" do
-    subject.to_full_name.should == "core-test-0.4.3"
+    subject.to_full_name.should == "core-test-0.4.9"
   end
 end
 
-describe Spade::Packager::Package, "converting" do
+describe BPM::Package, "converting" do
   before do
     cd(home)
   end
 
   subject do
-    package = Spade::Packager::Package.new
-    package.spade = fixtures("core-test-0.4.3.spd")
+    package = BPM::Package.new
+    package.bpm = fixtures("core-test-0.4.9.spd")
     package.as_json
   end
 
@@ -121,12 +121,12 @@ describe Spade::Packager::Package, "converting" do
   end
 end
 
-describe Spade::Packager::Package, "validating" do
+describe BPM::Package, "validating" do
   before do
     cd(home)
   end
 
-  subject { Spade::Packager::Package.new }
+  subject { BPM::Package.new }
 
   shared_examples_for "a good parser" do
     it "had a problem parsing package.json" do
@@ -170,7 +170,7 @@ describe Spade::Packager::Package, "validating" do
 
 end
 
-describe Spade::Packager::Package, "validation errors" do
+describe BPM::Package, "validation errors" do
   let(:email) { "user@example.com" }
 
   before do
@@ -180,7 +180,7 @@ describe Spade::Packager::Package, "validation errors" do
   end
 
   subject do
-    Spade::Packager::Package.new(email)
+    BPM::Package.new(email)
   end
 
   def write_package
@@ -221,7 +221,7 @@ describe Spade::Packager::Package, "validation errors" do
 
   it "is valid without specifying a test directory" do
     write_package do |package|
-      package["directories"].delete("test")
+      package["directories"].delete("tests")
     end
 
     subject.should be_valid
@@ -237,31 +237,57 @@ describe Spade::Packager::Package, "validation errors" do
     subject.to_spec.files.should == ["package.json"]
   end
 
-  %w[lib test].each do |dir|
-    it "is invalid without a #{dir} directory that exists" do
-      write_package do |package|
-        package["directories"][dir] = "nope"
-      end
-
-      subject.should have_error("'nope' specified for #{dir} directory, is not a directory")
-    end
-
-    it "is valid without a #{dir} directory that exists" do
-    FileUtils.mkdir_p(home("somewhere", "else"))
-      write_package do |package|
-        package["directories"][dir] = "./somewhere/else"
-      end
-
-      subject.should be_valid
-    end
-
+  %w(lib tests).each do |dir|
     it "is invalid if #{dir} points to a file" do
       FileUtils.touch(home("somefile"))
       write_package do |package|
         package["directories"][dir] = "./somefile"
       end
 
-      subject.should have_error("'./somefile' specified for #{dir} directory, is not a directory")
+      subject.should have_error("'./somefile', specified for #{dir} directory, is not a directory")
+    end
+
+    it "is invalid with a #{dir} directory that doesn't exist" do
+      write_package do |package|
+        package["directories"][dir] = "nope"
+      end
+
+      subject.should have_error("'nope', specified for #{dir} directory, is not a directory")
+    end
+
+    it "is valid with a #{dir} directory that exists" do
+      FileUtils.mkdir_p(home("somewhere", "else"))
+      write_package do |package|
+        package["directories"][dir] = "./somewhere/else"
+      end
+
+      subject.should be_valid
     end
   end
+
+  it "is valid with a lib directory array" do
+    FileUtils.mkdir_p(home("vendor/lib"))
+    write_package do |package|
+      package["directories"]["lib"] = ["./lib", "./vendor/lib"]
+    end
+
+    subject.should be_valid
+  end
+
+  it "is invalid if any lib directories don't exist" do
+    write_package do |package|
+      package["directories"]["lib"] = ["./lib", "./fake"]
+    end
+
+    subject.should have_error "'./fake', specified for lib directory, is not a directory"
+  end
+
+  it "is invalid if the lib directory array is empty" do
+    write_package do |package|
+      package["directories"]["lib"] = []
+    end
+
+    subject.should have_error("A lib directory is required")
+  end
+
 end

@@ -46,8 +46,8 @@ module SpecHelpers
     tmp.join("local", *path)
   end
 
-  def spade_dir(*path)
-    home(Spade::SPADE_DIR, *path)
+  def bpm_dir(*path)
+    home(BPM::BPM_DIR, *path)
   end
 
   def goto_home
