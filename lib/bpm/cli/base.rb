@@ -173,21 +173,19 @@ module BPM
       end
 
       desc "build", "Build a bpm package from a package.json"
+      method_option :email, :type => :string,  :default => nil,   :aliases => ['-e'],    :desc => 'Specify an author email address'
       def build
         local = BPM::Local.new
-        if local.logged_in?
-          package = local.pack("package.json")
-          if package.errors.empty?
-            puts "Successfully built package: #{package.to_ext}"
-          else
-            failure_message = "BPM encountered the following problems building your package:"
-            package.errors.each do |error|
-              failure_message << "\n* #{error}"
-            end
-            abort failure_message
-          end
+        package = local.pack("package.json", options[:email])
+        
+        if package.errors.empty?
+          puts "Successfully built package: #{package.to_ext}"
         else
-          abort LOGIN_MESSAGE
+          failure_message = "BPM encountered the following problems building your package:"
+          package.errors.each do |error|
+            failure_message << "\n* #{error}"
+          end
+          abort failure_message
         end
       end
 
