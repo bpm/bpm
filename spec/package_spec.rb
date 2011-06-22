@@ -11,8 +11,8 @@ describe BPM::Package, "#to_spec" do
   end
 
   subject do
-    package = BPM::Package.new(email)
     package.json_path = fixtures("package.json")
+    package = BPM::Package.new(nil, email)
     if spec = package.to_spec
       spec
     else
@@ -180,7 +180,7 @@ describe BPM::Package, "validation errors" do
   end
 
   subject do
-    BPM::Package.new(email)
+    BPM::Package.new(nil, email)
   end
 
   def write_package

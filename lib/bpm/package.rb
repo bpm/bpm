@@ -5,11 +5,13 @@ module BPM
     EXT      = "spd"
     METADATA = %w[keywords licenses engines main bin directories]
     FIELDS   = %w[name version description author homepage summary]
-    attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories, :dependencies
+    attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories, :dependencies, :root_path
     attr_accessor *FIELDS
 
-    def initialize(email = "")
-      @email = email
+    def initialize(root_path=nil, email = "")
+      @root_path = root_path || Dir.pwd
+      @json_path = File.join @root_path, 'package.json'
+      @email     = email
     end
 
     def bpm=(path)
@@ -114,7 +116,7 @@ module BPM
       success = true
 
       if paths = [*lib_path]
-        non_dirs = paths.reject{|p| File.directory?(File.join(Dir.pwd, p)) }
+        non_dirs = paths.reject{|p| File.directory?(File.join(@root_path, p))}
         if paths.empty?
           add_error "A lib directory is required"
           success = false
@@ -124,7 +126,7 @@ module BPM
         end
       end
 
-      unless tests_path.nil? || File.directory?(File.join(Dir.pwd, tests_path))
+      unless tests_path.nil? || File.directory?(File.join(@root_path, tests_path))
         add_error "'#{tests_path}', specified for tests directory, is not a directory"
         success = false
       end

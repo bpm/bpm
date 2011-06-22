@@ -10,7 +10,7 @@ module BPM
     end
 
     def pack(path)
-      package = BPM::Package.new(creds.email)
+      package = BPM::Package.new(nil, creds.email)
       package.json_path = path
       if package.valid?
         silence do
