@@ -11,8 +11,8 @@ describe BPM::Package, "#to_spec" do
   end
 
   subject do
-    package.json_path = fixtures("package.json")
     package = BPM::Package.new(nil, email)
+    package.json_path = fixtures("core-test", "package.json")
     if spec = package.to_spec
       spec
     else
@@ -95,7 +95,7 @@ describe BPM::Package, "#to_s" do
 
   subject do
     package = BPM::Package.new
-    package.json_path = fixtures("package.json")
+    package.json_path = fixtures("core-test","package.json")
     package.valid?
     package
   end
@@ -117,7 +117,7 @@ describe BPM::Package, "converting" do
   end
 
   it "can recreate the same package.json from the package" do
-    subject.should == JSON.parse(File.read(fixtures("package.json")))
+    subject.should == JSON.parse(File.read(fixtures("core-test", "package.json")))
   end
 end
 
@@ -154,7 +154,7 @@ describe BPM::Package, "validating" do
 
   context "json can't be read" do
     before do
-      FileUtils.cp fixtures("package.json"), "."
+      FileUtils.cp fixtures("core-test", "package.json"), "."
       FileUtils.chmod 0000, "package.json"
       subject.json_path = "package.json"
     end
@@ -185,7 +185,7 @@ describe BPM::Package, "validation errors" do
 
   def write_package
     path    = home("package.json")
-    package = JSON.parse(File.read(fixtures("package.json")))
+    package = JSON.parse(File.read(fixtures("core-test","package.json")))
     yield package
     File.open(path, "w") do |file|
       file.write package.to_json

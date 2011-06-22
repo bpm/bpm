@@ -11,7 +11,6 @@ describe "bpm build when logged in" do
 
   it "builds a bpm from a given package.json" do
     FileUtils.cp_r fixtures("core-test"), "."
-    FileUtils.cp fixtures("package.json"), "core-test"
     cd "core-test"
     bpm "build"
 
