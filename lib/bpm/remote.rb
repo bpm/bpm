@@ -70,6 +70,12 @@ module BPM
       fetcher = LibGems::SpecFetcher.fetcher
       fetcher.find_matching(dependency_for(packages), all, false, prerelease).map(&:first)
     end
+    
+    def find_package(package_name, package_version, prerelease)
+      fetcher = LibGems::SpecFetcher.fetcher
+      dep = LibGems::Dependency.new(package_name, package_version)
+      fetcher.find_matching(dep, true, false, prerelease).map(&:first)
+    end
 
     def install(package, version, prerelease)
       inst = LibGems::DependencyInstaller.new(:prerelease => prerelease)

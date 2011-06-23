@@ -24,7 +24,7 @@ RSpec::Matchers.define :have_error do |error|
       package.errors.first.include?(error) == true
   end
 end
-
+    
 # Make sure matchers can get to the path helpers
 class RSpec::Matchers::Matcher
   include SpecHelpers

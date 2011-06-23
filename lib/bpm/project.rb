@@ -45,25 +45,43 @@ module BPM
     def dirty!
       @has_changes = true
     end
+    
+    def add_dependency(package_name, package_version, prerelease=false, verbose=false) 
 
-    def add_dependency(package_name, package_version)
+      # select the best version
+      if File.exists? File.join(@root_path, 'packages', package_name)
+        # TODO: get package version
+      else
+        index = BPM::Remote.new.find_package(package_name, package_version, prerelease)
+        package_version = index && index.size>0 ? index.first[1].to_s : nil 
+      end
+
+      return nil unless package_version # not found
+      
       if dependencies[package_name] != package_version
         dependencies[package_name] = package_version
         dirty!
-      else
-        false
+        package_version
       end
+      
     end
-
-    def remove_dependency(package_name)
+    
+    def remove_dependency(package_name, verbose=false)
       if dependencies[package_name]
         dependencies.delete(package_name)
         dirty!
-      else
-        false
+        package_version
       end
     end
 
+    def save!
+      return unless dirty?
+      @had_changes = false
+      File.open @json_path, 'w+' do |fd|
+        fd.write as_json.to_json
+      end
+    end
+    
     def fetch_dependencies(verbose=false)
       core_fetch_dependencies(dependencies, :runtime, verbose)
     end
@@ -94,27 +112,30 @@ module BPM
     end
 
     def core_fetch_dependencies(deps, kind, verbose)
+      ret = true
+      deps.each do |pkg_name, pkg_version|
+        ret &&= core_fetch_dependency pkg_name, pkg_version, kind, verbose
+      end
+      ret
+    end 
+  
+    def core_fetch_dependency(package_name, package_version, kind, verbose)
       success = true
-
-      deps.each do |package_name, package_version|
-
-        dep = LibGems::Dependency.new(package_name, ">= #{package_version}", kind)
-        installed = LibGems.source_index.search(dep)
-
-        if installed.empty?
-          puts "Fetching #{package_name} (#{package_version}) from remote" if verbose
-
-          installed = BPM::Remote.new.install(package_name, package_version, false)
-          installed = installed.find { |i| i.name == package_name }
-          if (installed)
-            puts "Fetched #{installed.name} (#{installed.version}) from remote" if verbose
-          else
-            add_error("Unable to find #{package_name} #{package_version} to fetch")
-            success = false
-          end
+      dep = LibGems::Dependency.new(package_name, package_version, kind)
+      installed = LibGems.source_index.search(dep)
+      
+      if installed.empty?
+        puts "Fetching #{package_name} (#{package_version}) from remote" if verbose
+        
+        installed = BPM::Remote.new.install(package_name, package_version, false)
+        installed = installed.find { |i| i.name == package_name }
+        if (installed)
+          puts "Fetched #{installed.name} (#{installed.version}) from remote" if verbose
+        else
+          add_error("Unable to find #{package_name} #{package_version} to fetch")
+          success = false
         end
       end
-
       success
     end
 

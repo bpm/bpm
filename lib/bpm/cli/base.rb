@@ -55,23 +55,51 @@ module BPM
         print_specs(packages, index)
       end
 
-      # TODO: Options for versions and prerelease
       desc "add [PACKAGE]", "Add package to project"
-      def add(name)
-        dep = LibGems::Dependency.new(name, LibGems::Requirement.default)
-        installed = LibGems.source_index.search(dep)
-        package = if installed.empty?
-          say "Installing from remote"
-          installed = BPM::Remote.new.install(name, '>= 0', false)
-          installed.find{|i| i.name == name }
-        else
-          installed.inject{|newest,current| newest.version > current.version ? newest : current }
+      method_option :version,    :type => :string,  :default => ">= 0", :aliases => ['-v'],    :desc => 'Specify a version to install'
+      method_option :prpkect,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
+      def add(*package_names)
+        
+        if package_names.size.zero?
+          abort "You must specify at least one package"
         end
-        if package
-          say "Added #{package.name} (#{package.version})"
-        else
-          say "Unable to find package to add"
+
+        package_version = options[:version]
+        if package_names.size>1 && package_version != '>= 0'
+          abort "You can only name one package with the version option"
         end
+        
+        if options[:project]
+          project_path = File.expand_path options[:project]
+          if BPM::Project.is_project_root? project_path
+            abort "#{project_path} does not appear to be managed by bpm"
+          else
+            project = BPM::Project.new project_path
+          end
+        else
+          project = BPM::Project.nearest_project Dir.pwd
+          if project.nil?
+            abort "You do not appear to be inside of a bpm project"
+          end
+        end
+
+        verbose = options[:verbose]
+        prerelease = options[:prerelease]
+
+        package_names.each do |package_name|
+          added_version = project.add_dependency(package_name, package_version, prerelease, verbose)
+          if added_version
+            say "Added #{package_name} (#{added_version})"
+          else
+            $stderr.write "Can't find package #{package_name} (#{package_version})"
+          end
+          
+        end
+        
+        project.save!
+        project.fetch_dependencies          
+        
       end
 
       desc "login", "Log in with your BPM credentials"
