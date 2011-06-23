@@ -109,7 +109,7 @@ module BPM
     def read
       @attributes = JSON.parse(File.read(@json_path))
     rescue *[JSON::ParserError, Errno::EACCES, Errno::ENOENT] => ex
-      add_error "There was a problem parsing package.json: #{ex.message}"
+      add_error "There was a problem parsing #{File.basename(@json_path)}: #{ex.message}"
     end
 
     def validate_paths
