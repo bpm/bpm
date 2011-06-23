@@ -48,8 +48,8 @@ module BPM
       end
       
 
-      desc "installed [PACKAGE]", "Shows what bpm packages are installed"
-      def installed(*packages)
+      desc "fetched [PACKAGE]", "Shows what bpm packages are fetched"
+      def fetched(*packages)
         local = BPM::Local.new
         index = local.installed(packages)
         print_specs(packages, index)

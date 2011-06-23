@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "bpm installed" do
+describe "bpm fetched" do
   before do
     goto_home
     set_host
@@ -10,10 +10,10 @@ describe "bpm installed" do
     start_fake(FakeGemServer.new)
   end
 
-  it "lists installed packages" do
-    bpm "install", "rake"
+  it "lists fetched packages" do
+    bpm "fetch", "rake"
     wait
-    bpm "installed"
+    bpm "fetched"
 
     output = stdout.read
     output.should include("rake (0.8.7)")
@@ -24,22 +24,22 @@ describe "bpm installed" do
   end
 
   it "lists all installed packages from different versions" do
-    bpm "install", "rake"
+    bpm "fetch", "rake"
     wait
-    bpm "install", "rake", "-v", "0.8.6"
+    bpm "fetch", "rake", "-v", "0.8.6"
     wait
-    bpm "installed"
+    bpm "fetched"
 
     output = stdout.read
     output.should include("rake (0.8.7, 0.8.6)")
   end
 
   it "filters packages when given an argument" do
-    bpm "install", "rake"
+    bpm "fetch", "rake"
     wait
-    bpm "install", "builder"
+    bpm "fetch", "builder"
     wait
-    bpm "installed", "builder"
+    bpm "fetched", "builder"
 
     output = stdout.read
     output.should_not include("rake")
@@ -47,7 +47,7 @@ describe "bpm installed" do
   end
 
   it "says it couldn't find any if none found" do
-    bpm "installed", "rails", :track_stderr => true
+    bpm "fetched", "rails", :track_stderr => true
 
     stderr.read.strip.should == 'No packages found matching "rails".'
     exit_status.should_not be_success
