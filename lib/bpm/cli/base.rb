@@ -195,7 +195,7 @@ module BPM
       desc "compile [PATH]", "Build the bpm_package for development"
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
       def compile(path=nil)
-        project = Project.nearest_project self, (path || Dir.pwd)
+        project = Project.nearest_project(path || Dir.pwd)
         if project.nil?
           if path.nil?
             abort "You do not appear to be in a valid bpm project.  Maybe you are in the wrong working directory?"

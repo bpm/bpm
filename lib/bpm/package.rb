@@ -89,6 +89,34 @@ module BPM
       read && parse
     end
 
+    # TODO: Make better errors
+    # TODO: This might not work well with conflicting versions
+    def local_deps(search_path=nil)
+      search_path ||= File.join(root_path, "packages")
+
+      dependencies.inject([]) do |list, (name, version)|
+        package = Package.new(File.join(search_path, name))
+        requirement = LibGems::Requirement.new(version)
+        if package.has_json?
+          package.load_json
+        else
+          raise "Can't find package #{name} required in #{self.name}"
+        end
+        unless requirement.satisfied_by?(LibGems::Version.new(package.version))
+          raise "#{name} (#{package.version}) doesn't match #{version} required in #{self.name}"
+        end
+        (package.local_deps(search_path) << package).each do |dep|
+          list << dep unless list.any?{|d| d.name == dep.name }
+        end
+        list
+      end
+    end
+
+    def compile(mode=:production, verbose=false)
+      deps = local_deps
+      puts deps.map(&:name).join("\n")
+    end
+
     private
 
     def directory_files
