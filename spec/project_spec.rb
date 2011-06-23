@@ -3,18 +3,18 @@ require "spec_helper"
 describe BPM::Project, "project_file_path" do
 
   it "should return both project file paths" do
-    path = File.expand_path('../fixtures/hello_world', __FILE__)
+    path = fixtures('hello_world')
     expected = File.join(path, 'hello_world.json')
     BPM::Project.project_file_path(path).should == expected
   end
 
   it "should return [] on a package" do
-    path = File.expand_path('../fixtures/core-test', __FILE__)
+    path = fixtures('core-test')
     BPM::Project.project_file_path(path).should == nil
   end
 
   it "should return [] on a project with no file" do
-    path = File.expand_path('../fixtures/simple_hello', __FILE__)
+    path = fixtures('simple_hello')
     BPM::Project.project_file_path(path).should == nil
   end
 
@@ -23,18 +23,15 @@ end
 describe BPM::Project, "is_project_root?" do
 
   it "should return true for a project path" do
-    path = File.expand_path('../fixtures/hello_world', __FILE__)
-    BPM::Project.is_project_root?(path).should == true
+    BPM::Project.is_project_root?(fixtures('hello_world')).should == true
   end
 
   it "should return false for a package" do
-    path = File.expand_path('../fixtures/core-test', __FILE__)
-    BPM::Project.is_project_root?(path).should == false
+    BPM::Project.is_project_root?(fixtures('core-test')).should == false
   end
   
   it "should return true for a project with no project file" do
-    path = File.expand_path('../fixtures/simple_hello', __FILE__)
-    BPM::Project.is_project_root?(path).should == true
+    BPM::Project.is_project_root?(fixtures('simple_hello')).should == true
   end
 
 end
@@ -43,61 +40,88 @@ describe BPM::Project, "nearest_project" do
 
   describe "standard project" do
     subject do
-      File.expand_path('../fixtures/hello_world', __FILE__)
+      fixtures('hello_world').to_s # string not Pathname
     end
     
     it "should return project instance for project path" do
-      BPM::Project.nearest_project(nil, subject).path.should == subject
+      BPM::Project.nearest_project(subject).root_path.should == subject
     end
 
     it "should return project instance for path inside of project" do
       path = File.join subject, 'lib'
-      BPM::Project.nearest_project(nil, path).path.should == subject
+      BPM::Project.nearest_project(path).root_path.should == subject
     end
   end
 
   describe "simple project" do
     subject do
-      File.expand_path('../fixtures/simple_hello', __FILE__)
+      fixtures('simple_hello').to_s # string not Pathname
     end
     
     it "should return project instance for project path" do
-      BPM::Project.nearest_project(nil, subject).path.should == subject
+      BPM::Project.nearest_project(subject).root_path.should == subject
     end
 
     it "should return project instance for path inside of project" do
       path = File.join subject, 'lib'
-      BPM::Project.nearest_project(nil, path).path.should == subject
+      BPM::Project.nearest_project(path).root_path.should == subject
     end
   end
 
   it "should return nil for a package" do
-    path = File.expand_path('../fixtures/core-test', __FILE__)
-    BPM::Project.nearest_project(nil,path).should == nil
+    BPM::Project.nearest_project(fixtures('core-test')).should == nil
   end
   
 end
 
-describe BPM::Project, "#project_config" do
+describe BPM::Project, "project metadata" do
 
   describe "standard project" do
     subject do
-      BPM::Project.new nil, File.expand_path('../fixtures/hello_world', __FILE__)
+      BPM::Project.new fixtures('hello_world')
     end
 
-    it "should return project config" do
-      subject.project_config["name"].should == 'hello_world'
+    it "should be valid" do
+      subject.valid?.should == true
+    end
+    
+    it "should get project name" do
+      subject.name.should == "hello_world"
+    end
+    
+    it "should get a project version" do
+      subject.version.should == "2.0.0"
+    end
+    
+    it "should get dependencies" do
+      subject.dependencies.should == {
+        "spade" => "0.5.0"
+      }
     end
     
   end
 
   describe "simple project" do
     subject do
-      BPM::Project.new nil, File.expand_path('../fixtures/simple_hello', __FILE__)
+      BPM::Project.new fixtures('simple_hello')
     end
 
-    it "should return project config" do
-      subject.project_config["name"].should == "simple_hello"
+    it "should be valid" do
+      subject.valid?.should == true
+    end
+    
+    it "should get project name" do
+      subject.name.should == "simple_hello"
+    end
+
+    
+    it "should get a default version" do
+      subject.version.should == "0.0.1"
+    end
+    
+    it "should get dependencies read from bpm_packages.js file" do
+      subject.dependencies.should == {
+      }
     end
     
   end
