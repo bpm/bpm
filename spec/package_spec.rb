@@ -122,7 +122,7 @@ describe BPM::Package, "converting" do
 
   subject do
     package = BPM::Package.new
-    package.bpm = fixtures("core-test-0.4.9.spd")
+    package.bpkg = fixtures("core-test-0.4.9.spd")
     package.as_json
   end
 

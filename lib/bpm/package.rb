@@ -4,7 +4,7 @@ module BPM
   class Package
     EXT      = "spd"
     METADATA = %w[keywords licenses engines main bin directories]
-    FIELDS   = %w[name version description author homepage summary]
+    FIELDS   = %w[name version description author homepage summary bpm]
     attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories, :dependencies, :root_path
     attr_accessor *FIELDS
 
@@ -12,10 +12,16 @@ module BPM
       @root_path = root_path || Dir.pwd
       @json_path = File.join @root_path, 'package.json'
       @email     = email
+      @attributes = {}
       @directories = {}
+      @metadata = {}
     end
 
-    def bpm=(path)
+    def bpm
+      @bpm || BPM::VERSION
+    end
+
+    def bpkg=(path)
       format = LibGems::Format.from_file_by_path(path)
       fill_from_gemspec(format.spec)
     end
@@ -49,6 +55,10 @@ module BPM
       FIELDS.each{|key| json[key] = send(key)}
       json["dependencies"] = self.dependencies
       json
+    end
+
+    def to_json
+      as_json.to_json
     end
 
     def to_full_name
