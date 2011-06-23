@@ -78,7 +78,15 @@ module BPM
     end
 
     def valid?
-      read && parse && validate
+      load_json && validate
+    end
+
+    def has_json?
+      File.exist?(json_path)
+    end
+
+    def load_json
+      read && parse
     end
 
     private

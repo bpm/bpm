@@ -35,7 +35,7 @@ module BPM
     def initialize(root_path)
       super root_path
       @json_path = File.join root_path, "#{File.basename(root_path)}.json"
-      read && parse && validate
+      load_json && validate
     end
 
     def dirty?
