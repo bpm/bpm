@@ -20,7 +20,6 @@ module BPM
     end
 
     def self.nearest_project(path)
-
       path = File.expand_path path
 
       last = nil

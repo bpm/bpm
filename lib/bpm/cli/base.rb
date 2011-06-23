@@ -186,7 +186,7 @@ module BPM
 
       desc "init [PATHS]", "Configure a project to use bpm for management"
       def init(*paths)
-        paths = [Dir.pwd] if paths.size.zero?
+        paths = [Dir.pwd] if paths.empty?
         paths.each do |path|
           InitGenerator.new(self, path, path).run
         end
