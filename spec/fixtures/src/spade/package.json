@@ -1,0 +1,15 @@
+{
+  "name": "spade",
+  "version": "0.5.0",
+  "description": "spade browser runtime",
+  "summary": "spade summary",
+  "homepage": "http://github.com/strobecorp/spade",
+  "author": "Charles Jolley",
+  "keywords": ["CommonJS", "runtime", "transport"],
+
+  "dependencies": {},
+  
+  "directories": {
+    "lib": "lib"
+  }
+}
