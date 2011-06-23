@@ -110,6 +110,7 @@ module BPM
       end
     end
 
+    # TODO: Should this be in package?
     def core_fetch_dependencies(deps, kind, verbose)
       ret = true
       deps.each do |pkg_name, pkg_version|
@@ -120,21 +121,26 @@ module BPM
   
     def core_fetch_dependency(package_name, package_version, kind, verbose)
       success = true
-      dep = LibGems::Dependency.new(package_name, package_version, kind)
-      installed = LibGems.source_index.search(dep)
-      
-      if installed.empty?
-        puts "Fetching #{package_name} (#{package_version}) from remote" if verbose
-        
-        installed = BPM::Remote.new.install(package_name, package_version, false)
-        installed = installed.find { |i| i.name == package_name }
-        if (installed)
-          puts "Fetched #{installed.name} (#{installed.version}) from remote" if verbose
-        else
-          add_error("Unable to find #{package_name} #{package_version} to fetch")
-          success = false
+
+      deps.each do |package_name, package_version|
+
+        dep = LibGems::Dependency.new(package_name, package_version, kind)
+        installed = LibGems.source_index.search(dep)
+
+        if installed.empty?
+          puts "Fetching #{package_name} (#{package_version}) from remote" if verbose
+
+          installed = BPM::Remote.new.install(package_name, package_version, false)
+          installed = installed.find { |i| i.name == package_name }
+          if (installed)
+            puts "Fetched #{installed.name} (#{installed.version}) from remote" if verbose
+          else
+            add_error("Unable to find #{package_name} #{package_version} to fetch")
+            success = false
+          end
         end
       end
+
       success
     end
 
