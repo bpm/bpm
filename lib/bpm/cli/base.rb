@@ -26,7 +26,7 @@ module BPM
           else
             say "Fetched dependent packages for #{project.name}"
           end
-          
+
         else
           report_arity_error("fetch") and return if packages.size.zero?
 
@@ -46,7 +46,7 @@ module BPM
           end
         end
       end
-      
+
 
       desc "fetched [PACKAGE]", "Shows what bpm packages are fetched"
       def fetched(*packages)
@@ -80,7 +80,7 @@ module BPM
       def login
         email = options[:username]
         password = options[:password]
-        
+
         unless email && password
           highline = HighLine.new
           say "Enter your BPM credentials."
@@ -94,7 +94,7 @@ module BPM
             password ||= highline.ask "\nPassword:" do |q|
               next unless STDIN.tty?
               q.echo = "*"
-            end 
+            end
           rescue Interrupt => ex
             abort "Cancelled login."
           end
@@ -163,7 +163,7 @@ module BPM
           InitGenerator.new(self, path, path).run
         end
       end
-      
+
       desc "compile [PATH]", "Build the bpm_package for development"
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
       def compile(path=nil)
@@ -184,7 +184,7 @@ module BPM
       def build
         local = BPM::Local.new
         package = local.pack("package.json", options[:email])
-        
+
         if package.errors.empty?
           puts "Successfully built package: #{package.to_ext}"
         else
