@@ -8,15 +8,19 @@ module BPM::CLI
     def name
       File.basename destination_root
     end
-    
+
     def bpm_version
       BPM::VERSION
     end
-    
+
     def run
       FileUtils.cd(destination_root)
 
-      template "project.json", "#{name}.json"
+      if File.exist?("package.json")
+        convert_package(destination_root)
+      else
+        template "project.json", "#{name}.json"
+      end
 
       empty_directory "static"
 
@@ -25,6 +29,17 @@ module BPM::CLI
         template "bpm_styles.css"
       end
     end
+
+    private
+
+      def convert_package(destination_root)
+        package = BPM::Package.new(destination_root)
+        package.load_json
+        File.open("#{name}.json", "w") do |f|
+          f.write JSON.pretty_generate(package.as_json)
+        end
+        puts "created #{name}.json from package.json"
+      end
 
   end
 end
