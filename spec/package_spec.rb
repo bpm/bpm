@@ -1,5 +1,15 @@
 require "spec_helper"
 
+describe BPM::Package do
+  it "should have 'lib' as default lib_path'" do
+    subject.send(:lib_path).should == 'lib'
+  end
+
+  it "should have 'tests' as default tests_path'" do
+    subject.send(:tests_path).should == 'tests'
+  end
+end
+
 describe BPM::Package, "#to_spec" do
   let(:email) { "user@example.com" }
 

@@ -12,6 +12,7 @@ module BPM
       @root_path = root_path || Dir.pwd
       @json_path = File.join @root_path, 'package.json'
       @email     = email
+      @directories = {}
     end
 
     def bpm=(path)
@@ -31,7 +32,7 @@ module BPM
         spec.description       = description
         spec.requirements      = [metadata.to_json]
         spec.files             = directory_files + ["package.json"]
-        spec.test_files        = glob_files(tests_path) if tests_path
+        spec.test_files        = glob_files(tests_path)
         spec.bindir            = bin_path
         spec.executables       = bin_files.map{|p| File.basename(p) } if bin_path
         # TODO: IS this right?
@@ -93,7 +94,7 @@ module BPM
     end
 
     def tests_path
-      @directories["tests"]
+      @directories["tests"] || "tests"
     end
 
     def parse
