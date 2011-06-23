@@ -14,27 +14,39 @@ module BPM
       desc "owner", "Manage users for a package"
       subcommand "owner", BPM::CLI::Owner
 
-      desc "install [PACKAGE]", "Installs one or many bpm packages"
+      desc "fetch [PACKAGE]", "Fetch one or many bpm packages to local cache"
       method_option :version,    :type => :string,  :default => ">= 0", :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
-      def install(*packages)
-        report_arity_error("install") and return if packages.size.zero?
-
-        begin
-          packages.each do |package|
-            installed = BPM::Remote.new.install(package, options[:version], options[:prerelease])
-            installed.each do |spec|
-              say "Successfully installed #{spec.full_name}"
-            end
+      def fetch(*packages)
+        project = BPM::Project.nearest_project(Dir.pwd) if packages.size==0
+        if project
+          success = project.fetch_dependencies options[:verbose]
+          if !success
+            abort project.errors * "\n"
+          else
+            say "Fetched dependent packages for #{project.name}"
           end
-        rescue LibGems::InstallError => e
-          abort "Install error: #{e}"
-        rescue LibGems::GemNotFoundException => e
-          abort "Can't find package #{e.name} #{e.version} available for install"
-        rescue Errno::EACCES, LibGems::FilePermissionError => e
-          abort e.message
+          
+        else
+          report_arity_error("fetch") and return if packages.size.zero?
+
+          begin
+            packages.each do |package|
+              installed = BPM::Remote.new.install(package, options[:version], options[:prerelease])
+              installed.each do |spec|
+                say "Successfully fetched #{spec.name} (#{spec.version})"
+              end
+            end
+          rescue LibGems::InstallError => e
+            abort "Fetch error: #{e}"
+          rescue LibGems::GemNotFoundException => e
+            abort "Can't find package #{e.name} #{e.version} available for fetch"
+          rescue Errno::EACCES, LibGems::FilePermissionError => e
+            abort e.message
+          end
         end
       end
+      
 
       desc "installed [PACKAGE]", "Shows what bpm packages are installed"
       def installed(*packages)
