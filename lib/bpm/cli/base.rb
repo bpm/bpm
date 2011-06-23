@@ -75,22 +75,29 @@ module BPM
       end
 
       desc "login", "Log in with your BPM credentials"
+      method_option :username,  :type => :string,  :default => nil, :aliases => ['-u'], :desc => 'Specify the username to login as'
+      method_option :password,  :type => :string,  :default => nil, :aliases => ['-p'], :desc => 'Specify the login password'
       def login
-        highline = HighLine.new
-        say "Enter your BPM credentials."
+        email = options[:username]
+        password = options[:password]
+        
+        unless email && password
+          highline = HighLine.new
+          say "Enter your BPM credentials."
 
-        begin
-          email = highline.ask "\nEmail:" do |q|
-            next unless STDIN.tty?
-            q.readline = true
-          end
+          begin
+            email ||= highline.ask "\nEmail:" do |q|
+              next unless STDIN.tty?
+              q.readline = true
+            end
 
-          password = highline.ask "\nPassword:" do |q|
-            next unless STDIN.tty?
-            q.echo = "*"
+            password ||= highline.ask "\nPassword:" do |q|
+              next unless STDIN.tty?
+              q.echo = "*"
+            end 
+          rescue Interrupt => ex
+            abort "Cancelled login."
           end
-        rescue Interrupt => ex
-          abort "Cancelled login."
         end
 
         say "\nLogging in as #{email}..."
@@ -99,7 +106,7 @@ module BPM
           say "Logged in!"
         else
           say "Incorrect email or password."
-          login
+          login unless options[:username] && options[:password]
         end
       end
 

@@ -72,4 +72,39 @@ describe "bpm login" do
     YAML.load_file(creds)[:bpm_api_key].should == api_key
     YAML.load_file(creds)[:bpm_email].should == email
   end
+
+  it "will login with credentials provided as cli arguments" do
+    bpm "login", "-u", email, "-p", password
+    output = stdout.read
+    output.should_not include("Enter your BPM credentials.")
+    output.should include("Logging in as #{email}...")
+  end
+  
+  it "will not retry on failure if username and password are provided as cli arguments" do
+    bpm "login", "-u", email, "-p", "badpassword"
+    output = stdout.read
+    output.should_not include("Enter your BPM credentials.")
+    output.should include("Logging in as #{email}...")
+    output.should include("Incorrect email or password.")
+  end
+  
+  it "will only prompt for username if password is provided" do
+    bpm "login", "-p", password
+    input email
+    output = stdout.read
+    output.should include("Enter your BPM credentials.")
+    output.should include("Email:")
+    output.should_not include("Password:")
+    output.should include("Logging in as #{email}...")
+  end
+  
+  it "will only prompt for password if username is provided" do
+    bpm "login", "-u", email
+    input password
+    output = stdout.read
+    output.should include("Enter your BPM credentials.")
+    output.should_not include("Email:")
+    output.should include("Password:")
+    output.should include("Logging in as #{email}...")
+  end
 end
