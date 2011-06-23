@@ -55,20 +55,6 @@ module BPM
         print_specs(packages, index)
       end
 
-      desc "uninstall [PACKAGE]", "Uninstalls one or many packages"
-      def uninstall(*packages)
-        local = BPM::Local.new
-        if packages.size > 0
-          packages.each do |package|
-            if !local.uninstall(package)
-              abort %{No packages installed named "#{package}"}
-            end
-          end
-        else
-          report_arity_error('uninstall')
-        end
-      end
-
       # TODO: Options for versions and prerelease
       desc "add [PACKAGE]", "Add package to project"
       def add(name)
