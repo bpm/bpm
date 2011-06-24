@@ -112,8 +112,10 @@ module BPM
       end
     end
 
-    def compile(mode=:production, project_path=root_path, verbose=false)
+    def compile(mode=:production, project_path=nil, verbose=false)
       puts "Compiling #{name}" if verbose
+
+      project_path ||= root_path
 
       require 'spade'
       out = []

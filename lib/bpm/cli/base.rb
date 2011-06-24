@@ -195,8 +195,15 @@ module BPM
             abort "No bpm project could be found at #{File.expand_path path}"
           end
         else
+          out = project.compile_dependencies(options[:mode], options[:verbose])
+          path = File.join(project.root_path, 'static', 'bpm_packages.js')
+          File.open(path, 'w'){|f| f.puts out }
+          puts "Wrote dependencies to #{path}"
+
           out = project.compile(options[:mode], nil, options[:verbose])
-          puts out.join("\n\n")
+          path = File.join(project.root_path, 'static', 'bpm_app.js')
+          File.open(path, 'w'){|f| f.puts out }
+          puts "Wrote project to #{path}"
         end
       end
 
