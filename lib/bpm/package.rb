@@ -112,9 +112,31 @@ module BPM
       end
     end
 
-    def compile(mode=:production, verbose=false)
-      deps = local_deps
-      puts deps.map(&:name).join("\n")
+    def compile(mode=:production, project_path=root_path, verbose=false)
+      puts "Compiling #{name}" if verbose
+
+      require 'spade'
+      out = []
+      Spade::MainContext.new(:rootdir => project_path) do |ctx|
+        packages_path = File.join(project_path, "packages")
+        (local_deps(packages_path) << self).each do |pkg|
+          ctx.eval("spade.register(\"#{pkg.name}\", #{File.read(pkg.json_path)});");
+        end
+
+        paths = [*lib_path].map{|p| File.join(root_path, p) }
+        ids = paths.map do |p|
+          p += '/' if p[-1] != '/'
+          glob_files(p).map do |f|
+            f.sub(p, '').sub(/\.[^\.]+$/,'')
+          end
+        end.flatten
+        ids.each do |id|
+          puts "    #{name}/#{id}" if verbose
+          out << ctx.eval("spade.compile(\"#{name}/#{id}\", \"#{name}\");")
+        end
+      end
+
+      out.compact
     end
 
     private
@@ -216,6 +238,7 @@ module BPM
 
       self.metadata = JSON.parse(spec.requirements.first)
     end
+
   end
 end
 

@@ -203,7 +203,8 @@ module BPM
             abort "No bpm project could be found at #{File.expand_path path}"
           end
         else
-          project.compile(options[:mode], options[:verbose])
+          out = project.compile(options[:mode], nil, options[:verbose])
+          puts out.join("\n\n")
         end
       end
 

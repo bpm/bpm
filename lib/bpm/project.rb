@@ -85,6 +85,11 @@ module BPM
       core_fetch_dependencies(dependencies, :runtime, verbose)
     end
 
+    def compile(mode=:production, project_path=nil, verbose=false)
+      project_path ||= root_path
+      out = local_deps.map{|d| d.compile(mode, project_path, verbose) }.flatten
+      out << super(mode, project_path, verbose) # compile self
+    end
 
   private
 
