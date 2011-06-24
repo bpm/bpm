@@ -80,19 +80,7 @@ module BPM
         end
 
         # find project
-        if options[:project]
-          project_path = File.expand_path options[:project]
-          if BPM::Project.is_project_root? project_path
-            abort "#{project_path} does not appear to be managed by bpm"
-          else
-            project = BPM::Project.new project_path
-          end
-        else
-          project = BPM::Project.nearest_project Dir.pwd
-          if project.nil?
-            abort "You do not appear to be inside of a bpm project"
-          end
-        end
+        project = find_project
 
         begin
           project.add_dependencies deps, options[:verbose]
@@ -101,6 +89,11 @@ module BPM
         end
       end
 
+      desc "update", "Updates installed packages to match your project.json"
+      def update
+        find_project.update options[:verbose]
+      end
+      
       desc "login", "Log in with your BPM credentials"
       method_option :username,  :type => :string,  :default => nil, :aliases => ['-u'], :desc => 'Specify the username to login as'
       method_option :password,  :type => :string,  :default => nil, :aliases => ['-p'], :desc => 'Specify the login password'
@@ -246,6 +239,24 @@ module BPM
           self.class.handle_argument_error(self.class.tasks[name], nil)
         end
 
+        def find_project
+          if options[:project]
+            project_path = File.expand_path options[:project]
+            if BPM::Project.is_project_root? project_path
+              abort "#{project_path} does not appear to be managed by bpm"
+            else
+              project = BPM::Project.new project_path
+            end
+          else
+            project = BPM::Project.nearest_project Dir.pwd
+            if project.nil?
+              abort "You do not appear to be inside of a bpm project"
+            end
+          end
+          
+          project
+        end
+        
         def print_specs(names, index)
           packages = {}
 

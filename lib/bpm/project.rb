@@ -45,7 +45,6 @@ module BPM
       puts "Fetch missing packages..." if verbose
       core_fetch_dependencies hard_deps, :runtime, verbose
 
-      puts "Installing and verifying packages..." if verbose
       verified_deps = install_and_verify_packages hard_deps, verbose
 
       # the dependencies saved in the project file be the actual 
@@ -59,6 +58,11 @@ module BPM
       save!
     end
 
+    def update(verbose=false)
+      core_fetch_dependencies dependencies, :runtime, verbose
+      install_and_verify_packages dependencies, verbose
+    end
+    
     def save!
       @had_changes = false
       File.open @json_path, 'w+' do |fd|
@@ -133,6 +137,8 @@ module BPM
     end
 
     def install_and_verify_packages(deps, verbose)
+      puts "Installing and verifying packages..." if verbose
+
       todo = []
       seen = []
       verified  = {}
