@@ -1,0 +1,15 @@
+{
+  "name": "jquery",
+  "version": "1.4.3",
+  "description": "jquery",
+  "summary": "jquery",
+  "homepage": "http://jquery.com",
+  "author": "John Resig",
+  "keywords": ["CommonJS", "runtime", "transport"],
+
+  "dependencies": {},
+  
+  "directories": {
+    "lib": "lib"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "coffee",
+  "version": "1.0.1.pre",
+  "description": "coffee desc",
+  "summary": "coffee summary",
+  "homepage": "http://coffee.com",
+  "author": "Coffee Guy",
+  "keywords": ["CommonJS", "runtime", "transport"],
+
+  "dependencies": {
+    "jquery": "1.4.3"
+  },
+  
+  "directories": {
+    "lib": "lib",
+    "bin": "bin",
+    "test": "qunit"
+  }
+}

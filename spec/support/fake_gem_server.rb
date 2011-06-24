@@ -22,7 +22,8 @@ class FakeGemServer
       [200, {"Content-Type" => "application/octet-stream"}, compress(latest_index)]
     elsif request.path =~ /prerelease_specs/
       prerelease_index = [
-        index("bundler",  "1.1.pre")
+        index("bundler",  "1.1.pre"),
+        index("coffee",  "1.0.1.pre")
       ]
       [200, {"Content-Type" => "application/octet-stream"}, compress(prerelease_index)]
     elsif request.path =~ /specs/
