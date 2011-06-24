@@ -35,7 +35,20 @@ module BPM
         [spec.name, spec.version, spec.original_platform]
       end
     end
+    
+    def preferred_version(package, vers, prerelease)
+      dep = LibGems::Dependency.new package, vers
+      specs = LibGems.source_index.search dep
+      specs.last.version.to_s
+    end
 
+    def source_root(package, vers, prerelease)
+      dep = LibGems::Dependency.new package, vers
+      specs = LibGems.source_index.search dep
+      spec = specs.last
+      File.join spec.installation_path, 'gems', "#{spec.name}-#{spec.version}" 
+    end
+    
     private
 
     def silence

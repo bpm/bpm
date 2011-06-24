@@ -37,44 +37,29 @@ module BPM
       load_json && validate
     end
 
-    def dirty?
-      @has_changes || false
-    end
+    def add_dependencies(new_deps, verbose=false)
 
-    def dirty!
-      @has_changes = true
-    end
-    
-    def add_dependency(package_name, package_version, prerelease=false, verbose=false) 
+      hard_deps = dependencies.dup
+      new_deps.each { |pkg_name, pkg_vers| hard_deps[pkg_name] = pkg_vers }
 
-      # select the best version
-      if File.exists? File.join(@root_path, 'packages', package_name)
-        # TODO: get package version
-      else
-        index = BPM::Remote.new.find_package(package_name, package_version, prerelease)
-        package_version = index && index.size>0 ? index.first[1].to_s : nil 
-      end
+      puts "Fetch missing packages..." if verbose
+      core_fetch_dependencies hard_deps, :runtime, verbose
 
-      return nil unless package_version # not found
-      
-      if dependencies[package_name] != package_version
-        dependencies[package_name] = package_version
-        dirty!
-        package_version
+      puts "Installing and verifying packages..." if verbose
+      verified_deps = install_and_verify_packages hard_deps, verbose
+
+      # the dependencies saved in the project file be the actual 
+      # versions we installed. Replace the new deps verions passed in with
+      # the actual versions used.
+      new_deps.each do |package_name, _|
+        hard_deps[package_name] = verified_deps[package_name]
       end
       
-    end
-    
-    def remove_dependency(package_name, verbose=false)
-      if dependencies[package_name]
-        package_version = dependencies.delete(package_name)
-        dirty!
-        package_version
-      end
+      @dependencies = hard_deps
+      save!
     end
 
     def save!
-      return unless dirty?
       @had_changes = false
       File.open @json_path, 'w+' do |fd|
         fd.write as_json.to_json
@@ -115,33 +100,113 @@ module BPM
       end
     end
 
-    # TODO: Should this be in package?
+
+    # Fetch any dependencies into local cache for the passed set of deps
     def core_fetch_dependencies(deps, kind, verbose)
-      deps.inject(true) do |ret, (pkg_name, pkg_version)|
-        ret && core_fetch_dependency(pkg_name, pkg_version, kind, verbose)
+      deps.each do |pkg_name, pkg_version|
+        core_fetch_dependency pkg_name, pkg_version, kind, verbose
+      end
+    end 
+  
+    def core_fetch_dependency(package_name, vers, kind, verbose)
+      
+      prerelease = false
+      if vers == '>= 0-pre'
+        prerelease = true
+        vers = '>= 0'
+      else
+        prerelease = vers =~ /[a-zA-Z]/
+      end
+
+      dep = LibGems::Dependency.new(package_name, vers, kind)
+      cur_installed = LibGems.source_index.search(dep)
+      
+      installed = BPM::Remote.new.install(package_name, vers, prerelease)
+      installed.each do |i|
+        cur_installed.reject! { |ci| ci.name == i.name && ci.version == i.version }
+      end
+
+      installed = installed.find { |i| i.name == package_name }
+      if cur_installed.size>0
+        puts "Fetched #{installed.name} (#{installed.version}) from remote" 
       end
     end
 
-    def core_fetch_dependency(package_name, package_version, kind, verbose)
-      dep = LibGems::Dependency.new(package_name, package_version, kind)
-      installed = LibGems.source_index.search(dep)
+    def install_and_verify_packages(deps, verbose)
+      todo = []
+      seen = []
+      verified  = {}
+      
+      deps.each { |package_name, vers| todo << [package_name, vers] }
+      local = BPM::Local.new
 
-      if installed.empty?
-        puts "Fetching #{package_name} (#{package_version}) from remote" if verbose
+      while todo.size>0
+        package_name, vers = todo.shift
+        next if seen.include? package_name
+        seen << package_name
+        
+        dst_path = File.join @root_path, 'packages', package_name
 
-        installed = BPM::Remote.new.install(package_name, package_version, false)
-        installed = installed.find { |i| i.name == package_name }
-        if (installed)
-          puts "Fetched #{installed.name} (#{installed.version}) from remote" if verbose
+        if has_local_package? package_name 
+          puts "Skipping local package #{package_name}" if verbose
+          pkg = BPM::Package.new dst_path
+          
         else
-          add_error("Unable to find #{package_name} #{package_version} to fetch")
-          return false
-        end
-      end
 
-      true
+          # get the locally installs dep
+          if vers == '>= 0-pre'
+            prerel = true
+            vers   = '>= 0'
+          else
+            prerel = vers =~ /[a-zA-Z]/
+          end
+          
+          preferred_vers = local.preferred_version package_name, vers, prerel
+          
+          if File.exist?(dst_path)
+            pkg = BPM::Package.new dst_path
+            pkg.load_json
+            pkg = nil unless pkg.version == preferred_vers
+          else
+            pkg = nil
+          end
+
+          # copy pkg if needed
+          if pkg.nil?
+            FileUtils.rm_r dst_path if File.exists? dst_path
+            src_path = local.source_root package_name, preferred_vers, prerel
+            
+            FileUtils.mkdir_p File.dirname(dst_path)
+            FileUtils.cp_r src_path, dst_path
+            pkg = BPM::Package.new dst_path
+            pkg.load_json
+            puts "Added #{pkg.name} (#{pkg.version})" 
+            
+          else
+            puts "Skipping installed package #{package_name} (#{preferred_vers})" if verbose
+          end
+          
+        end
+
+        # add dependencies to list
+        if pkg.valid?
+          pkg.dependencies.each do |dep_name, dep_vers|
+            todo << [dep_name, dep_vers]
+          end
+        end
+
+        verified[pkg.name] = pkg.version
+      end
+      
+      verified
+        
     end
 
+    def has_local_package?(package_name)
+      false
+    end
+
+    
   end
 
 end

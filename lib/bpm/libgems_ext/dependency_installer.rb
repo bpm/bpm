@@ -42,7 +42,7 @@ module LibGems
 
       if spec_and_source.nil? then
         raise LibGems::GemNotFoundException.new(
-          "Could not find a valid spd '#{gem_name}' (#{version}) locally or in a repository",
+          "Could not find #{prerelease ? 'prerelease ' : ''}package '#{gem_name}' (#{version}) locally or in a repository",
           gem_name, version, @errors)
       end
 

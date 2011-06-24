@@ -3,7 +3,7 @@ require 'json'
 module BPM
   class Package
     EXT      = "spd"
-    METADATA = %w[keywords licenses engines main bin directories bpm]
+    METADATA = %w[keywords licenses engines main bin directories]
     FIELDS   = %w[name version description author homepage summary]
     attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories, :dependencies, :root_path
     attr_accessor *FIELDS
@@ -195,7 +195,9 @@ module BPM
         end
       end
 
-      unless tests_path.nil? || File.directory?(File.join(@root_path, tests_path))
+      # look for actual 'tests' in directories hash since simply having no
+      # tests dir is allowed as well.
+      unless @directories['tests'].nil? || File.directory?(File.join(@root_path, tests_path))
         add_error "'#{tests_path}', specified for tests directory, is not a directory"
         success = false
       end
@@ -236,7 +238,9 @@ module BPM
       self.dependencies = {}
       spec.dependencies.each{|d| self.dependencies[d.name] = d.requirement.to_s }
 
-      self.metadata = JSON.parse(spec.requirements.first)
+      if spec.requirements && spec.requirements.size>0
+        self.metadata = JSON.parse(spec.requirements.first)
+      end
     end
 
   end
