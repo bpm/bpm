@@ -67,7 +67,7 @@ module BPM
     
     def remove_dependency(package_name, verbose=false)
       if dependencies[package_name]
-        dependencies.delete(package_name)
+        package_version = dependencies.delete(package_name)
         dirty!
         package_version
       end
@@ -117,36 +117,29 @@ module BPM
 
     # TODO: Should this be in package?
     def core_fetch_dependencies(deps, kind, verbose)
-      ret = true
-      deps.each do |pkg_name, pkg_version|
-        ret &&= core_fetch_dependency pkg_name, pkg_version, kind, verbose
+      deps.inject(true) do |ret, (pkg_name, pkg_version)|
+        ret && core_fetch_dependency(pkg_name, pkg_version, kind, verbose)
       end
-      ret
-    end 
-  
+    end
+
     def core_fetch_dependency(package_name, package_version, kind, verbose)
-      success = true
+      dep = LibGems::Dependency.new(package_name, package_version, kind)
+      installed = LibGems.source_index.search(dep)
 
-      deps.each do |package_name, package_version|
+      if installed.empty?
+        puts "Fetching #{package_name} (#{package_version}) from remote" if verbose
 
-        dep = LibGems::Dependency.new(package_name, package_version, kind)
-        installed = LibGems.source_index.search(dep)
-
-        if installed.empty?
-          puts "Fetching #{package_name} (#{package_version}) from remote" if verbose
-
-          installed = BPM::Remote.new.install(package_name, package_version, false)
-          installed = installed.find { |i| i.name == package_name }
-          if (installed)
-            puts "Fetched #{installed.name} (#{installed.version}) from remote" if verbose
-          else
-            add_error("Unable to find #{package_name} #{package_version} to fetch")
-            success = false
-          end
+        installed = BPM::Remote.new.install(package_name, package_version, false)
+        installed = installed.find { |i| i.name == package_name }
+        if (installed)
+          puts "Fetched #{installed.name} (#{installed.version}) from remote" if verbose
+        else
+          add_error("Unable to find #{package_name} #{package_version} to fetch")
+          return false
         end
       end
 
-      success
+      true
     end
 
   end

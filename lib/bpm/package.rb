@@ -3,8 +3,8 @@ require 'json'
 module BPM
   class Package
     EXT      = "spd"
-    METADATA = %w[keywords licenses engines main bin directories]
-    FIELDS   = %w[name version description author homepage summary bpm]
+    METADATA = %w[keywords licenses engines main bin directories bpm]
+    FIELDS   = %w[name version description author homepage summary]
     attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories, :dependencies, :root_path
     attr_accessor *FIELDS
 
