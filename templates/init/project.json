@@ -9,10 +9,10 @@
 
   "directories": {
     "lib":        "./lib",
-    "test":       "./tests"
+    "tests":      "./tests"
   },
 
   "dependencies": {
-    "spade":    "0.5.0"
+    "spade":    ">= 0.1.1"
   }
 }
