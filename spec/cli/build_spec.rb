@@ -32,29 +32,28 @@ describe "bpm build without logging in" do
 
   it "builds a bpm from a given package.json" do
     FileUtils.cp_r fixtures("core-test"), "."
-    FileUtils.cp fixtures("package.json"), "core-test"
     cd "core-test"
-    bpm "build"
+    bpm "build", "-e", "joe@example.com"
 
     exit_status.should be_success
     output = stdout.read
 
-    package = LibGems::Format.from_file_by_path("core-test-0.4.3.spd")
+    package = LibGems::Format.from_file_by_path("core-test-0.4.9.spd")
     package.spec.name.should == "core-test"
-    package.spec.version.should == LibGems::Version.new("0.4.3")
+    package.spec.version.should == LibGems::Version.new("0.4.9")
   end
+
   it "sets the email address if one is given" do
     FileUtils.cp_r fixtures("core-test"), "."
-    FileUtils.cp fixtures("package.json"), "core-test"
     cd "core-test"
     bpm "build", "-e", "lucy@allen.com"
 
     exit_status.should be_success
     output = stdout.read
 
-    package = LibGems::Format.from_file_by_path("core-test-0.4.3.spd")
+    package = LibGems::Format.from_file_by_path("core-test-0.4.9.spd")
     package.spec.name.should == "core-test"
-    package.spec.version.should == LibGems::Version.new("0.4.3")
+    package.spec.version.should == LibGems::Version.new("0.4.9")
     package.spec.email.should == "lucy@allen.com"
   end
 end

@@ -42,8 +42,8 @@ describe "bpm unpack" do
     output.should include("Unpacked package into: #{Dir.pwd}/coffee-1.0.1.pre")
     output.should include("Unpacked package into: #{Dir.pwd}/jquery-1.4.3")
 
-    home("coffee-1.0.1.pre/bin/coffee").should exist
-    home("jquery-1.4.3/main.js").should exist
+    home("coffee-1.0.1.pre", "bin", "coffee").should exist
+    home("jquery-1.4.3", "lib", "main.js").should exist
   end
 
   it "shows a friendly error message if bpm can't write to the given directory" do
