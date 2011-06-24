@@ -123,20 +123,28 @@ module BPM
           ctx.eval("spade.register(\"#{pkg.name}\", #{File.read(pkg.json_path)});");
         end
 
+        formats = ctx.eval("spade.listFormats('#{name}')");
+
         paths = [*lib_path].map{|p| File.join(root_path, p) }
         ids = paths.map do |p|
           p += '/' if p[-1] != '/'
           glob_files(p).map do |f|
-            f.sub(p, '').sub(/\.[^\.]+$/,'')
-          end
+            f.sub!(p, '')
+            if f =~ /(\.([^\.]+))$/
+              return nil unless formats.include?($2)
+              f.sub!($1,'') # Remove format
+            end
+            f
+          end.compact
         end.flatten
         ids.each do |id|
           puts "    #{name}/#{id}" if verbose
-          out << ctx.eval("spade.compile(\"#{name}/#{id}\", \"#{name}\");")
+          compiled = ctx.eval("spade.compile(\"#{name}/#{id}\", \"#{name}\");")
+          out << compiled if compiled
         end
       end
 
-      out.compact
+      out
     end
 
     private
