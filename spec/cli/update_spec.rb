@@ -53,6 +53,6 @@ describe 'bpm update' do
     File.exists?(dummy_path).should be_true # did not reinstall
   end
   
-  # TODO: verify compile
+  it "should verify compile"
   
 end
