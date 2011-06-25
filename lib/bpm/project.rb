@@ -177,11 +177,13 @@ module BPM
 
           # copy pkg if needed
           if pkg.nil?
-            FileUtils.rm_r dst_path if File.exists? dst_path
+
             src_path = local.source_root package_name, preferred_vers, prerel
             
-            FileUtils.mkdir_p File.dirname(dst_path)
+            FileUtils.rm_r dst_path if File.exists? dst_path
+            FileUtils.mkdir_p File.dirname(dst_path) #, :mode => 0755
             FileUtils.cp_r src_path, dst_path
+              
             pkg = BPM::Package.new dst_path
             pkg.load_json
             puts "Added #{pkg.name} (#{pkg.version})" 

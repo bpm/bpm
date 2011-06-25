@@ -11,6 +11,9 @@ describe 'bpm add' do
     start_fake(FakeGemServer.new)
     FileUtils.cp_r(fixtures('hello_world'), '.')
     cd home('hello_world')
+    
+    bpm 'update'
+    wait
   end
 
   def validate_dependency_in_project_file(package_name, package_version)
