@@ -112,6 +112,9 @@ describe 'bpm add' do
     bpm "add", "jquery", :track_stderr => true
     exit_status.should_not be_success
     no_dependency 'jquery'
+    
+    FileUtils.chmod 0755, home('hello_world', 'packages')
+    FileUtils.chmod 0755, home('hello_world', 'hello_world.json')
   end
   
   it "adds packages with different versions" do
