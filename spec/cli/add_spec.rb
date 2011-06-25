@@ -162,6 +162,15 @@ describe 'bpm add' do
     bpm "add", :track_stderr => true
     stderr.read.should include("at least one package")
   end
-
+  
+  it "should make a soft dependency a hard dependency" do
+    bpm 'update'
+    wait
+    has_soft_dependency 'ivory', '0.0.1'  # precond
+    
+    bpm 'add', 'ivory'
+    wait
+    has_dependency 'ivory', '0.0.1'
+  end
     
 end
