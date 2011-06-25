@@ -91,7 +91,11 @@ module BPM
 
       desc "update", "Updates installed packages to match your project.json"
       def update
-        find_project.update options[:verbose]
+        begin
+          find_project.update options[:versbose]
+        rescue Exception => e
+          abort e.message
+        end
       end
       
       desc "login", "Log in with your BPM credentials"
