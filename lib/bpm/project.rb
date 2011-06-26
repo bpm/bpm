@@ -98,6 +98,18 @@ module BPM
       local_deps.map{|d| d.compile(mode, root_path, verbose) }.flatten
     end
 
+    def compile_all(mode=:production, verbose=false)
+      out  = compile_dependencies(mode, verbose)
+      path = File.join(@root_path, 'static', 'bpm_packages.js')
+      File.open(path, 'w') { |f| f.puts out }
+      puts "Wrote dependencies to #{path}"
+
+      out = compile(mode, nil, verbose)
+      path = File.join(@root_path, 'static', 'bpm_app.js')
+      File.open(path, 'w') { |f| f.puts out }
+      puts "Wrote project to #{path}"
+    end
+    
   private
 
     def read

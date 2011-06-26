@@ -84,6 +84,7 @@ module BPM
 
         begin
           project.add_dependencies deps, options[:verbose]
+          project.compile_all :debug, options[:verbose]
         rescue Exception => e
           abort e.message
         end
@@ -99,7 +100,10 @@ module BPM
         end
 
         begin
-          find_project.remove_dependencies package_names, options[:verbose]
+          project = find_project
+          project.remove_dependencies package_names, options[:verbose]
+          project.compile_all :debug, options[:verbose]
+          
         rescue Exception => e
           abort e.message
         end
@@ -109,7 +113,9 @@ module BPM
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def update
         begin
-          find_project.update options[:verbose]
+          project = find_project
+          project.update options[:verbose]
+          project.compile_all :debug, options[:verbose]
         rescue Exception => e
           abort e.message
         end
@@ -207,24 +213,14 @@ module BPM
 
       desc "compile [PATH]", "Build the bpm_package for development"
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
+      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def compile(path=nil)
-        project = Project.nearest_project(path || Dir.pwd)
-        if project.nil?
-          if path.nil?
-            abort "You do not appear to be in a valid bpm project.  Maybe you are in the wrong working directory?"
-          else
-            abort "No bpm project could be found at #{File.expand_path path}"
-          end
-        else
-          out = project.compile_dependencies(options[:mode], options[:verbose])
-          path = File.join(project.root_path, 'static', 'bpm_packages.js')
-          File.open(path, 'w'){|f| f.puts out }
-          puts "Wrote dependencies to #{path}"
-
-          out = project.compile(options[:mode], nil, options[:verbose])
-          path = File.join(project.root_path, 'static', 'bpm_app.js')
-          File.open(path, 'w'){|f| f.puts out }
-          puts "Wrote project to #{path}"
+        
+        begin
+          project = find_project
+          project.compile_all options[:mode], options[:verbose]
+        rescue Exception => e
+          abort e.message
         end
       end
 
