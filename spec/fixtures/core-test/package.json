@@ -1,25 +1,37 @@
 {
   "name": "core-test",
+
   "description": "Flexible testing library for JavaScript.",
+
   "summary": "A fully featured asynchronous testing library for JavaScript, compatible with other frameworks.",
+
   "keywords": ["javascript", "testing"],
+
   "author": "Charles Jolley",
+
   "homepage": "https://github.com/strobecorp/core-test",
+
   "version": "0.4.9",
+
   "licenses":     [{
     "type":       "MIT",
     "url":        "https://github.com/strobecorp/core-test/raw/master/LICENSE"
   }],
+
   "engines": ["browser", "all"],
+
   "directories": {
     "lib": "./lib",
     "resources": "./resources",
     "tests": "./tests"
   },
+
   "main": "./lib/main",
+
   "bin": {
     "cot": "./bin/cot"
   },
+  
   "dependencies": {
     "ivory": "= 0.0.1",
     "optparse": "= 1.0.1"
