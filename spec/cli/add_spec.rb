@@ -12,7 +12,7 @@ describe 'bpm add' do
     FileUtils.cp_r(fixtures('hello_world'), '.')
     cd home('hello_world')
     
-    bpm 'update'
+    bpm 'compile'
     wait
   end
 
@@ -165,7 +165,7 @@ describe 'bpm add' do
   end
   
   it "should make a soft dependency a hard dependency" do
-    bpm 'update'
+    bpm 'compile'
     wait
     has_soft_dependency 'ivory', '0.0.1'  # precond
     
@@ -192,7 +192,6 @@ describe 'bpm add' do
     no_dependency 'custom_package'
   end
   
-  it "should verify compile"
   it "should verify working with config-less projects"
   
 end

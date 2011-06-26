@@ -11,7 +11,7 @@ describe 'bpm remove' do
     start_fake(FakeGemServer.new)
     FileUtils.cp_r(fixtures('hello_world'), '.')
     cd home('hello_world')
-    bpm 'update' # make sure existing packages are installed 
+    bpm 'compile' # make sure existing packages are installed 
     wait
   end
   

@@ -108,14 +108,17 @@ module BPM
           abort e.message
         end
       end
-      
-      desc "update", "Updates installed packages to match your project.json"
+
+
+      desc "compile", "Build the bpm_package.js for development"
+      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      def update
+      def compile(path=nil)
+        
         begin
           project = find_project
           project.update options[:verbose]
-          project.compile_all :debug, options[:verbose]
+          project.compile_all options[:mode], options[:verbose]
         rescue Exception => e
           abort e.message
         end
@@ -208,19 +211,9 @@ module BPM
         paths = [Dir.pwd] if paths.empty?
         paths.each do |path|
           InitGenerator.new(self, path, path).run
-        end
-      end
-
-      desc "compile [PATH]", "Build the bpm_package for development"
-      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
-      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      def compile(path=nil)
-        
-        begin
-          project = find_project
-          project.compile_all options[:mode], options[:verbose]
-        rescue Exception => e
-          abort e.message
+          project = BPM::Project.new path
+          project.update options[:verbose]
+          project.compile_all :debug, options[:verbose]
         end
       end
 
