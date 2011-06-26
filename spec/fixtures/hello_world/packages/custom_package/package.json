@@ -1,0 +1,17 @@
+{
+  "name": "custom_package",
+  "version": "2.0.0",
+  "description": "custom desc",
+  "summary": "custom summary",
+  "homepage": "http://homepage",
+  "author": "Joe",
+  "keywords": ["bundler"],
+
+  "dependencies": {
+    "rake": "0.8.6"
+  },
+  
+  "directories": {
+    "lib": "lib"
+  }
+}

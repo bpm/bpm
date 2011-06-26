@@ -29,6 +29,7 @@ describe 'bpm add' do
       pkg.load_json
       pkg.version.should == package_version
     else
+      pkg_path = File.join pkg_path, 'bpm.lock'
       File.exists?(pkg_path).should_not be_true
     end
   end
@@ -172,5 +173,19 @@ describe 'bpm add' do
     wait
     has_dependency 'ivory', '0.0.1'
   end
-    
+
+  it "should use local package if available" do
+    no_dependency 'custom_package'
+
+    bpm "add", "custom_package"
+    output = stdout.read
+
+    output.should include("Using local package 'custom_package'")
+    has_dependency 'custom_package', '2.0.0'
+    has_soft_dependency 'rake', '0.8.6'
+  end
+  
+  it "should verify compile"
+  it "should verify working with config-less projects"
+  
 end

@@ -28,6 +28,7 @@ describe 'bpm remove' do
       pkg.load_json
       pkg.version.should == package_version
     else
+      pkg_path = File.join pkg_path, 'bpm.lock'
       File.exists?(pkg_path).should_not be_true
     end
   end
@@ -60,11 +61,11 @@ describe 'bpm remove' do
     no_dependency 'spade'
     has_dependency 'core-test', '0.4.9' # did not remove other dep
   end
-
+  
   it "should remove soft dependencies" do
     bpm 'remove', 'core-test'
     wait
-
+  
     output = stdout.read
     %w(core-test:0.4.9 ivory:0.0.1 optparse:1.0.1).each do |line|
       pkg_name, pkg_vers = line.split ':'
@@ -72,14 +73,14 @@ describe 'bpm remove' do
       no_dependency pkg_name
     end
   end
-
+  
   it "should remove soft dependencies only when they are no longer needed" do
     bpm 'add', 'ivory', '-v', '0.0.1', '--verbose' # make a hard dep
     wait
     
     bpm 'remove', 'core-test', '--verbose'
     wait
-
+  
     output = stdout.read
     %w(core-test:0.4.9 optparse:1.0.1).each do |line|
       pkg_name, pkg_vers = line.split ':'
@@ -104,6 +105,19 @@ describe 'bpm remove' do
     output.should include("'fake' is not a dependency")
   end
   
+  it "should not uninstall local packages" do
+    bpm 'add', 'custom_package'
+    wait
+    has_dependency 'custom_package', '2.0.0'
+    
+    bpm 'remove', 'custom_package'
+    output = stdout.read
+    
+    no_dependency 'custom_package'
+    File.exists?(home('hello_world', 'packages', 'custom_package', 'package.json')).should be_true
+  end
   
+  it "should verify compile"
+  it "should verify working with config-less projects"
   
 end
