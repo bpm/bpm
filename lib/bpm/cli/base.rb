@@ -89,6 +89,22 @@ module BPM
         end
       end
 
+      desc "remove [PACKAGE]", "Remove package from project"
+      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      def remove(*package_names)
+
+        # map to dependencies
+        if package_names.size.zero?
+          abort "You must specify at least one package"
+        end
+
+        begin
+          find_project.remove_dependencies package_names, options[:verbose]
+        rescue Exception => e
+          abort e.message
+        end
+      end
+      
       desc "update", "Updates installed packages to match your project.json"
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def update

@@ -46,6 +46,7 @@ module BPM
       core_fetch_dependencies hard_deps, :runtime, verbose
 
       verified_deps = install_and_verify_packages hard_deps, verbose
+      remove_unused_packages verified_deps, verbose
 
       # the dependencies saved in the project file be the actual 
       # versions we installed. Replace the new deps verions passed in with
@@ -53,6 +54,23 @@ module BPM
       new_deps.each do |package_name, _|
         hard_deps[package_name] = verified_deps[package_name]
       end
+      
+      @dependencies = hard_deps
+      save!
+    end
+
+    def remove_dependencies(package_names, verbose=false)
+
+      hard_deps = dependencies.dup
+      package_names.each do |pkg_name|
+        raise "'#{pkg_name}' is not a dependency" if hard_deps[pkg_name].nil?
+        hard_deps.delete pkg_name
+      end
+
+      # note: never make this first call verbose because it will lead to 
+      # confusing output
+      verified_deps = install_and_verify_packages hard_deps, false
+      remove_unused_packages verified_deps, verbose
       
       @dependencies = hard_deps
       save!
@@ -208,6 +226,18 @@ module BPM
         
     end
 
+    def remove_unused_packages(used_packages, verbose)
+      packages_path = File.join @root_path, 'packages'
+      Dir.glob(File.join(packages_path, '*')).each do |package_name|
+        package_name = File.basename package_name
+        
+        next if used_packages.include? package_name 
+        next if has_local_package? package_name
+        FileUtils.rm_r File.join(packages_path, package_name)
+        puts "Removed unused package '#{package_name}'"
+      end
+    end
+    
     def has_local_package?(package_name)
       false
     end
