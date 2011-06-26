@@ -10,6 +10,8 @@ module BPM
   autoload :Repository,           'bpm/repository'
   autoload :Generator,            'bpm/generator'
   autoload :Project,              'bpm/project'
+  autoload :Server,               'bpm/server'
+  autoload :Pipeline,             'bpm/pipeline'
 end
 
 require 'bpm/libgems_ext'

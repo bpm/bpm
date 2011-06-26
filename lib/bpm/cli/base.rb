@@ -109,18 +109,16 @@ module BPM
         end
       end
 
-      desc "autocompile", "Preview server that will autocompile assets.  Useful for hacking",
+      desc "autocompile", "Preview server that will autocompile assets.  Useful for hacking"
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      method_options :port, :type => :number, :default => 4020, :desc => "Port to host server on"
+      method_option :port,       :type => :string,  :default => '4020', :desc => "Port to host server on"
       def autocompile
-        require 'sprockets'
-        require 'rack'
         
         project = find_project
-        Rack::Server.start {
-          :app => Sprockets::Environment.new(project.root_path)
-        }
+        puts project
+        BPM::Server.start project, :Port => options[:port]
+        
       end
       
       desc "compile", "Build the bpm_package.js for development"

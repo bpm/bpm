@@ -110,6 +110,37 @@ module BPM
       puts "Wrote project to #{path}"
     end
     
+    def path_to_package(package_name)
+      return root_path if package_name == self.name
+      path = File.join(root_path, 'packages', package_name)
+      File.exists?(path) ? path : nil
+    end
+    
+    def path_from_module(module_path)
+      path_parts   = module_path.to_s.split '/'
+      package_name = path_parts.shift
+      module_path = path_to_package(package_name)
+      if module_path
+        # expand package_name => package_name/main
+        path_parts = ['main'] if path_parts.size == 0
+    
+        # expand package_name/~dirname => package_name/mapped_dirname
+        if path_parts.first && path_parts.first =~ /^~/
+          dirname = path_parts.shift[1..-1]
+        else
+          dirname = 'lib'
+        end
+        pkg = BPM::Package.new(module_path)
+        pkg.load_json
+        dirname = (pkg && pkg.directories[dirname]) || dirname
+    
+        # join the rest of the path
+        module_path = [package_name, dirname, *path_parts] * '/'
+      end
+      
+      module_path
+    end
+    
   private
 
     def read
