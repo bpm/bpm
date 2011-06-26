@@ -133,14 +133,13 @@ module BPM
           glob_files(p).map do |f|
             f.sub!(p, '')
             if f =~ /(\.([^\.]+))$/
-              return nil unless formats.include?($2)
-              f.sub!($1,'') # Remove format
+              f = formats.include?($2) ? f.sub!($1,'') : nil # Remove format
             end
             f
           end.compact
         end.flatten
+        
         ids.each do |id|
-          puts "    #{name}/#{id}" if verbose
           compiled = ctx.eval("spade.compile(\"#{name}/#{id}\", \"#{name}\");")
           out << compiled if compiled
         end
