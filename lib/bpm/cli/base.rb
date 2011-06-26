@@ -57,7 +57,7 @@ module BPM
 
       desc "add [PACKAGE]", "Add package to project"
       method_option :version,    :type => :string,  :default => ">= 0", :aliases => ['-v'],    :desc => 'Specify a version to install'
-      method_option :prpkect,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
       def add(*package_names)
 
@@ -90,9 +90,10 @@ module BPM
       end
 
       desc "update", "Updates installed packages to match your project.json"
+      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def update
         begin
-          find_project.update options[:versbose]
+          find_project.update options[:verbose]
         rescue Exception => e
           abort e.message
         end
