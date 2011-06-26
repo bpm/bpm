@@ -185,6 +185,13 @@ describe 'bpm add' do
     has_soft_dependency 'rake', '0.8.6'
   end
   
+  it "should fail if local package version is not compatible" do
+    bpm "add", "custom_package", "-v", "3.0.0", :track_stderr => true
+    output = stderr.read
+    output.should include("'custom_package' (2.0.0) is not compatible")
+    no_dependency 'custom_package'
+  end
+  
   it "should verify compile"
   it "should verify working with config-less projects"
   

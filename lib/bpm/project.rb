@@ -152,9 +152,16 @@ module BPM
         package_root = File.join(@root_path, 'packages', package_name)
         lock_path    = File.join package_root, 'bpm.lock'
         
+        
         if File.exists?(package_root) && !File.exists?(lock_path)
           pkg = BPM::Package.new package_root
           pkg.load_json
+
+          req = LibGems::Requirement.new(package_version)
+          unless req.satisfied_by? LibGems::Requirement.new(pkg.version)
+            raise "Local package '#{pkg.name}' (#{pkg.version}) is not compatible with required version #{package_version}"
+          end
+           
           puts "Using local package '#{pkg.name}' (#{pkg.version})" if verbose
           pkg.dependencies.each do |pkg_name, pkg_vers| 
             todo << [pkg_name, pkg_vers]
