@@ -86,7 +86,7 @@ module BPM
     def save!
       @had_changes = false
       File.open @json_path, 'w+' do |fd|
-        fd.write as_json.to_json
+        fd.write JSON.pretty_generate as_json
       end
     end
     
