@@ -217,11 +217,12 @@ module BPM
         end
       end
 
-      desc "build", "Build a bpm package from a package.json"
+      desc "build [PACKAGE]", "Build a bpm package from a package.json"
       method_option :email, :type => :string,  :default => nil,   :aliases => ['-e'],    :desc => 'Specify an author email address'
-      def build
+      def build(package_path=nil)
+        package_path ||= Dir.pwd
         local = BPM::Local.new
-        package = local.pack("package.json", options[:email])
+        package = local.pack(File.join(package_path, "package.json"), options[:email])
 
         if package.errors.empty?
           puts "Successfully built package: #{package.to_ext}"

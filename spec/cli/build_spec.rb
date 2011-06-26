@@ -36,7 +36,19 @@ describe "bpm build without logging in" do
     bpm "build", "-e", "joe@example.com"
 
     exit_status.should be_success
+  
+    package = LibGems::Format.from_file_by_path("core-test-0.4.9.spd")
+    package.spec.name.should == "core-test"
+    package.spec.version.should == LibGems::Version.new("0.4.9")
+  end
 
+  it "builds a bpm when given a path to a package" do
+    FileUtils.cp_r fixtures("core-test"), "."
+    bpm "build", "core-test", "-e", "joe@example.com"
+
+    exit_status.should be_success
+    
+    cd 'core-test'
     package = LibGems::Format.from_file_by_path("core-test-0.4.9.spd")
     package.spec.name.should == "core-test"
     package.spec.version.should == LibGems::Version.new("0.4.9")

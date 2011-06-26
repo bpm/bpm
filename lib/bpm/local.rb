@@ -10,13 +10,21 @@ module BPM
     end
 
     def pack(path, email=nil)
+      package_path = File.dirname(File.expand_path path)
+      cur_pwd = Dir.pwd
+
+      FileUtils.cd package_path if package_path != cur_pwd
       package = BPM::Package.new(nil, email || creds.email)
-      package.json_path = path
+      package.json_path = File.basename path
+      
+      
       if package.valid?
         silence do
           LibGems::Builder.new(package.to_spec).build
         end
       end
+
+      FileUtils.cd cur_pwd if package_path != cur_pwd
       package
     end
 
