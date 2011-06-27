@@ -14,5 +14,9 @@
   "directories": {
     "lib": "lib",
     "not-normal": "custom_dir"
+  },
+  
+  "pipeline": {
+    "libs": ["lib", "not-normal"]
   }
 }

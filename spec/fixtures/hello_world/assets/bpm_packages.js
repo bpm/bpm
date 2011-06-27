@@ -5,6 +5,7 @@
    To use this file, load this file in your HTML head.
    =========================================================================*/ 
 
+//= require_self
 //= require custom_package
 //= require custom_package/~not-normal/basic-module
 

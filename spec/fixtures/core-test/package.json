@@ -35,6 +35,10 @@
   "dependencies": {
     "ivory": "= 0.0.1",
     "optparse": "= 1.0.1"
+  },
+  
+  "pipeline": {
+    "css": ["resources"]
   }
 }
 

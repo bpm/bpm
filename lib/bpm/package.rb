@@ -148,8 +148,6 @@ module BPM
       out
     end
 
-    private
-
     def directory_files
       directories.reject{|k,_| k == 'tests' }.values.map{|dir| glob_files(dir) }.flatten
     end
@@ -174,6 +172,18 @@ module BPM
       @directories["tests"] || "tests"
     end
 
+    # named directories that are expected to contain code.  These will be 
+    # searched for supported modules
+    def pipeline_libs
+      (@attributes['pipeline'] && @attributes['pipeline']['libs']) || ['lib']
+    end
+
+    def pipeline_css
+      (@attributes['pipeline'] && @attributes['pipeline']['css']) || ['css']
+    end
+
+  private
+  
     def parse
       FIELDS.each do |field|
         send("#{field}=", @attributes[field])

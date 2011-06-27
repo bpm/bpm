@@ -99,6 +99,8 @@ module BPM
     end
 
     def compile_all(mode=:production, verbose=false)
+      return
+      
       out  = compile_dependencies(mode, verbose)
       path = File.join(@root_path, 'static', 'bpm_packages.js')
       File.open(path, 'w') { |f| f.puts out }
