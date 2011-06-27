@@ -39,7 +39,7 @@ module BPM
 
     def add_dependencies(new_deps, verbose=false)
 
-      old_deps  = local_deps
+      old_deps  = local_deps rescue [] # only care about this for reporting
       
       hard_deps = dependencies.dup
       new_deps.each { |pkg_name, pkg_vers| hard_deps[pkg_name] = pkg_vers }
@@ -284,14 +284,15 @@ module BPM
       cur_installed = LibGems.source_index.search(dep)
       
       installed = BPM::Remote.new.install(package_name, vers, prerelease)
-      installed.each do |i|
-        cur_installed.reject! { |ci| ci.name == i.name && ci.version == i.version }
+
+      cur_installed.each do |ci|
+        installed.reject! { |i| ci.name == i.name && ci.version == i.version }
       end
 
-      installed = installed.find { |i| i.name == package_name }
-      if cur_installed.size>0
-        puts "Fetched #{installed.name} (#{installed.version}) from remote" 
+      installed.each do |i|
+        puts "Fetched #{i.name} (#{i.version}) from remote" if verbose 
       end
+      
     end
 
     def build_local_deps(deps, verbose=false)
@@ -337,10 +338,13 @@ module BPM
           end
 
           src_path = local.source_root package_name, vers, prerel
-          pkg      = BPM::Package.new src_path
-          pkg.load_json
+          if src_path
+            pkg      = BPM::Package.new src_path
+            pkg.load_json
           
-          puts "~ Using fetched package '#{pkg.name}' (#{pkg.version})" if verbose
+            puts "~ Using fetched package '#{pkg.name}' (#{pkg.version})" if verbose
+          end
+          
         end
 
         if pkg.nil?
