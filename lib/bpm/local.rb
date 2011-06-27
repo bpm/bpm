@@ -53,6 +53,10 @@ module BPM
     def source_root(package, vers, prerelease)
       dep = LibGems::Dependency.new package, vers
       specs = LibGems.source_index.search dep
+
+      dep2 = LibGems::Dependency.new package, '>= 0'
+      specs2 = LibGems.source_index.search dep2 
+      puts "package: #{package} vers: #{vers} specs: \n  #{specs2.join("\n  ")}"
       
       spec = specs.last
       spec &&

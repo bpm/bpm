@@ -31,6 +31,11 @@ module SpecHelpers
   def stop_fake
     Process.kill(9, @fake_pid) if @fake_pid
   end
+  
+  def reset_libgems(path)
+    LibGems.send(:set_home, path)
+    LibGems.send(:set_paths, path)
+  end
 
   private
 

@@ -131,7 +131,7 @@ EOF
       end
 
       # configure search paths
-      append_path File.join project_path, 'packages'
+      append_path File.join project_path, '.bpm', 'packages'
       append_path File.dirname project_path
       append_path File.join project_path, 'assets'
     end    

@@ -85,8 +85,8 @@ module BPM
         begin
           project.add_dependencies deps, true
           project.build :debug, true
-        rescue Exception => e
-          abort e.message
+        # rescue Exception => e
+        #   abort e.message
         end
       end
 
