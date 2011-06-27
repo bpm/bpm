@@ -64,18 +64,23 @@ module BPM
     def remove_dependencies(package_names, verbose=false)
 
       hard_deps = dependencies.dup
-      deps = local_deps
+      old_deps = local_deps
       
       package_names.each do |pkg_name|
         raise "'#{pkg_name}' is not a dependency" if hard_deps[pkg_name].nil?
         hard_deps.delete pkg_name
-        dep = deps.find { |pkg| pkg.name == pkg_name }
-        puts "Removed package '#{pkg_name}' (#{dep.version})"
       end
 
       @dependencies = hard_deps
       @local_deps = nil #make sure this will be recalculated next time 
+      
+      old_deps.each do |dep|
+        next if local_deps.find { |pkg| (pkg.name == dep.name) && (pkg.version == dep.version) }
+        puts "Removed package '#{dep.name}' (#{dep.version})"
+      end
+        
       save!
+      
     end
 
     def save!
