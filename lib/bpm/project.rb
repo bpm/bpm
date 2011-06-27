@@ -39,19 +39,25 @@ module BPM
 
     def add_dependencies(new_deps, verbose=false)
 
+      old_deps  = local_deps
+      
       hard_deps = dependencies.dup
       new_deps.each { |pkg_name, pkg_vers| hard_deps[pkg_name] = pkg_vers }
-      @dependencies = hard_deps
-      save!
 
       exp_deps = expand_local_packages hard_deps, true
       core_fetch_dependencies exp_deps, :runtime, true
 
-      deps = local_deps
-      new_deps.each do |pkg_name, pkg_vers|
-        dep = deps.find { |pkg| pkg.name == pkg_name }
-        puts "Added package '#{pkg_name}' (#{dep.version})"
+      @local_deps = nil
+      @dependencies = hard_deps
+
+      validate_dependencies hard_deps, verbose
+      
+      local_deps.each do |dep|
+        next if old_deps.find { |pkg| (pkg.name == dep.name) && (pkg.version == dep.version) }
+        puts "Added package '#{dep.name}' (#{dep.version})"
       end
+
+      save!
           
     end
 
@@ -169,6 +175,24 @@ module BPM
     def local_deps(verbose=false)
       @local_deps ||= build_local_deps(dependencies, verbose)
     end
+
+
+    # Verifies that packages are available to meet all the dependencies
+    def validate_dependencies(deps=nil, verbose=false)
+      deps.each do |package_name, package_version|
+        
+        package_version = '>= 0' if package_version == '>= 0-pre'
+        
+        pkg = local_deps.find { |dep| dep.name == package_name }
+        raise "Required package '#{package_name}' not found #{local_deps.map { |x| x.name }}" if pkg.nil?
+        if pkg.version.sub(/^= /,'') != package_version.sub(/^= /,'')
+          req = LibGems::Requirement.new(package_version)
+          unless req.satisfied_by? LibGems::Requirement.new(pkg.version)
+            raise "Required package '#{package_name}' not found for version #{package_version} (closest match #{pkg.name} #{pkg.version} #{pkg.json_path} #{pkg.root_path})"
+          end
+        end
+      end
+    end
     
   private
 
@@ -193,7 +217,7 @@ module BPM
         end
       end
     end
-
+    
     # builds a set of dependencies that excludes locally installed packages
     # and includes their dependencies instead.
     def expand_local_packages(deps, verbose)
@@ -282,16 +306,18 @@ module BPM
           # already seen - verify requirements are not in conflict
           req = LibGems::Requirement.new(vers)
           pkg = ret.find { |p| p.name == package_name }
-          unless req.satisfied_by? LibGems::Requirement.new(pkg.version)
+          unless vers.sub(/^= /,'')==pkg.version.sub(/^= /,'') || (req.satisfied_by? LibGems::Requirement.new(pkg.version))
             raise "Conflicting dependencies '#{package_name}' requires #{pkg.version} and #{vers}"
           end
           
           next
         end
 
+        pkg = nil
         seen << package_name
 
         if has_local_package? package_name 
+          dst_path = File.join root_path, 'packages', package_name
           pkg = BPM::Package.new dst_path
           pkg.load_json
           puts "~ Using local package '#{pkg.name}' (#{pkg.version})" if verbose
@@ -329,8 +355,7 @@ module BPM
 
     def has_local_package?(package_name)
       package_root = File.join @root_path, 'packages', package_name
-      lock_path    = File.join package_root, 'bpm.lock'
-      File.exists?(package_root) && !File.exists?(lock_path)
+      File.exists? package_root
     end
 
     

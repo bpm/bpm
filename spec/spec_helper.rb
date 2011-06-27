@@ -6,6 +6,7 @@ require 'support/fake_gem_server'
 require 'support/fake_gemcutter'
 require 'support/matchers'
 require 'support/path'
+require 'support/project'
 
 module SpecHelpers
   def set_host(host='http://localhost:9292')

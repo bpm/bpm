@@ -16,42 +16,6 @@ describe 'bpm add' do
     wait
   end
 
-  def validate_dependency_in_project_file(package_name, package_version)
-    json = JSON.parse File.read(home('hello_world', 'hello_world.json'))
-    json['dependencies'][package_name].should == package_version
-  end
-
-  def validate_installed_dependency(package_name, package_version)
-    pkg_path = home('hello_world', 'packages', package_name)
-    if package_version
-      File.exists?(pkg_path).should be_true
-      pkg = BPM::Package.new(pkg_path)
-      pkg.load_json
-      pkg.version.should == package_version
-    else
-      pkg_path = File.join pkg_path, 'bpm.lock'
-      File.exists?(pkg_path).should_not be_true
-    end
-  end
-    
-  def has_dependency(package_name, package_version)
-    validate_dependency_in_project_file package_name, package_version
-    validate_installed_dependency package_name, package_version
-    # TODO: Verify packages built into bpm_packages.js and css
-  end
-
-  def has_soft_dependency(package_name, package_version)
-    validate_dependency_in_project_file package_name, nil
-    validate_installed_dependency package_name, package_version
-    # TODO: Verify packages built into bpm_packages.js and css
-  end
-  
-  def no_dependency(package_name)
-    validate_dependency_in_project_file package_name, nil
-    validate_installed_dependency package_name, nil
-    # TODO: Verify packages not built into bpm_packages.js and css
-  end
-  
   it "must be called from within a project" do
     cd home # outside of project
     bpm "add", "jquery", :track_stderr => true
@@ -63,7 +27,7 @@ describe 'bpm add' do
     wait
     
     output = stdout.read
-    output.should include('Added jquery (1.4.3)')
+    output.should include("Added package 'jquery' (1.4.3)")
     has_dependency 'jquery', '1.4.3'
   end
   
@@ -74,7 +38,7 @@ describe 'bpm add' do
   
     %w(jquery:1.4.3 rake:0.8.7).each do |pkg|
       pkg_name, pkg_version = pkg.split ':'
-      output.should include("Added #{pkg_name} (#{pkg_version})")
+      output.should include("Added package '#{pkg_name}' (#{pkg_version})")
       has_dependency pkg_name, pkg_version
     end
   end
@@ -85,10 +49,10 @@ describe 'bpm add' do
     
     output = stdout.read
     
-    output.should include("Added coffee (1.0.1.pre)")
-    output.should include("Added jquery (1.4.3)")
+    output.should include("Added package 'coffee' (1.0.1.pre)")
+    output.should include("Added package 'jquery' (1.4.3)")
     
-    has_dependency 'coffee', '1.0.1.pre'
+    has_dependency 'coffee', '1.0.1.pre', '>= 0-pre'
     has_soft_dependency 'jquery', '1.4.3'
   end
   
@@ -124,14 +88,14 @@ describe 'bpm add' do
   it "adds packages with different versions" do
     bpm "add", "rake", "-v", "0.8.6"
   
-    stdout.read.should include("Added rake (0.8.6)")
-    has_dependency 'rake', '0.8.6'
+    stdout.read.should include("Added package 'rake' (0.8.6)")
+    has_dependency 'rake', '0.8.6', '0.8.6'
   end
   
   it "updates a package to latest version" do
     bpm 'add', 'rake', '-v', '0.8.6'
     wait
-    has_dependency 'rake', '0.8.6' # precond
+    has_dependency 'rake', '0.8.6', '0.8.6' # precond
   
     output = stdout.read
     bpm 'add', 'rake'
@@ -139,8 +103,8 @@ describe 'bpm add' do
   
     output = stdout.read
     output.should_not include('Fetched spade') # not required 2nd time
-    output.should_not include('Added spade (0.5.0)')
-    output.should include('Added rake (0.8.7)')
+    output.should_not include("Added package 'spade' (0.5.0)")
+    output.should include("Added package 'rake' (0.8.7)")
     has_dependency 'rake', '0.8.7'
   end
   
@@ -148,8 +112,8 @@ describe 'bpm add' do
     bpm "add", "bundler", "--pre", "--verbose"
     wait
     output = stdout.read
-    output.should include("Added bundler (1.1.pre)")
-    has_dependency 'bundler', '1.1.pre'
+    output.should include("Added package 'bundler' (1.1.pre)")
+    has_dependency 'bundler', '1.1.pre', '>= 0-pre'
   end
   
   it "does not add the normal package when asking for a prerelease" do
@@ -176,10 +140,10 @@ describe 'bpm add' do
 
   it "should use local package if available" do
     no_dependency 'custom_package'
-
+  
     bpm "add", "custom_package"
     output = stdout.read
-
+  
     output.should include("Using local package 'custom_package'")
     has_dependency 'custom_package', '2.0.0'
     has_soft_dependency 'rake', '0.8.6'
