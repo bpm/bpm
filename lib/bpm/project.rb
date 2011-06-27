@@ -246,7 +246,7 @@ module BPM
           pkg.load_json
 
           req = LibGems::Requirement.new(package_version)
-          unless req.satisfied_by? LibGems::Requirement.new(pkg.version)
+          unless req.satisfied_by? LibGems::Version.new(pkg.version)
             raise "Local package '#{pkg.name}' (#{pkg.version}) is not compatible with required version #{package_version}"
           end
            
@@ -318,7 +318,7 @@ module BPM
     def satisfied_by?(req_vers, new_vers)
       req = LibGems::Requirement.new req_vers
       req_vers.sub(/^= /,'') == new_vers.sub(/^= /,'') ||
-      req.satisfied_by?(LibGems::Requirement.new(new_vers)) 
+      req.satisfied_by?(LibGems::Version.new(new_vers)) 
     end
 
     def clean_version(vers)
