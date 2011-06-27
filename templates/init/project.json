@@ -12,7 +12,5 @@
     "tests":      "./tests"
   },
 
-  "dependencies": {
-    "spade":    ">= 0.1.1"
-  }
+  "dependencies": {}
 }

@@ -22,9 +22,9 @@ module BPM::CLI
         template "project.json", "#{name}.json"
       end
 
-      empty_directory "static"
+      empty_directory "assets"
 
-      inside "static" do
+      inside "assets" do
         template "bpm_packages.js"
         template "bpm_styles.css"
       end

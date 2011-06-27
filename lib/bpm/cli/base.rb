@@ -83,8 +83,8 @@ module BPM
         project = find_project
 
         begin
-          project.add_dependencies deps, options[:verbose]
-          project.compile_all :debug, options[:verbose]
+          project.add_dependencies deps, true
+          project.build :debug, true
         rescue Exception => e
           abort e.message
         end
@@ -101,8 +101,9 @@ module BPM
 
         begin
           project = find_project
-          project.remove_dependencies package_names, options[:verbose]
-          project.compile_all :debug, options[:verbose]
+          project.unbuild options[:verbose]
+          project.remove_dependencies package_names, true
+          project.build :debug, true
           
         rescue Exception => e
           abort e.message
@@ -128,8 +129,8 @@ module BPM
         
         begin
           project = find_project
-          project.update options[:verbose]
-          project.compile_all options[:mode], options[:verbose]
+          project.fetch_dependencies options[:verbose]
+          project.build options[:mode], options[:verbose]
         rescue Exception => e
           abort e.message
         end
@@ -223,8 +224,8 @@ module BPM
         paths.each do |path|
           InitGenerator.new(self, path, path).run
           project = BPM::Project.new path
-          project.update options[:verbose]
-          project.compile_all :debug, options[:verbose]
+          project.fetch_dependencies true
+          project.build :debug, true
         end
       end
 

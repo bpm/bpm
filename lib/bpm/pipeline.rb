@@ -62,12 +62,19 @@ module BPM
     def build_dependency_context_and_body
 
       project = environment.project
+      if project.local_deps.size > 0
+        manifest = project.local_deps.map do |x| 
+          "#{x.name} (#{x.version})"
+        end.join " "
+      else
+        manifest = "(none)"
+      end
       
       # Add in the generated header
       body = <<EOF
 /* ===========================================================================
    BPM Static Dependencies
-   MANIFEST: #{project.local_deps.map { |x| "#{x.name} (#{x.version})"} * " "}
+   MANIFEST: #{manifest}
    This file is generated automatically by the bpm (http://www.bpmjs.org)    
    To use this file, load this file in your HTML head.
    =========================================================================*/
@@ -129,6 +136,30 @@ EOF
       append_path File.join project_path, 'assets'
     end    
       
+    # Returns an array of all the buildable assets in the current directory.
+    # These are the assets that will be built when you compile the project.
+    def buildable_assets
+      
+      # make sure the logical_path can be used to simply build into the 
+      # assets directory when we are done
+      ret = ['bpm_packages.js', 'bpm_styles.css']
+      
+      project.local_deps.each do |pkg|
+        pkg.load_json
+        pkg.pipeline_assets.each do |dir|
+          dir_name = pkg.directories[dir] || dir
+          dir_name.sub! /^\.?\//, ''
+          pkg_root = File.join(pkg.root_path, dir_name)
+          Dir[File.join(pkg_root, '**', '*')].each do |fn|
+            fn.sub! /^#{Regexp.escape pkg_root}\//, ''
+            ret << File.join(pkg.name, dir_name, fn)
+          end
+        end
+      end
+
+      ret.sort.map { |x| find_asset x }.compact
+    end
+    
     # Detect whenever we are asked to build some of the magic files and swap
     # in a custom asset type that can generate the contents.
     def build_asset(logical_path, pathname, options)

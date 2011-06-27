@@ -182,6 +182,10 @@ module BPM
       (@attributes['pipeline'] && @attributes['pipeline']['css']) || ['css']
     end
 
+    def pipeline_assets
+      (@attributes['pipeline'] && @attributes['pipeline']['assets']) || ['assets', 'resources']
+    end
+
   private
   
     def parse

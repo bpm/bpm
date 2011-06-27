@@ -16,7 +16,7 @@ module BPM
 
     def self.is_project_root?(path)
       !!project_file_path(path) ||
-      File.exists?(File.join(path, 'static', 'bpm_packages.js'))
+      File.exists?(File.join(path, 'assets', 'bpm_packages.js'))
     end
 
     def self.nearest_project(path)
@@ -41,48 +41,37 @@ module BPM
 
       hard_deps = dependencies.dup
       new_deps.each { |pkg_name, pkg_vers| hard_deps[pkg_name] = pkg_vers }
-
-      exp_deps = expand_local_packages hard_deps, true
-      
-      puts "Fetch missing packages..." if verbose
-      core_fetch_dependencies exp_deps, :runtime, verbose
-
-      verified_deps = install_and_verify_packages hard_deps, verbose
-      remove_unused_packages verified_deps, verbose
-
-      # the dependencies saved in the project file be the actual 
-      # versions we installed. Replace the new deps verions passed in with
-      # the actual versions used.
-      new_deps.each do |package_name, _|
-        hard_deps[package_name] = verified_deps[package_name]
-      end
-      
       @dependencies = hard_deps
       save!
+
+      exp_deps = expand_local_packages hard_deps, true
+      core_fetch_dependencies exp_deps, :runtime, true
+
+      deps = local_deps
+      new_deps.each do |pkg_name, pkg_vers|
+        dep = deps.find { |pkg| pkg.name == pkg_name }
+        puts "Added package '#{pkg_name}' (#{dep.version})"
+      end
+          
     end
 
     def remove_dependencies(package_names, verbose=false)
 
       hard_deps = dependencies.dup
+      deps = local_deps
+      
       package_names.each do |pkg_name|
         raise "'#{pkg_name}' is not a dependency" if hard_deps[pkg_name].nil?
         hard_deps.delete pkg_name
+        dep = deps.find { |pkg| pkg.name == pkg_name }
+        puts "Removed package '#{pkg_name}' (#{dep.version})"
       end
 
-      # note: never make this first call verbose because it will lead to 
-      # confusing output
-      verified_deps = install_and_verify_packages hard_deps, false
-      remove_unused_packages verified_deps, verbose
-      
       @dependencies = hard_deps
+      @local_deps = nil #make sure this will be recalculated next time 
       save!
     end
 
-    def update(verbose=false)
-      core_fetch_dependencies dependencies, :runtime, verbose
-      install_and_verify_packages dependencies, verbose
-    end
-    
     def save!
       @had_changes = false
       File.open @json_path, 'w+' do |fd|
@@ -94,30 +83,64 @@ module BPM
       core_fetch_dependencies(dependencies, :runtime, verbose)
     end
 
-    def compile_dependencies(mode=:production, verbose=false)
-      local_deps.map{|d| d.compile(mode, root_path, verbose) }.flatten
-    end
+    # Builds assets directory for dependent packages
+    def build(mode=:debug, verbose=false)
+      puts "Building static assets..." if verbose
+      pipeline = BPM::Pipeline.new self
+      asset_root = File.join root_path, 'assets'
 
-    def compile_all(mode=:production, verbose=false)
-      return
+      pipeline.buildable_assets.each do |asset|
+        dst_path = File.join asset_root, asset.logical_path
+        if asset.kind_of? Sprockets::StaticAsset
+          puts "~ Copying #{asset.logical_path}" if verbose
+          FileUtils.rm dst_path if File.exists? dst_path
+          FileUtils.mkdir_p File.dirname(dst_path)
+          FileUtils.cp asset.pathname, dst_path
+        else
+          puts "~ Building #{asset.logical_path}" if verbose
+          File.open(dst_path, 'w+') { |fd| fd << asset.to_s }
+        end
+      end
       
-      out  = compile_dependencies(mode, verbose)
-      path = File.join(@root_path, 'static', 'bpm_packages.js')
-      File.open(path, 'w') { |f| f.puts out }
-      puts "Wrote dependencies to #{path}"
-
-      out = compile(mode, nil, verbose)
-      path = File.join(@root_path, 'static', 'bpm_app.js')
-      File.open(path, 'w') { |f| f.puts out }
-      puts "Wrote project to #{path}"
+      puts "\n" if verbose
+    end
+      
+    # Removes any built assets from the project.  Usually called before a
+    # package is removed from the project to cleanup any assets
+    def unbuild(verbose=false)
+      
+      puts "Removing stale assets..." if verbose
+      
+      pipeline = BPM::Pipeline.new self
+      asset_root = File.join root_path, 'assets'
+      pipeline.buildable_assets.each do |asset|
+        next if asset.logical_path =~ /^bpm_/
+        asset_path = File.join asset_root, asset.logical_path
+        next unless File.exists? asset_path
+        puts "~ Removing #{asset.logical_path}" if verbose
+        FileUtils.rm asset_path
+        
+        # cleanup empty directories
+        while !File.exists?(asset_path)
+          asset_path = File.dirname asset_path
+          FileUtils.rmdir(asset_path) if File.directory?(asset_path)
+          if verbose && !File.exists?(asset_path) 
+            puts "~ Removed empty directory #{File.basename asset_path}"
+          end
+        end
+      end
+      
+      puts "\n" if verbose
     end
     
+    # Returns the path on disk to reach a given package name
     def path_to_package(package_name)
       return root_path if package_name == self.name
       path = File.join(root_path, 'packages', package_name)
       File.exists?(path) ? path : nil
     end
     
+    # Returns the path on disk for a given module id (relative to the project)
     def path_from_module(module_path)
       path_parts   = module_path.to_s.split '/'
       package_name = path_parts.shift
@@ -141,6 +164,10 @@ module BPM
       end
       
       module_path
+    end
+    
+    def local_deps(verbose=false)
+      @local_deps ||= build_local_deps(dependencies, verbose)
     end
     
   private
@@ -183,10 +210,8 @@ module BPM
         seen << package_name
         
         package_root = File.join(@root_path, 'packages', package_name)
-        lock_path    = File.join package_root, 'bpm.lock'
         
-        
-        if File.exists?(package_root) && !File.exists?(lock_path)
+        if File.exists? package_root
           pkg = BPM::Package.new package_root
           pkg.load_json
 
@@ -195,7 +220,7 @@ module BPM
             raise "Local package '#{pkg.name}' (#{pkg.version}) is not compatible with required version #{package_version}"
           end
            
-          puts "Using local package '#{pkg.name}' (#{pkg.version})" if verbose
+          puts "~ Using local package '#{pkg.name}' (#{pkg.version})" if verbose
           pkg.dependencies.each do |pkg_name, pkg_vers| 
             todo << [pkg_name, pkg_vers]
           end
@@ -210,6 +235,7 @@ module BPM
     
     # Fetch any dependencies into local cache for the passed set of deps
     def core_fetch_dependencies(deps, kind, verbose)
+      puts "Fetching dependencies..." if verbose
       deps.each do |pkg_name, pkg_version|
         core_fetch_dependency pkg_name, pkg_version, kind, verbose
       end
@@ -239,98 +265,68 @@ module BPM
       end
     end
 
-    def install_and_verify_packages(deps, verbose)
-      puts "Installing and verifying packages..." if verbose
-
+    def build_local_deps(deps, verbose=false)
+      puts "Finding dependencies..." if verbose
       todo = []
       seen = []
-      verified  = {}
+      ret  = []
       
       deps.each { |package_name, vers| todo << [package_name, vers] }
       local = BPM::Local.new
-
-      while todo.size>0
+      
+      while todo.size > 0
         package_name, vers = todo.shift
-        next if seen.include? package_name
-        seen << package_name
         
-        dst_path = File.join @root_path, 'packages', package_name
+        if seen.include? package_name
+          
+          # already seen - verify requirements are not in conflict
+          req = LibGems::Requirement.new(vers)
+          pkg = ret.find { |p| p.name == package_name }
+          unless req.satisfied_by? LibGems::Requirement.new(pkg.version)
+            raise "Conflicting dependencies '#{package_name}' requires #{pkg.version} and #{vers}"
+          end
+          
+          next
+        end
+
+        seen << package_name
 
         if has_local_package? package_name 
-          puts "Skipping local package #{package_name}" if verbose
           pkg = BPM::Package.new dst_path
-          
+          pkg.load_json
+          puts "~ Using local package '#{pkg.name}' (#{pkg.version})" if verbose
         else
 
-          # get the locally installs dep
+          # get the installed dep
           if vers == '>= 0-pre'
             prerel = true
             vers   = '>= 0'
           else
             prerel = vers =~ /[a-zA-Z]/
           end
-          
-          preferred_vers = local.preferred_version package_name, vers, prerel
-          
-          if File.exist?(dst_path)
-            pkg = BPM::Package.new dst_path
-            pkg.load_json
-            pkg = nil unless pkg.version == preferred_vers
-          else
-            pkg = nil
-          end
 
-          # copy pkg if needed
-          if pkg.nil?
-
-            src_path = local.source_root package_name, preferred_vers, prerel
-            
-            FileUtils.rm_r dst_path if File.exists? dst_path
-            FileUtils.mkdir_p File.dirname(dst_path) #, :mode => 0755
-            FileUtils.cp_r src_path, dst_path
-            
-            # Add lock file - this allows us to distinguish between packages
-            # managed by bpm and those that are installed locally 
-            File.open(File.join(dst_path, 'bpm.lock'), 'w+') do |fd|
-              fd << "IMPORTANT: This file is automatically generated for packages managed by bpm.  Do not remove or modify this file yourself."
-            end
-              
-            pkg = BPM::Package.new dst_path
-            pkg.load_json
-            puts "Added #{pkg.name} (#{pkg.version})" 
-            
-          else
-            puts "Skipping installed package #{package_name} (#{preferred_vers})" if verbose
-          end
+          src_path = local.source_root package_name, vers, prerel
+          pkg      = BPM::Package.new src_path
+          pkg.load_json
           
+          puts "~ Using fetched package '#{pkg.name}' (#{pkg.version})" if verbose
         end
 
-        # add dependencies to list
-        if pkg.valid?
-          pkg.dependencies.each do |dep_name, dep_vers|
-            todo << [dep_name, dep_vers]
-          end
+        if pkg.nil?
+          raise "Could not find eligable package for '#{package_name}' (#{vers})"
         end
 
-        verified[pkg.name] = pkg.version
-      end
-      
-      verified
+        pkg.dependencies.each do |dep_name, dep_vers|
+          todo << [dep_name, dep_vers]
+        end
         
+        ret << pkg
+      end
+        
+      puts "\n" if verbose
+      ret
     end
 
-    def remove_unused_packages(used_packages, verbose)
-      packages_path = File.join @root_path, 'packages'
-      Dir.glob(File.join(packages_path, '*')).each do |package_name|
-        package_name = File.basename package_name
-        
-        next if used_packages.include? package_name 
-        next if has_local_package? package_name
-        FileUtils.rm_r File.join(packages_path, package_name)
-        puts "Removed unused package '#{package_name}'"
-      end
-    end
-    
     def has_local_package?(package_name)
       package_root = File.join @root_path, 'packages', package_name
       lock_path    = File.join package_root, 'bpm.lock'
