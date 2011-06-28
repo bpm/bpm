@@ -5,17 +5,11 @@ module BPM::CLI
 
     source_root File.join(::BPM::TEMPLATES_DIR, 'init')
 
-    def name
-      File.basename destination_root
-    end
-
     def bpm_version
       BPM::VERSION
     end
 
     def run
-      FileUtils.cd(destination_root)
-
       if File.exist?("package.json")
         convert_package(destination_root)
       else
@@ -28,6 +22,8 @@ module BPM::CLI
         template "bpm_packages.js"
         template "bpm_styles.css"
       end
+
+      true
     end
 
     private

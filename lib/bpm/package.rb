@@ -13,6 +13,7 @@ module BPM
       @json_path = File.join @root_path, 'package.json'
       @email     = email
       @attributes = {}
+      @dependencies = {}
       @directories = {}
       @metadata = {}
     end

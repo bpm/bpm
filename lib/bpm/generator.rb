@@ -7,9 +7,13 @@ module BPM
     attr_reader :name
 
     def initialize(thor, name, root)
-      @thor, @name, @root = thor, name, root
+      @thor, @name = thor, name
 
       self.destination_root = root
+    end
+
+    def dir_name
+      File.basename destination_root
     end
 
   private

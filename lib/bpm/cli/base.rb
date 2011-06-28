@@ -212,20 +212,27 @@ module BPM
       end
 
       desc "new [NAME]", "Generate a new project skeleton"
+      method_option :path, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
       def new(name)
-        path = File.expand_path name
-        ProjectGenerator.new(self, name, path).run
-        init(path)
+        puts "path: #{options[:path]}"
+        path = File.expand_path(options[:path] || underscore(name))
+        success = ProjectGenerator.new(self, name, path).run
+        run_init(name, path) if success
       end
 
       desc "init [PATHS]", "Configure a project to use bpm for management"
+      method_option :name, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
+      method_option :skip, :type => :boolean, :default => false, :desc => 'Skip any conflicting files'
       def init(*paths)
         paths = [Dir.pwd] if paths.empty?
+        paths.map!{|p| File.expand_path(p) }
+
+        if paths.length > 1 && options[:name]
+          abort "Can't specify a name with multiple paths"
+        end
+
         paths.each do |path|
-          InitGenerator.new(self, path, path).run
-          project = BPM::Project.new path
-          project.fetch_dependencies true
-          project.build :debug, true
+          run_init(options[:name] || File.basename(path), path)
         end
       end
 
@@ -265,6 +272,13 @@ module BPM
 
       private
 
+        def run_init(name, path)
+          InitGenerator.new(self, name, path).run
+          project = BPM::Project.new(path, name)
+          project.fetch_dependencies true
+          project.build :debug, true
+        end
+
         def report_arity_error(name)
           self.class.handle_argument_error(self.class.tasks[name], nil)
         end
@@ -302,6 +316,14 @@ module BPM
               puts "#{name} (#{versions.sort.reverse.join(", ")})"
             end
           end
+        end
+
+        def underscore(str)
+          str.gsub(/::/, '/').
+            gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+            gsub(/([a-z\d])([A-Z])/,'\1_\2').
+            tr("-", "_").
+            downcase
         end
 
     end

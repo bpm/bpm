@@ -31,9 +31,14 @@ module BPM
       nil
     end
 
-    def initialize(root_path)
+    attr_reader :name
+
+    def initialize(root_path, name=nil)
       super root_path
-      @json_path = File.join root_path, "#{File.basename(root_path)}.json"
+
+      @name = name || File.basename(root_path)
+      @json_path = File.join root_path, "#{@name}.json"
+
       load_json && validate
     end
 

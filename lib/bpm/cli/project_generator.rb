@@ -4,8 +4,12 @@ module BPM::CLI
     source_root File.join(::BPM::TEMPLATES_DIR, 'project')
 
     def run
-      empty_directory '.'
-      FileUtils.cd(destination_root)
+      if File.exist? destination_root
+        say_status "Directory #{dir_name} already exists", nil, :red
+        return false
+      end
+
+      empty_directory '.', :verbose => false
 
       template "LICENSE"
       template "README.md"
@@ -20,6 +24,8 @@ module BPM::CLI
       inside "tests" do
         template "main-test.js"
       end
+
+      true
     end
 
   end
