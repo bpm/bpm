@@ -9,7 +9,7 @@ describe "bpm new" do
   it "should create files" do
     bpm 'new', 'BpmTest'
 
-    files = %w(LICENSE README.md lib tests lib/main.js tests/main-test.js BpmTest.json
+    files = %w(LICENSE README.md index.html app.js lib tests lib/main.js tests/main-test.js BpmTest.json
                 assets assets/bpm_packages.js assets/bpm_styles.css)
 
     # output without coloration

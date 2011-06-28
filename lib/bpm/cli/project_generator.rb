@@ -13,6 +13,8 @@ module BPM::CLI
 
       template "LICENSE"
       template "README.md"
+      template "index.html"
+      template "app.js"
 
       empty_directory "lib"
       empty_directory "tests"
