@@ -53,6 +53,8 @@ module SpecHelpers
   def goto_home
     cd(home)
     env["HOME"] = home.to_s
+    env["BPM_HOME"] = bpm_dir.to_s
+    env["BPM_PATH"] = bpm_dir.to_s
     LibGems.clear_paths
   end
 

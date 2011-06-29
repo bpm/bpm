@@ -213,11 +213,16 @@ module BPM
 
       desc "new [NAME]", "Generate a new project skeleton"
       method_option :path, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
+      method_option :package, :type => :string, :default => nil, :desc => 'Specify a package template to build from'
       def new(name)
-        puts "path: #{options[:path]}"
+        package = install_package(options[:package])
+        template_path = package ? package.template_path(:project) : nil
+
         path = File.expand_path(options[:path] || underscore(name))
-        success = ProjectGenerator.new(self, name, path).run
-        run_init(name, path) if success
+        generator = get_generator(:project, package)
+        success = generator.new(self, name, path, template_path).run
+
+        run_init(name, path, package) if success
       end
 
       desc "init [PATHS]", "Configure a project to use bpm for management"
@@ -272,8 +277,18 @@ module BPM
 
       private
 
-        def run_init(name, path)
-          InitGenerator.new(self, name, path).run
+        def get_generator(type, package=nil)
+          require 'bpm/generator'
+          generator_pkg = package ? package.name : :default
+          package ? package.generator_for(type) : BPM.generator_for(type)
+        end
+
+        def run_init(name, path, package=nil)
+          template_path = package ? package.template_path(:init) : nil
+
+          generator = get_generator(:init, package)
+          generator.new(self, name, path, package && template_path).run
+
           project = BPM::Project.new(path, name)
           project.fetch_dependencies true
           project.build :debug, true
@@ -316,6 +331,18 @@ module BPM
               puts "#{name} (#{versions.sort.reverse.join(", ")})"
             end
           end
+        end
+
+        def install_package(pkg_name)
+          return nil unless pkg_name
+          dep = LibGems::Dependency.new(pkg_name)
+          installed = LibGems.source_index.search(dep)
+          if installed.empty?
+            installed = BPM::Remote.new.install(pkg_name)
+          end
+          spec = installed.find{|p| p.name == pkg_name }
+          abort "Unable to find package: #{pkg_name}" unless spec
+          BPM::Package.from_spec(spec)
         end
 
         def underscore(str)

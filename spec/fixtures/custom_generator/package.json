@@ -1,0 +1,12 @@
+{
+  "name": "custom_generator",
+  "description": "Testing generators",
+  "summary": "Testing generators",
+  "homepage": "http://github.com/sproutcore/bpm",
+  "author": "Peter Wagenet",
+  "version": "1.0",
+  "directories": {
+    "lib": "lib"
+  }
+}
+

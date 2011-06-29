@@ -303,3 +303,17 @@ describe BPM::Package, "validation errors" do
   end
 
 end
+
+describe BPM::Package, "templates" do
+
+  subject do
+    package = BPM::Package.new(fixtures("custom_generator"))
+    package.load_json
+    package
+  end
+
+  it "should have project template" do
+    subject.template_path('project').should == fixtures("custom_generator", "templates", "project").to_s
+  end
+
+end

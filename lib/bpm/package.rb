@@ -8,6 +8,12 @@ module BPM
     attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories, :dependencies, :root_path
     attr_accessor *FIELDS
 
+    def self.from_spec(spec)
+      pkg = new(spec.full_gem_path)
+      pkg.bpkg = spec
+      pkg
+    end
+
     def initialize(root_path=nil, email = "")
       @root_path = root_path || Dir.pwd
       @json_path = File.join @root_path, 'package.json'
@@ -22,9 +28,11 @@ module BPM
       @bpm || BPM::VERSION
     end
 
-    def bpkg=(path)
-      format = LibGems::Format.from_file_by_path(path)
-      fill_from_gemspec(format.spec)
+    def bpkg=(spec)
+      unless spec.is_a?(LibGems::Specification)
+        spec = LibGems::Format.from_file_by_path(spec.to_s).spec
+      end
+      fill_from_gemspec(spec)
     end
 
     def to_spec
@@ -38,7 +46,7 @@ module BPM
         spec.summary           = summary
         spec.description       = description
         spec.requirements      = [metadata.to_json]
-        spec.files             = directory_files + ["package.json"]
+        spec.files             = directory_files + template_files + ["package.json"]
         spec.test_files        = glob_files(tests_path)
         spec.bindir            = bin_path
         spec.executables       = bin_files.map{|p| File.basename(p) } if bin_path
@@ -68,6 +76,20 @@ module BPM
 
     def to_ext
       "#{self.to_full_name}.#{EXT}"
+    end
+
+    def template_path(name)
+      path = File.join(root_path, 'templates', name.to_s)
+      File.exist?(path) ? path : nil
+    end
+
+    def generator_for(type)
+      unless generator = BPM.generator_for(name, type, false)
+        path = File.join(root_path, 'templates', "#{type}_generator.rb")
+        load path if File.exist?(path)
+        generator = BPM.generator_for(name, type)
+      end
+      generator
     end
 
     def errors
@@ -123,6 +145,10 @@ module BPM
       else
         []
       end
+    end
+
+    def template_files
+      glob_files("templates")
     end
 
     def bin_path

@@ -1,6 +1,6 @@
 require 'bpm/version'
 
-module BPM::CLI
+module BPM
   class InitGenerator < BPM::Generator
 
     source_root File.join(::BPM::TEMPLATES_DIR, 'init')
@@ -40,3 +40,4 @@ module BPM::CLI
   end
 end
 
+BPM.register_generator(:default, :init, BPM::InitGenerator)

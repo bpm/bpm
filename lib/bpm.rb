@@ -8,7 +8,6 @@ module BPM
   autoload :Package,              'bpm/package'
   autoload :Remote,               'bpm/remote'
   autoload :Repository,           'bpm/repository'
-  autoload :Generator,            'bpm/generator'
   autoload :Project,              'bpm/project'
   autoload :Server,               'bpm/server'
 

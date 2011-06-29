@@ -3,11 +3,6 @@ require 'bpm/cli/base'
 module SpecHelpers
   attr_reader :stdin, :stdout, :stderr
 
-  def env
-    @env ||= {}
-  end
-
-
   def bpm(*argv)
     opts = Hash === argv.last ? argv.pop : {}
 

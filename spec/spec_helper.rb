@@ -1,5 +1,6 @@
 Bundler.require :default, :development
 
+require 'support/env'
 require 'support/cli'
 require 'support/fake'
 require 'support/fake_gem_server'
