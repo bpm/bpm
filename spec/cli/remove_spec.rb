@@ -6,8 +6,6 @@ describe 'bpm remove' do
   before do
     goto_home
     set_host
-    env["GEM_HOME"] = bpm_dir.to_s
-    env["GEM_PATH"] = bpm_dir.to_s
     start_fake(FakeGemServer.new)
     FileUtils.cp_r(fixtures('hello_world'), '.')
     cd home('hello_world')

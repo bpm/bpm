@@ -18,7 +18,7 @@ module BPM
       method_option :version,    :type => :string,  :default => ">= 0", :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
       def fetch(*packages)
-        project = BPM::Project.nearest_project(Dir.pwd) if packages.size==0
+        project = BPM::Project.nearest_project(Dir.pwd) if packages.empty?
         if project
           success = project.fetch_dependencies options[:verbose]
           if !success

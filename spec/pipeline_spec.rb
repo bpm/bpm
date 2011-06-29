@@ -18,9 +18,8 @@ describe BPM::Pipeline, "asset_path" do
   end
   
   it "should find any asset in packages" do
+    goto_home
     set_host
-    env["GEM_HOME"] = bpm_dir.to_s
-    env["GEM_PATH"] = bpm_dir.to_s
     start_fake(FakeGemServer.new)
     cd home('hello_world')
     
@@ -32,9 +31,8 @@ describe BPM::Pipeline, "asset_path" do
   end
   
   it "should find any asset in installed packages" do
+    goto_home
     set_host
-    env["GEM_HOME"] = bpm_dir.to_s
-    env["GEM_PATH"] = bpm_dir.to_s
     start_fake(FakeGemServer.new)
     cd home('hello_world')
     
@@ -48,9 +46,8 @@ describe BPM::Pipeline, "asset_path" do
   describe "bpm_packages.js" do
   
     before do
+      goto_home
       set_host
-      env["GEM_HOME"] = bpm_dir.to_s
-      env["GEM_PATH"] = bpm_dir.to_s
       start_fake(FakeGemServer.new)
       cd home('hello_world')
   
@@ -96,8 +93,6 @@ describe BPM::Pipeline, "asset_path" do
     before do
       goto_home
       set_host
-      env["GEM_HOME"] = bpm_dir.to_s
-      env["GEM_PATH"] = bpm_dir.to_s
       start_fake(FakeGemServer.new)
       cd home('hello_world')
   

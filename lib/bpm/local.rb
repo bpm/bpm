@@ -56,8 +56,7 @@ module BPM
 
       dep2 = LibGems::Dependency.new package, '>= 0'
       specs2 = LibGems.source_index.search dep2 
-      puts "package: #{package} vers: #{vers} specs: \n  #{specs2.join("\n  ")}"
-      
+
       spec = specs.last
       spec &&
       File.join(spec.installation_path, 'gems', "#{spec.name}-#{spec.version}") 

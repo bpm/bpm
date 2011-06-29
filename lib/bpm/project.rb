@@ -313,7 +313,8 @@ module BPM
 
       dep = LibGems::Dependency.new(package_name, vers, kind)
       cur_installed = LibGems.source_index.search(dep)
-      
+
+      # TODO: Why are we fetching even if we already have it? Are we looking for newer versions?
       installed = BPM::Remote.new.install(package_name, vers, prerelease)
 
       cur_installed.each do |ci|

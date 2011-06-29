@@ -6,9 +6,6 @@ describe 'bpm fetch' do
     goto_home
     FileUtils.cp_r(fixtures('hello_world'), '.')
     set_host
-    # TODO: Fix for LibGems
-    env["GEM_HOME"] = bpm_dir.to_s
-    env["GEM_PATH"] = bpm_dir.to_s
     start_fake(FakeGemServer.new)
   end
 

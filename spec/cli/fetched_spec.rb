@@ -4,9 +4,6 @@ describe "bpm fetched" do
   before do
     goto_home
     set_host
-    # TODO: Make this LibGems specific
-    env["GEM_HOME"] = bpm_dir.to_s
-    env["GEM_PATH"] = bpm_dir.to_s
     start_fake(FakeGemServer.new)
   end
 
