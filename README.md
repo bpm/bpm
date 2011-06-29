@@ -52,3 +52,4 @@ still incomplete including:
   * Format plugins (i.e. CoffeeScript)
   * Minification plugins
   * lots of other stuff I am forgetting
+  * node support - you will eventually be able to run JS that doesn't require the DOM in node.  We've prototyped this but it needs to be polished still.
