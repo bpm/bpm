@@ -113,42 +113,6 @@ module BPM
       end
     end
 
-    def compile(mode=:production, project_path=nil, verbose=false)
-      puts "Compiling #{name}" if verbose
-
-      project_path ||= root_path
-
-      require 'spade'
-      out = []
-      Spade::MainContext.new(:rootdir => project_path) do |ctx|
-        packages_path = File.join(project_path, "packages")
-        (local_deps(packages_path) << self).each do |pkg|
-          ctx.eval("spade.register(\"#{pkg.name}\", #{File.read(pkg.json_path)});");
-        end
-
-        formats = ctx.eval("spade.listFormats('#{name}')");
-
-        paths = [*lib_path].map{|p| File.join(root_path, p) }
-        ids = paths.map do |p|
-          p += '/' if p[-1] != '/'
-          glob_files(p).map do |f|
-            f.sub!(p, '')
-            if f =~ /(\.([^\.]+))$/
-              f = formats.include?($2) ? f.sub!($1,'') : nil # Remove format
-            end
-            f
-          end.compact
-        end.flatten
-        
-        ids.each do |id|
-          compiled = ctx.eval("spade.compile(\"#{name}/#{id}\", \"#{name}\");")
-          out << compiled if compiled
-        end
-      end
-
-      out
-    end
-
     def directory_files
       directories.reject{|k,_| k == 'tests' }.values.map{|dir| glob_files(dir) }.flatten
     end
