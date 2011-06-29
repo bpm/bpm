@@ -17,7 +17,7 @@ describe "bpm login" do
       user == email && password == pass
     end
 
-    LibGems.host = "http://localhost:9292"
+    set_host
     start_fake(protected_fake)
   end
 
