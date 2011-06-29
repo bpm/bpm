@@ -149,17 +149,17 @@ module BPM
     end
     
     # Returns the path on disk to reach a given package name
-    def path_to_package(package_name)
+    def path_from_package(package_name)
       return root_path if package_name == self.name
-      path = File.join(root_path, 'packages', package_name)
-      File.exists?(path) ? path : nil
+      path = local_deps.find { |pkg| pkg.name == package_name }
+      path && path.root_path
     end
     
     # Returns the path on disk for a given module id (relative to the project)
     def path_from_module(module_path)
       path_parts   = module_path.to_s.split '/'
       package_name = path_parts.shift
-      module_path = path_to_package(package_name)
+      module_path = path_from_package(package_name)
       if module_path
         # expand package_name => package_name/main
         path_parts = ['main'] if path_parts.size == 0
@@ -179,6 +179,31 @@ module BPM
       end
       
       module_path
+    end
+    
+    # Returns the package object and module id for the path. Path must match
+    # a package known to the project.
+    def package_and_module_from_path(path)
+      path = File.expand_path path.to_s
+      pkg = local_deps.find {|cur| path =~ /^#{Regexp.escape cur.root_path.to_s}/}
+      pkg = self if pkg.nil? && path =~ /^#{Regexp.escape root_path.to_s}/
+      raise "#{path} is not within a known package" if pkg.nil?
+      
+      path = Pathname.new(path).relative_path_from(Pathname.new(pkg.root_path)).split.map { |x| x.to_s }
+      
+      dir_name = pkg.directories.find do |dir_key, dname| 
+        Array(dname).include?(path.first)
+      end
+      
+      dir_name = dir_name ? dir_name.first : path.first
+      if dir_name == 'lib'
+        path.shift
+      else
+        path[0] = "~#{dir_name}"
+      end
+            
+      path[path.size-1] = File.basename path.last, '.*'
+      [pkg, path.join('/')]
     end
     
     def local_deps(verbose=false)

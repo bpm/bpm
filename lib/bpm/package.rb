@@ -173,6 +173,21 @@ module BPM
       @directories["tests"] || "tests"
     end
 
+    def transport_plugins(project)
+      plugin_modules('plugin:transport', project)
+    end
+
+    def plugin_modules(key_name, project)
+      return [@attributes[key_name]] if @attributes[key_name]
+      dependencies.keys.map do |pkg_name| 
+        dep = project.local_deps.find do |pkg| 
+          pkg.load_json
+          pkg.name == pkg_name
+        end
+        dep.attributes[key_name]
+      end.compact
+    end
+      
     # named directories that are expected to contain code.  These will be 
     # searched for supported modules
     def pipeline_libs

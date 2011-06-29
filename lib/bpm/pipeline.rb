@@ -20,7 +20,7 @@ module BPM
         project     = context.environment.project
         module_path = project.path_from_module path
         root = module_path.sub(/^([^\/]+)\//) do |s|
-          project.path_to_package s
+          project.path_from_package s
         end
                 
         context.depend_on(root)
@@ -108,6 +108,32 @@ EOF
     
   end
   
+  class TransportProcessor < Sprockets::Processor
+    
+    def evaluate(context, locals)
+      project = context.environment.project
+      pkg, module_id = project.package_and_module_from_path file
+      transport_plugins = pkg.transport_plugins(project)
+      
+      if transport_plugins.size > 1
+        raise "#{pkg.name} depends on #{transport_plugins.size} packages that define transport plugins.  Select a plugin by adding a `plugin:transport` property to the package.json"
+      elsif transport_plugins.size == 1
+        transport_module = transport_plugins.first
+        
+        transport_path   = context.resolve project.path_from_module(transport_module)
+
+        ctx = context.environment.js_context_for transport_path
+        ctx["PACKAGE_INFO"] = pkg.attributes
+        ctx["DATA"]         = data
+        wrapped = ctx.eval "exports.compileTransport(DATA, PACKAGE_INFO, '#{module_id}');"
+
+        wrapped
+      else
+        data
+      end
+    end
+    
+  end
   
   # A BPM package-aware asset pipeline.  Asset lookup respects package.json
   # directory configurations as well as loading preprocessors, formats, and
@@ -129,6 +155,9 @@ EOF
         unregister_processor kind, Sprockets::DirectiveProcessor
         register_processor   kind, BPM::DirectiveProcessor
       end
+      
+      register_postprocessor 'application/javascript', BPM::TransportProcessor
+      
 
       # configure search paths
       append_path File.join project_path, '.bpm', 'packages'
@@ -136,6 +165,13 @@ EOF
       append_path File.join project_path, 'assets'
     end    
       
+    # Loads the passed JavaScript file and evals it.  Used for loading 
+    # transport and other plugins.
+    def js_context_for(path)
+      @js_contexts ||= {}
+      @js_contexts[path] ||= build_js_context(path)
+    end
+    
     # Returns an array of all the buildable assets in the current directory.
     # These are the assets that will be built when you compile the project.
     def buildable_assets
@@ -173,6 +209,20 @@ EOF
         super logical_path, pathname, options
       end
     end
+    
+  private
+  
+    def build_js_context(path)
+      require 'v8'
+      
+      ctx = V8::Context.new do |ctx|
+        ctx['exports'] = {}
+        ctx.eval "(function(exports) { #{File.read path} })(exports);"
+      end
+      
+      @js_contexts[path] = ctx
+    end
+    
         
   end
   

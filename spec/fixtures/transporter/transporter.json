@@ -1,0 +1,18 @@
+{
+  "name":         "transporter",
+  "version":      "2.0.0",
+  "bpm":          "0.1.0",
+
+  "description":  "DESCRIPTION HERE",
+  "author":       "YOUR NAME HERE",
+  "homepage":     "URL",
+
+  "directories": {
+    "lib":        "./lib"
+  },
+
+  "dependencies": {
+    "transport":    "0.5.0"
+  }
+  
+}
