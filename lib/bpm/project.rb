@@ -94,7 +94,8 @@ module BPM
     end
     
     def fetch_dependencies(verbose=false)
-      core_fetch_dependencies(dependencies, :runtime, verbose)
+      exp_deps = expand_local_packages dependencies, true
+      core_fetch_dependencies(exp_deps, :runtime, verbose)
     end
 
     # Builds assets directory for dependent packages
