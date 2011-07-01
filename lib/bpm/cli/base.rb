@@ -56,27 +56,27 @@ module BPM
       end
 
       desc "add [PACKAGE]", "Add package to project"
-      method_option :version,    :type => :string,  :default => ">= 0", :aliases => ['-v'],    :desc => 'Specify a version to install'
+      method_option :version,    :type => :string,  :default => nil, :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
       def add(*package_names)
-
         # map to dependencies
-        if package_names.size.zero?
+        if package_names.empty?
           abort "You must specify at least one package"
-        elsif package_names.size == 1
-          deps = {}
-          vers = options[:version]
-          vers = '>= 0-pre' if vers == '>= 0' && options[:prerelease]
-          deps[package_names.first] = vers
         else
-          if options[:version] != '>= 0'
+          if package_names.size > 1 && options[:version]
             abort "You can only name one package with the version option"
           end
-          
+
           deps = {}
-          vers = options[:prerelease] ? '>= 0-pre' : '>= 0'
-          package_names.each { |name| deps[name] = vers }
+          package_names.each do |name|
+            vers = options[:version] || (options[:prerelease] ? '>= 0-pre' : '>= 0')
+            if name =~ /^(.+?)(-(\d[\w\.]*))?\.spd$/
+              name = $1
+              vers = $3 if $3
+            end
+            deps[name] = vers
+          end
         end
 
         # find project
