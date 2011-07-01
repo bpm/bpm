@@ -43,81 +43,139 @@ describe BPM::Pipeline, "asset_path" do
     asset.pathname.should == home('hello_world', '.bpm', 'packages', 'core-test', 'resources', 'runner.css')
   end
   
-  describe "bpm_packages.js" do
-  
+  describe "generated assets" do
+
     before do
       goto_home
       set_host
       start_fake(FakeGemServer.new)
       cd home('hello_world')
-  
+
       bpm 'add', 'custom_package'
       wait
-  
+
       @project = BPM::Project.new home('hello_world')
     end
+
+    describe "bpm_packages.js" do
+  
+      subject do
+        BPM::Pipeline.new(@project).find_asset 'bpm_packages.js'
+      end
     
+      it "should return an asset of type BPM::GeneratedAsset" do
+        subject.class.should == BPM::GeneratedAsset
+      end
     
-    subject do
-      BPM::Pipeline.new(@project).find_asset 'bpm_packages.js'
-    end
+      it "should find the bpm_packages.js" do
+        subject.pathname.should == home('hello_world', 'assets', 'bpm_packages.js')
+      end
+  
+      it "should find bpm_packages as well" do
+        BPM::Pipeline.new(@project).find_asset('bpm_packages').should == subject
+      end
     
-    it "should return an asset of type BPM::GeneratedAsset" do
-      subject.class.should == BPM::GeneratedAsset
-    end
+      it "should have a manifest line" do
+        subject.to_s.should include('MANIFEST: core-test (0.4.9) custom_package (2.0.0) ivory (0.0.1) optparse (1.0.1) rake (0.8.6) spade (0.5.0)')
+      end
     
-    it "should find the bpm_packages.js" do
-      subject.pathname.should == home('hello_world', 'assets', 'bpm_packages.js')
+      it "should include any required modules in the bpm_package.js" do
+        subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'lib', 'main.js')))
+      end
+    
+      it "should reference package.json directories when resolving modules" do
+        subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'custom_dir', 'basic-module.js')))
+      end
+    
     end
   
-    it "should find bpm_packages as well" do
-      BPM::Pipeline.new(@project).find_asset('bpm_packages').should == subject
-    end
+    describe "bpm_styles.css" do
+  
+      subject do
+        BPM::Pipeline.new(@project).find_asset 'bpm_styles.css'
+      end
     
-    it "should have a manifest line" do
-      subject.to_s.should include('MANIFEST: core-test (0.4.9) custom_package (2.0.0) ivory (0.0.1) optparse (1.0.1) rake (0.8.6) spade (0.5.0)')
-    end
+      it "should find bpm_styles.css" do
+        subject.pathname.should == home('hello_world', 'assets', 'bpm_styles.css')
+      end
     
-    it "should include any required modules in the bpm_package.js" do
-      subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'lib', 'main.js')))
-    end
+      it "should include any required modules in the bpm_styles.css" do
+        subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'css', 'sample_styles.css')))
+      end
+  
+      it "should reference installed package styles as well" do
+        subject.to_s.should include(File.read(home('hello_world', '.bpm', 'packages', 'core-test', 'resources', 'runner.css')))
+      end
     
-    it "should reference package.json directories when resolving modules" do
-      subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'custom_dir', 'basic-module.js')))
     end
+
+    describe "hello_world/app_package.js" do
+  
+      before do
+        FileUtils.mkdir_p home('hello_world', 'assets', 'hello_world')
+        FileUtils.touch home('hello_world', 'assets', 'hello_world', 'app_package.js')
+      end
     
+      subject do
+        BPM::Pipeline.new(@project).find_asset 'hello_world/app_package.js'
+      end
+    
+      it "should return an asset of type BPM::GeneratedAsset" do
+        subject.class.should == BPM::GeneratedAsset
+      end
+    
+      it "should find the app_package.js" do
+        subject.pathname.should == home('hello_world', 'assets', 'hello_world', 'app_package.js')
+      end
+  
+      it "should find app_package as well" do
+        BPM::Pipeline.new(@project).find_asset('hello_world/app_package').should == subject
+      end
+    
+      it "should have a manifest line" do
+        subject.to_s.should include('MANIFEST: hello_world (2.0.0)')
+      end
+    
+      it "should include any required modules in the app_package" do
+        subject.to_s.should include(File.read(home('hello_world', 'lib', 'main.js')))
+      end
+    end
+
+    describe "hello_world/app_styles.css" do
+
+      before do
+        FileUtils.mkdir_p home('hello_world', 'assets', 'hello_world')
+        FileUtils.touch home('hello_world', 'assets', 'hello_world', 'app_styles.css')
+      end
+
+      subject do
+        BPM::Pipeline.new(@project).find_asset 'hello_world/app_styles.css'
+      end
+
+      it "should return an asset of type BPM::GeneratedAsset" do
+        subject.class.should == BPM::GeneratedAsset
+      end
+
+      it "should find the app_styles.css" do
+        subject.pathname.should == home('hello_world', 'assets', 'hello_world', 'app_styles.css')
+      end
+
+      it "should find app_styles as well" do
+        BPM::Pipeline.new(@project).find_asset('hello_world/app_styles').should == subject
+      end
+
+      it "should have a manifest line" do
+        subject.to_s.should include('MANIFEST: hello_world (2.0.0)')
+      end
+
+      it "should include any required modules in the app_package" do
+        subject.to_s.should include(File.read(home('hello_world', 'css', 'dummy.css')))
+      end
+
+    end
+      
   end
   
-  describe "bpm_styles.css" do
-  
-    before do
-      goto_home
-      set_host
-      start_fake(FakeGemServer.new)
-      cd home('hello_world')
-  
-      bpm 'add', 'custom_package'
-      wait
-    end
-    
-    subject do
-      project = BPM::Project.new home('hello_world')
-      BPM::Pipeline.new(project).find_asset 'bpm_styles.css'
-    end
-    
-    it "should find bpm_styles.css" do
-      subject.pathname.should == home('hello_world', 'assets', 'bpm_styles.css')
-    end
-    
-    it "should include any required modules in the bpm_styles.css" do
-      subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'css', 'sample_styles.css')))
-    end
-  
-    it "should reference installed package styles as well" do
-      subject.to_s.should include(File.read(home('hello_world', '.bpm', 'packages', 'core-test', 'resources', 'runner.css')))
-    end
-    
-  end
 end
 
 

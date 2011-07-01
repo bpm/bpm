@@ -49,7 +49,7 @@ module BPM
       
       # make sure the logical_path can be used to simply build into the 
       # assets directory when we are done
-      ret = ['bpm_packages.js', 'bpm_styles.css']
+      ret = ['bpm_packages.js', 'bpm_styles.css', "#{project.name}/app_package.js", "#{project.name}/app_styles.css"]
       
       project.local_deps.each do |pkg|
         pkg.load_json
@@ -74,6 +74,10 @@ module BPM
         File.join project.root_path, 'assets', filename
       end
 
+      magic_paths += %w(app_package.js app_styles.css).map do |filename|
+        File.join project.root_path, 'assets', project.name, filename
+      end
+            
       if magic_paths.include? pathname.to_s
         BPM::GeneratedAsset.new(self, logical_path, pathname, options)
       else

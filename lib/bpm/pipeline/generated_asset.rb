@@ -20,8 +20,9 @@ module BPM
     def build_dependency_context_and_body
 
       project = environment.project
-      if project.local_deps.size > 0
-        manifest = project.local_deps.map do |x| 
+      pkgs = pathname.to_s =~ /app_/ ? [project] : project.local_deps
+      if pkgs.size > 0
+        manifest = pkgs.map do |x| 
           "#{x.name} (#{x.version})"
         end.join " "
       else
@@ -48,7 +49,7 @@ EOF
 
       dir_name, dir_method = FORMAT_METHODS[content_type] || ['lib', 'pipeline_libs']
 
-      project.local_deps.map do |pkg|
+      pkgs.map do |pkg|
         pkg.load_json
         pkg.send(dir_method).each do |dir|
           dir_name = pkg.directories[dir] || dir 
