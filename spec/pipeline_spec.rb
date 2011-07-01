@@ -250,8 +250,8 @@ describe BPM::Pipeline, 'transport processor' do
     FileUtils.cp_r fixtures('transporter'), '.'
     cd home('transporter')
 
-    # bpm 'compile'
-    # wait
+    bpm 'compile'
+    wait
   end
   
   subject do
