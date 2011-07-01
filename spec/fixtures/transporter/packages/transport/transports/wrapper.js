@@ -1,5 +1,5 @@
 
-exports.compileTransport = function(body, pkg, moduleId) {
-  return "define_transport(function() {\n"+body+"\n});";
+exports.compileTransport = function(body, pkg, moduleId, filename) {
+  return "define_transport(function() {\n"+body+"\n}), '"+pkg.name+"', '"+moduleId+"', '"+filename+"');";
 };
 

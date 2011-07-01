@@ -13,13 +13,17 @@ module BPM
         raise "#{pkg.name} depends on #{transport_plugins.size} packages that define transport plugins.  Select a plugin by adding a `plugin:transport` property to the package.json"
       elsif transport_plugins.size == 1
         transport_module = transport_plugins.first
-        
+
         transport_path   = context.resolve project.path_from_module(transport_module)
+
+        project_path = project.root_path.to_s
+        project_path << '/' if project_path !~ /\/$/
+        filepath = file.sub(/^#{project_path}/,'')
 
         ctx = context.environment.js_context_for transport_path
         ctx["PACKAGE_INFO"] = pkg.attributes
         ctx["DATA"]         = data
-        wrapped = ctx.eval "exports.compileTransport(DATA, PACKAGE_INFO, '#{module_id}');"
+        wrapped = ctx.eval "exports.compileTransport(DATA, PACKAGE_INFO, '#{module_id}', '#{filepath}');"
 
         wrapped
       else

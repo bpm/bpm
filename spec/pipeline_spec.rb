@@ -203,7 +203,7 @@ describe BPM::Pipeline, 'transport processor' do
   
   it "should wrap main.js" do
     asset = subject.find_asset 'transporter/lib/main.js'
-    asset.to_s.should include('define_transport(function() {');
+    asset.to_s.should == "define_transport(function() {\n//TRANSPORT\ntransporter();\n//TRANSPORT\n;\n\n}), 'transporter', 'main', 'lib/main.js');"
     asset.pathname.to_s.should == File.join(Dir.pwd, 'lib', 'main.js')
   end
   
