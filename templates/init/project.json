@@ -12,5 +12,7 @@
     "tests":      "./tests"
   },
 
-  "dependencies": {}
+  "dependencies": {
+    <%= %["#{package.name}": "#{package.version}"] if package %>
+  }
 }

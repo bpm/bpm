@@ -29,10 +29,10 @@ module BPM
   class Generator
     include Thor::Actions
 
-    attr_reader :name
+    attr_reader :name, :package
 
-    def initialize(thor, name, root, template_path=nil)
-      @thor, @name, @template_path = thor, name, template_path
+    def initialize(thor, name, root, template_path=nil, package=nil)
+      @thor, @name, @template_path, @package = thor, name, template_path, package
 
       self.destination_root = root
     end

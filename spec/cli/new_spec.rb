@@ -48,41 +48,67 @@ describe "bpm new" do
 
   describe "package templates" do
 
-    before do
-      goto_home
+    describe "with custom generator" do
 
-      # Install package
-      cd fixtures
-      with_env do
-        BPM::Remote.new.install("custom_generator-1.0.bpkg", ">= 0", false)
+      before do
+        goto_home
+
+        # Install package
+        cd fixtures
+        with_env do
+          BPM::Remote.new.install("custom_generator-1.0.bpkg", ">= 0", false)
+        end
+        cd home
       end
-      cd home
-    end
 
-    it "should create custom files" do
-      bpm 'new', 'BpmTest', '--package=custom_generator'
+      it "should create custom files" do
+        bpm 'new', 'BpmTest', '--package=custom_generator'
 
-      files = %w(lib lib/main.js app.js BpmTest.json assets assets/bpm_packages.js assets/bpm_styles.css)
+        files = %w(lib lib/main.js app.js BpmTest.json assets assets/bpm_packages.js assets/bpm_styles.css)
 
-      # output without coloration
-      output = stdout.read.gsub(/\e\[\d+m/,'')
+        # output without coloration
+        output = stdout.read.gsub(/\e\[\d+m/,'')
 
-      files.each do |file|
-        output.should =~ /create\s+#{file}$/
-        home("bpm_test", file).should exist
+        files.each do |file|
+          output.should =~ /create\s+#{file}$/
+          home("bpm_test", file).should exist
+        end
       end
+
+      it "should create custom app.js with explicit generator" do
+        bpm 'new', 'BpmTest', '--package=custom_generator' and wait
+
+        File.read(home("bpm_test", "app.js")).should == "require('BpmTest/main.js')\n"
+      end
+
+      it "should create custom project.json without explicit generator" do
+        bpm 'new', 'BpmTest', '--package=custom_generator' and wait
+
+        File.read(home("bpm_test", "BpmTest.json")).should =~ /"spade": ">= 0"/
+      end
+
     end
 
-    it "should create custom app.js with explicit generator" do
-      bpm 'new', 'BpmTest', '--package=custom_generator' and wait
+    describe "with custom generator" do
 
-      File.read(home("bpm_test", "app.js")).should == "require('BpmTest/main.js')\n"
-    end
+      before do
+        goto_home
 
-    it "should create custom project.json without explicit generator" do
-      bpm 'new', 'BpmTest', '--package=custom_generator' and wait
+        # Install package
+        cd fixtures
+        with_env do
+          installed = BPM::Remote.new.install("jquery-1.4.3.bpkg", ">= 0", false)
+          puts installed.inspect
+        end
+        cd home
+      end
 
-      File.read(home("bpm_test", "BpmTest.json")).should =~ /"spade": ">= 0"/
+      it "should add package as a dependency even if it doesn't have custom generator" do
+        bpm 'new', 'BpmTest', '--package=jquery' and wait
+
+        File.read(home("bpm_test", "BpmTest.json")).should =~ /"dependencies": {\n\s+"jquery": "1.4.3"\n\s+}/
+      end
+
     end
 
     it "should install the package if it doesn't exist locally"

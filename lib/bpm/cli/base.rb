@@ -220,7 +220,7 @@ module BPM
 
         path = File.expand_path(options[:path] || underscore(name))
         generator = get_generator(:project, package)
-        success = generator.new(self, name, path, template_path).run
+        success = generator.new(self, name, path, template_path, package).run
 
         run_init(name, path, package) if success
       end
@@ -287,7 +287,7 @@ module BPM
           template_path = package ? package.template_path(:init) : nil
 
           generator = get_generator(:init, package)
-          generator.new(self, name, path, package && template_path).run
+          generator.new(self, name, path, template_path, package).run
 
           project = BPM::Project.new(path, name)
           project.fetch_dependencies true
@@ -335,10 +335,12 @@ module BPM
 
         def install_package(pkg_name)
           return nil unless pkg_name
-          dep = LibGems::Dependency.new(pkg_name)
-          installed = LibGems.source_index.search(dep)
-          if installed.empty?
-            installed = BPM::Remote.new.install(pkg_name)
+          begin
+            # Try remote first to get the latest versions
+            installed = BPM::Remote.new.install(pkg_name, ">= 0", false)
+          rescue LibGems::GemNotFoundException
+            dep = LibGems::Dependency.new(pkg_name)
+            installed = LibGems.source_index.search(dep)
           end
           spec = installed.find{|p| p.name == pkg_name }
           abort "Unable to find package: #{pkg_name}" unless spec
