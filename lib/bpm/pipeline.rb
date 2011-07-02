@@ -1,4 +1,5 @@
 require 'sprockets'
+require 'v8'
 
 module BPM
 
@@ -90,14 +91,15 @@ module BPM
   private
   
     def build_js_context(path)
-      require 'v8'
-      
-      ctx = V8::Context.new do |ctx|
-        ctx['exports'] = {}
-        ctx.eval "(function(exports) { #{File.read path} })(exports);"
+      ctx = nil
+      V8::C::Locker() do
+        ctx = V8::Context.new do |ctx|
+          ctx['exports'] = {}
+          ctx.eval "(function(exports) { #{File.read path} })(exports);"
+        end
       end
+      ctx
       
-      @js_contexts[path] = ctx
     end
     
         

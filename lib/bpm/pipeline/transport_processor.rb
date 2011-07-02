@@ -24,9 +24,13 @@ module BPM
 
       transport_path = context.resolve project.path_from_module(transport_plugins.first)
       ctx = context.environment.js_context_for transport_path
-      ctx["PACKAGE_INFO"] = pkg.attributes
-      ctx["DATA"]         = data
-      out = ctx.eval("exports.compileTransport(DATA, PACKAGE_INFO, '#{module_id}', '#{filepath}');")
+      out = ''
+
+      V8::C::Locker() do
+        ctx["PACKAGE_INFO"] = pkg.attributes
+        ctx["DATA"]         = data
+        out = ctx.eval("exports.compileTransport(DATA, PACKAGE_INFO, '#{module_id}', '#{filepath}');")
+      end
 
       out + "\n\n"
     end
