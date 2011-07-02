@@ -1,5 +1,4 @@
 require 'thor'
-require 'highline'
 
 module BPM
   module CLI
@@ -144,6 +143,7 @@ module BPM
         password = options[:password]
 
         unless email && password
+          require 'highline'
           highline = HighLine.new
           say "Enter your BPM credentials."
 
