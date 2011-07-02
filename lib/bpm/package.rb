@@ -168,11 +168,11 @@ module BPM
     end
 
     def transport_plugins(project)
-      plugin_modules('plugin:transport', project)
+      plugin_modules('plugin:transport', project, false)
     end
 
-    def plugin_modules(key_name, project)
-      return [@attributes[key_name]] if @attributes[key_name]
+    def plugin_modules(key_name, project, own=true)
+      return [@attributes[key_name]] if own && @attributes[key_name]
       dependencies.keys.map do |pkg_name| 
         dep = project.local_deps.find do |pkg| 
           pkg.load_json

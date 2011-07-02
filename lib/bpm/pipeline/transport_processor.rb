@@ -8,27 +8,27 @@ module BPM
       project = context.environment.project
       pkg, module_id = project.package_and_module_from_path file
       transport_plugins = pkg.transport_plugins(project)
-      
+
+      # No transport, just return the existing data
+      return data if transport_plugins.empty?
+
       if transport_plugins.size > 1
-        raise "#{pkg.name} depends on #{transport_plugins.size} packages that define transport plugins.  Select a plugin by adding a `plugin:transport` property to the package.json"
-      elsif transport_plugins.size == 1
-        transport_module = transport_plugins.first
-
-        transport_path   = context.resolve project.path_from_module(transport_module)
-
-        project_path = project.root_path.to_s
-        project_path << '/' if project_path !~ /\/$/
-        filepath = file.sub(/^#{project_path}/,'')
-
-        ctx = context.environment.js_context_for transport_path
-        ctx["PACKAGE_INFO"] = pkg.attributes
-        ctx["DATA"]         = data
-        wrapped = ctx.eval "exports.compileTransport(DATA, PACKAGE_INFO, '#{module_id}', '#{filepath}');"
-
-        wrapped
-      else
-        data
+        # TODO: Maybe make custom error for this
+        raise "#{pkg.name} depends on #{transport_plugins.size} packages that define transport plugins. " \
+                "Select a plugin by adding a `plugin:transport` property to the package.json"
       end
+
+      project_path = project.root_path.to_s
+      project_path << '/' if project_path !~ /\/$/
+      filepath = file.sub(/^#{project_path}/,'') # relative file path from project
+
+      transport_path = context.resolve project.path_from_module(transport_plugins.first)
+      ctx = context.environment.js_context_for transport_path
+      ctx["PACKAGE_INFO"] = pkg.attributes
+      ctx["DATA"]         = data
+      out = ctx.eval("exports.compileTransport(DATA, PACKAGE_INFO, '#{module_id}', '#{filepath}');")
+
+      out + "\n\n"
     end
     
   end

@@ -26,9 +26,11 @@ module BPM
         unregister_processor kind, Sprockets::DirectiveProcessor
         register_processor   kind, BPM::DirectiveProcessor
       end
-      
+
       register_postprocessor 'application/javascript', BPM::TransportProcessor
-      
+
+      # This gunks things up. I'm not a fan - PDW
+      unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
 
       # configure search paths
       append_path File.join project_path, '.bpm', 'packages'
