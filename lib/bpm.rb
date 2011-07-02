@@ -1,4 +1,4 @@
-require 'sprockets'
+require 'vendored_sprockets'
 
 module BPM
   BPM_DIR = ".bpm"
