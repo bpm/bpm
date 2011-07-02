@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rack", "~> 1.2.1"
 
   paths = `git submodule`.split("\n").map do |line|
-    path = line.gsub(/^ \w+ ([^\s]+) .+$/,'\1')
+    path = line.gsub(/^.\w+\s+(\S+).*/,'\1')
     `cd #{path}; git ls-files`.split("\n").map { |p| File.join(path, p) }
   end
   paths << `git ls-files`.split("\n")
