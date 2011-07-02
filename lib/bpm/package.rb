@@ -24,10 +24,6 @@ module BPM
       @metadata = {}
     end
 
-    def bpm
-      @bpm || BPM::VERSION
-    end
-
     def bpkg=(spec)
       unless spec.is_a?(LibGems::Specification)
         spec = LibGems::Format.from_file_by_path(spec.to_s).spec

@@ -9,9 +9,12 @@ module BPM
     BPM_DIR = '.bpm'
 
     def self.project_file_path(path)
-      json_path = File.join path, "#{File.basename(path)}.json"
-      json = JSON.load(File.read(json_path)) rescue nil
-      return json && json["bpm"] && json_path
+      Dir[File.join(path, '*.json')].find{|p| is_project_json?(p) }
+    end
+
+    def self.is_project_json?(path)
+      json = JSON.load(File.read(path)) rescue nil
+      return !!(json && json["bpm"])
     end
 
     def self.is_project_root?(path)
@@ -36,10 +39,20 @@ module BPM
     def initialize(root_path, name=nil)
       super root_path
 
+      if !name
+        # If no name, try to find project json and get name from it
+        project_file = self.class.project_file_path(root_path)
+        name = File.basename(project_file, '.json') if project_file
+      end
+
       @name = name || File.basename(root_path)
-      @json_path = File.join root_path, "#{@name}.json"
+      @json_path = File.join(root_path, "#{@name}.json")
 
       load_json && validate
+    end
+
+    def bpm
+      @bpm || BPM::VERSION
     end
 
     def add_dependencies(new_deps, verbose=false)
@@ -230,7 +243,13 @@ module BPM
       
       @local_deps = nil
     end
-    
+
+    def as_json
+      json = super
+      json["bpm"] = self.bpm
+      json
+    end
+
   private
 
     def read

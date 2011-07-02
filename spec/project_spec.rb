@@ -2,20 +2,26 @@ require "spec_helper"
 
 describe BPM::Project, "project_file_path" do
 
-  it "should return both project file paths" do
+  it "should return project file path" do
     path = fixtures('hello_world')
     expected = File.join(path, 'hello_world.json')
     BPM::Project.project_file_path(path).should == expected
   end
 
-  it "should return [] on a package" do
+  it "should return nil on a package" do
     path = fixtures('core-test')
     BPM::Project.project_file_path(path).should == nil
   end
 
-  it "should return [] on a project with no file" do
+  it "should return nil on a project with no file" do
     path = fixtures('simple_hello')
     BPM::Project.project_file_path(path).should == nil
+  end
+
+  it "should return project path with different name" do
+    path = fixtures('custom_name')
+    expected = File.join(path, 'MyProject.json')
+    BPM::Project.project_file_path(path).should == expected
   end
 
 end
@@ -127,4 +133,14 @@ describe BPM::Project, "project metadata" do
     
   end
   
+end
+
+describe BPM::Project, "converting" do
+  subject do
+    BPM::Project.nearest_project(fixtures("hello_world")).as_json
+  end
+
+  it "should have bpm set to current version" do
+    subject["bpm"].should == BPM::VERSION
+  end
 end
