@@ -3,10 +3,6 @@ require 'v8'
 
 module BPM
 
-  autoload :DirectiveProcessor,   'bpm/pipeline/directive_processor'
-  autoload :GeneratedAsset,       'bpm/pipeline/generated_asset'
-  autoload :TransportProcessor,   'bpm/pipeline/transport_processor'
-  
   # A BPM package-aware asset pipeline.  Asset lookup respects package.json
   # directory configurations as well as loading preprocessors, formats, and
   # postprocessors from the package config.
