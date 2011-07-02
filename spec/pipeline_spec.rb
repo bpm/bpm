@@ -259,13 +259,17 @@ describe BPM::Pipeline, 'transport processor' do
     BPM::Pipeline.new project
   end
   
-  it "should wrap main.js" do
+  it "should wrap the project's main.js" do
     asset = subject.find_asset 'transporter/lib/main.js'
-    asset.to_s.should == "define_transport(function() {\n//TRANSPORT\ntransporter();\n//TRANSPORT\n;\n\n}), 'transporter', 'main', 'lib/main.js');"
+    asset.to_s.should == "define_transport(function() {\n//TRANSPORT\ntransporter();\n//TRANSPORT\n\n}), 'transporter', 'main', 'lib/main.js');\n\n"
     asset.pathname.to_s.should == File.join(Dir.pwd, 'lib', 'main.js')
   end
-  
-  
+
+  it "should not wrap transport/main.js" do
+    asset = subject.find_asset 'transport/lib/main.js'
+    asset.to_s.should == "// TRANSPORT DEMO\n"
+  end
+
 end
 
   
