@@ -16,7 +16,7 @@ describe "bpm push" do
     end
 
     it "registers a gem when sent with the right api key" do
-      bpm "push", "../../spec/fixtures/rake-0.8.7.spd"
+      bpm "push", "../../spec/fixtures/rake-0.8.7.bpkg"
 
       stdout.read.should include("Successfully registered rake (0.8.7)")
     end
@@ -25,7 +25,7 @@ describe "bpm push" do
   it "shows rejection message if wrong api key is supplied" do
     write_api_key("beefbeef")
 
-    bpm "push", "../../spec/fixtures/rake-0.8.7.spd"
+    bpm "push", "../../spec/fixtures/rake-0.8.7.bpkg"
 
     stdout.read.should include("One cannot simply walk into Mordor!")
   end
@@ -40,13 +40,13 @@ describe "bpm push without api key" do
   end
 
   it "ignores files that don't exist" do
-    bpm "push", "rake-1.0.0.spd"
+    bpm "push", "rake-1.0.0.bpkg"
 
     stdout.read.should include("No such file")
   end
 
   it "must push a valid gem" do
-    bpm "push", "../../spec/fixtures/badrake-0.8.7.spd"
+    bpm "push", "../../spec/fixtures/badrake-0.8.7.bpkg"
 
     stdout.read.should include("There was a problem opening your package.")
   end
@@ -66,7 +66,7 @@ describe "bpm push without api key" do
   end
 
   it "asks for login first if api key does not exist" do
-    bpm "push", "../../spec/fixtures/rake-0.8.7.spd"
+    bpm "push", "../../spec/fixtures/rake-0.8.7.bpkg"
 
     stdout.read.should include("Please login first with `bpm login`")
   end

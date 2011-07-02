@@ -54,7 +54,7 @@ describe "bpm new" do
       # Install package
       cd fixtures
       with_env do
-        BPM::Remote.new.install("custom_generator-1.0.spd", ">= 0", false)
+        BPM::Remote.new.install("custom_generator-1.0.bpkg", ">= 0", false)
       end
       cd home
     end

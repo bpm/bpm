@@ -3,7 +3,7 @@ require 'libgems/dependency_installer'
 module LibGems
   class DependencyInstaller
 
-    # Had to overwrite this all just to change the match from /gem$/ to /spd$/
+    # Had to overwrite this all just to change the match from /gem$/ to /bpkg$/
     # TODO: Consider whether extension should be settable in LibGems
     def find_spec_by_name_and_version(gem_name,
                                       version = LibGems::Requirement.default,
@@ -20,7 +20,7 @@ module LibGems
 
       unless local_gems.empty? then
         local_gems.each do |gem_file|
-          next unless gem_file =~ /spd$/
+          next unless gem_file =~ /bpkg$/
           begin
             spec = LibGems::Format.from_file_by_path(gem_file).spec
             spec_and_source = [spec, gem_file]
@@ -69,7 +69,7 @@ module LibGems
           next if @source_index.any? { |n,_| n == spec.full_name } and not last
 
           # TODO: make this sorta_verbose so other users can benefit from it
-          say "Installing spd #{spec.full_name}" if LibGems.configuration.really_verbose
+          say "Installing bpkg #{spec.full_name}" if LibGems.configuration.really_verbose
 
           _, source_uri = @specs_and_sources.assoc spec
           begin
@@ -108,7 +108,7 @@ module LibGems
       gems_and_sources = []
 
       if @domain == :both or @domain == :local then
-        Dir[File.join(Dir.pwd, "#{dep.name}-[0-9]*.spd")].each do |gem_file|
+        Dir[File.join(Dir.pwd, "#{dep.name}-[0-9]*.bpkg")].each do |gem_file|
           spec = LibGems::Format.from_file_by_path(gem_file).spec
           gems_and_sources << [spec, gem_file] if spec.name == dep.name
         end

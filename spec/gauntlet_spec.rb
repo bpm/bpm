@@ -25,8 +25,8 @@ describe "bpm build the gauntlet" do
       bpm "build"
 
       exit_status.should be_success
-      stdout.read.should include("Successfully built package: #{package}-#{version}.spd")
-      File.exist?(tmp.join(package, "#{package}-#{version}.spd"))
+      stdout.read.should include("Successfully built package: #{package}-#{version}.bpkg")
+      File.exist?(tmp.join(package, "#{package}-#{version}.bpkg"))
     end
   end
 =end

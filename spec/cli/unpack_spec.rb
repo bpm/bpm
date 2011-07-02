@@ -6,8 +6,8 @@ describe "bpm unpack" do
   end
 
   it "builds a gem from a given package.json" do
-    FileUtils.cp fixtures("coffee-1.0.1.pre.spd"), "."
-    bpm "unpack", "coffee-1.0.1.pre.spd"
+    FileUtils.cp fixtures("coffee-1.0.1.pre.bpkg"), "."
+    bpm "unpack", "coffee-1.0.1.pre.bpkg"
 
     exit_status.should be_success
     output = stdout.read
@@ -22,8 +22,8 @@ describe "bpm unpack" do
   end
 
   it "can unpack to a different directory" do
-    FileUtils.cp fixtures("coffee-1.0.1.pre.spd"), "."
-    bpm "unpack", "coffee-1.0.1.pre.spd", "--target", "star/bucks"
+    FileUtils.cp fixtures("coffee-1.0.1.pre.bpkg"), "."
+    bpm "unpack", "coffee-1.0.1.pre.bpkg", "--target", "star/bucks"
 
     exit_status.should be_success
     output = stdout.read
@@ -33,9 +33,9 @@ describe "bpm unpack" do
   end
 
   it "can unpack more than one package" do
-    FileUtils.cp fixtures("coffee-1.0.1.pre.spd"), "."
-    FileUtils.cp fixtures("jquery-1.4.3.spd"), "."
-    bpm "unpack", "coffee-1.0.1.pre.spd", "jquery-1.4.3.spd"
+    FileUtils.cp fixtures("coffee-1.0.1.pre.bpkg"), "."
+    FileUtils.cp fixtures("jquery-1.4.3.bpkg"), "."
+    bpm "unpack", "coffee-1.0.1.pre.bpkg", "jquery-1.4.3.bpkg"
 
     exit_status.should be_success
     output = stdout.read
@@ -49,24 +49,24 @@ describe "bpm unpack" do
   it "shows a friendly error message if bpm can't write to the given directory" do
     FileUtils.mkdir_p(home("bad"))
     cd(home("bad"))
-    FileUtils.cp fixtures("jquery-1.4.3.spd"), "."
+    FileUtils.cp fixtures("jquery-1.4.3.bpkg"), "."
     FileUtils.chmod 0555, "."
-    bpm "unpack", "jquery-1.4.3.spd", :track_stderr => true
+    bpm "unpack", "jquery-1.4.3.bpkg", :track_stderr => true
 
     exit_status.should_not be_success
     output = stderr.read
-    output.should include("There was a problem unpacking jquery-1.4.3.spd:")
+    output.should include("There was a problem unpacking jquery-1.4.3.bpkg:")
     output.should include("Permission denied")
   end
 
   it "shows a friendly error message if bpm can't read the package" do
-    FileUtils.cp fixtures("jquery-1.4.3.spd"), "."
-    FileUtils.chmod 0000, "jquery-1.4.3.spd"
-    bpm "unpack", "jquery-1.4.3.spd", :track_stderr => true
+    FileUtils.cp fixtures("jquery-1.4.3.bpkg"), "."
+    FileUtils.chmod 0000, "jquery-1.4.3.bpkg"
+    bpm "unpack", "jquery-1.4.3.bpkg", :track_stderr => true
 
     exit_status.should_not be_success
     output = stderr.read
-    output.should include("There was a problem unpacking jquery-1.4.3.spd:")
+    output.should include("There was a problem unpacking jquery-1.4.3.bpkg:")
     output.should include("Permission denied")
   end
 end

@@ -91,8 +91,8 @@ describe BPM::Package, "#to_spec" do
     expand_sort(subject.test_files).should == expand_sort(test_files)
   end
 
-  it "hacks the file name to return .spd" do
-    subject.file_name.should == "core-test-0.4.9.spd"
+  it "hacks the file name to return .bpkg" do
+    subject.file_name.should == "core-test-0.4.9.bpkg"
   end
 
   it "sets the rubyforge_project to appease older versions of rubygems" do
@@ -122,7 +122,7 @@ describe BPM::Package, "converting" do
 
   subject do
     package = BPM::Package.new
-    package.bpkg = fixtures("core-test-0.4.9.spd")
+    package.bpkg = fixtures("core-test-0.4.9.bpkg")
     package.as_json
   end
 

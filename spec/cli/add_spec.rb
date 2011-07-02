@@ -156,7 +156,7 @@ describe 'bpm add' do
 
   it "should verify working with config-less projects"
 
-  it "should work with .spd file"
-  # i.e. `bpm add package.spd`
+  it "should work with .bpkg file"
+  # i.e. `bpm add package.bpkg`
 
 end
