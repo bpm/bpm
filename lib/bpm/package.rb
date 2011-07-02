@@ -166,6 +166,10 @@ module BPM
     def transport_plugins(project)
       plugin_modules('plugin:transport', project, false)
     end
+    
+    def minifier_plugins(project)
+      [@attributes['plugin:minifier']].compact
+    end
 
     def plugin_modules(key_name, project, own=true)
       return [@attributes[key_name]] if own && @attributes[key_name]

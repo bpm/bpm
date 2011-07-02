@@ -1,0 +1,21 @@
+{
+  "name":         "uglyduck",
+  "version":      "1.0.0",
+  "bpm":          "0.1.0",
+
+  "description":  "DESCRIPTION HERE",
+  "author":       "YOUR NAME HERE",
+  "homepage":     "URL",
+
+  "directories": {
+    "lib":        "lib",
+    "minifier":   "minifier",
+    "test":       "tests"
+  },
+
+  "dependencies": {
+  },
+  
+  "plugin:minifier": "uglyduck/~minifier/main"
+  
+}

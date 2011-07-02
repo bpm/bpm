@@ -162,11 +162,15 @@ module BPM
       puts "\n" if verbose
     end
     
+    def package_from_name(package_name)
+      return self if package_name == self.name
+      local_deps.find { |pkg| pkg.name == package_name }
+    end
+    
     # Returns the path on disk to reach a given package name
     def path_from_package(package_name)
-      return root_path if package_name == self.name
-      path = local_deps.find { |pkg| pkg.name == package_name }
-      path && path.root_path
+      ret = package_from_name package_name
+      ret && ret.root_path
     end
     
     # Returns the path on disk for a given module id (relative to the project)
@@ -248,6 +252,10 @@ module BPM
       json = super
       json["bpm"] = self.bpm
       json
+    end
+    
+    def minifier_name
+      @attributes['pipeline'] && @attributes['pipeline']['minifier']
     end
 
   private
