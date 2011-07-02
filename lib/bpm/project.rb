@@ -203,27 +203,40 @@ module BPM
     # a package known to the project.
     def package_and_module_from_path(path)
       path = File.expand_path path.to_s
-      pkg = local_deps.find {|cur| path =~ /^#{Regexp.escape cur.root_path.to_s}/}
+      pkg = local_deps.find {|cur| path =~ /^#{Regexp.escape cur.root_path.to_s}\//}
       pkg = self if pkg.nil? && path =~ /^#{Regexp.escape root_path.to_s}/
       raise "#{path} is not within a known package" if pkg.nil?
-      
-      path = Pathname.new(path).relative_path_from(Pathname.new(pkg.root_path)).split.map { |x| x.to_s }
-      
-      dir_name = pkg.directories.find do |dir_key, dname| 
-        Array(dname).include?(path.first)
+
+      dir_name = nil
+      pkg.directories.each do |dname, dpath|
+        dpaths = Array(dpath).map{|d| File.expand_path(d, pkg.root_path) }
+        dpaths.each do |d|
+          # Find a match and see if we can replace
+          if path.gsub!(/^#{Regexp.escape(d)}\//, "#{dname}/")
+            dir_name = dname
+            break
+          end
+        end
+        break if dir_name
       end
-      
-      dir_name = dir_name ? dir_name.first : path.first
-      if dir_name == 'lib'
-        path.shift
+
+      if dir_name
+        parts = path.split("/")
       else
-        path[0] = "~#{dir_name}"
+        parts = Pathname.new(path).relative_path_from(Pathname.new(pkg.root_path)).to_s.split("/")
+        dir_name = parts.first
       end
-            
-      path[path.size-1] = File.basename path.last, '.*'
-      [pkg, path.join('/')]
+
+      if dir_name == 'lib'
+        parts.shift
+      else
+        parts[0] = "~#{dir_name}"
+      end
+
+      parts[parts.size-1] = File.basename(parts.last, '.*')
+      [pkg, parts.join('/')]
     end
-    
+
     def local_deps(verbose=false)
       @local_deps ||= build_local_deps
     end

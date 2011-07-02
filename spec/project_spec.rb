@@ -144,3 +144,23 @@ describe BPM::Project, "converting" do
     subject["bpm"].should == BPM::VERSION
   end
 end
+
+describe BPM::Project, "package_and_module_from_path" do
+
+  it "should find package in deps"
+
+  it "should fallback to self if not found in deps"
+
+  it "should throw error if no package"
+
+  it "should not match partial directories"
+  # i.e. packages/sproutcore should not match for packages/sproutcore-runtime
+
+  it "should handle and valid directory reference in package directories array"
+  # i.e. "lib": ["./lib", "./vendor/lib"]
+
+  it "should replace with directory names"
+
+  it "should not include lib directory in module name"
+
+end
