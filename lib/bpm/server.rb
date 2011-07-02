@@ -37,6 +37,11 @@ module BPM
         map '/assets' do
           run BPM::Trial.new(BPM::Pipeline.new cur_project)
         end
+        
+        map '/' do
+          run Rack::Directory.new cur_project.root_path
+        end
+        
       end.to_app
     end
     
