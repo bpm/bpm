@@ -57,7 +57,7 @@ describe 'bpm add' do
   it "adds no packages when any are invalid" do
     bpm "add", "jquery", "fake", :track_stderr => true
 
-    stderr.read.should include("Could not find package 'fake'")
+    stderr.read.should == "Could not find eligable package for 'fake' (>= 0)\n"
 
     no_dependency 'jquery'
     no_dependency 'fake'
@@ -66,7 +66,7 @@ describe 'bpm add' do
   it "fails when adding invalid package" do
     bpm "add", "fake", :track_stderr => true
 
-    stderr.read.should include("Could not find package 'fake'")
+    stderr.read.should == "Could not find eligable package for 'fake' (>= 0)\n"
     no_dependency 'fake'
   end
 
@@ -117,7 +117,7 @@ describe 'bpm add' do
   it "does not add the normal package when asking for a prerelease" do
     bpm "add", "rake", "--pre", :track_stderr => true
     wait
-    stderr.read.should include("Could not find prerelease package 'rake'")
+    stderr.read.should == "Could not find eligable package for 'rake' (>= 0-pre)\n"
     no_dependency 'rake'
   end
 
