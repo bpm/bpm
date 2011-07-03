@@ -14,6 +14,8 @@ module BPM
     # Pass in the project you want the pipeline to manage.
     def initialize(project)
       @project = project
+      @plugin_contexts = {}
+      
       project_path = project.root_path
 
       super project_path
@@ -35,11 +37,8 @@ module BPM
       append_path File.join project_path, 'assets'
     end    
       
-    # Loads the passed JavaScript file and evals it.  Used for loading 
-    # transport and other plugins.
-    def js_context_for(path)
-      @js_contexts ||= {}
-      @js_contexts[path] ||= build_js_context(path)
+    def plugin_context_for(module_id)
+      @plugin_contexts[module_id] ||= build_plugin_context(module_id)
     end
     
     # Returns an array of all the buildable assets in the current directory.
@@ -76,8 +75,12 @@ module BPM
       magic_paths += %w(app_package.js app_styles.css).map do |filename|
         File.join project.root_path, 'assets', project.name, filename
       end
-            
-      if magic_paths.include? pathname.to_s
+      
+      plugin_path = File.join project.root_path, '.bpm', 'plugins'
+      
+      if pathname.to_s =~ /^#{Regexp.escape plugin_path}/
+         BPM::PluginAsset.new(self, "spade/~transports/spade", pathname, options)     
+      elsif magic_paths.include? pathname.to_s
         BPM::GeneratedAsset.new(self, logical_path, pathname, options)
       else
         super logical_path, pathname, options
@@ -86,18 +89,20 @@ module BPM
     
   private
   
-    def build_js_context(path)
+    def build_plugin_context(module_id)
+      asset = BPM::PluginAsset.new(self, module_id)
+      plugin_text = asset.to_s
+      
       ctx = nil
       V8::C::Locker() do
         ctx = V8::Context.new do |ctx|
-          ctx['exports'] = {}
-          ctx.eval "(function(exports) { #{File.read path} })(exports);"
+          ctx['BPM_PLUGIN'] = {}
+          ctx.eval plugin_text
         end
       end
-      ctx
       
+      ctx
     end
-    
         
   end
   

@@ -261,7 +261,8 @@ describe BPM::Pipeline, 'transport processor' do
   
   it "should wrap the project's main.js" do
     asset = subject.find_asset 'transporter/lib/main.js'
-    asset.to_s.should == "define_transport(function() {\n//TRANSPORT\ntransporter();\n//TRANSPORT\n\n}), 'transporter', 'main', 'lib/main.js');\n\n"
+    exp_path = home('transporter', 'lib', 'main.js')
+    asset.to_s.should == "define_transport(function() {\n//TRANSPORT\ntransporter();\n//TRANSPORT\n\n}), 'transporter', 'main', '#{exp_path}');\n\n"
     asset.pathname.to_s.should == File.join(Dir.pwd, 'lib', 'main.js')
   end
 
@@ -297,6 +298,7 @@ describe BPM::Pipeline, 'minifier' do
     file_path = home('minitest', 'packages', 'uglyduck', 'lib', 'main.js')
     expected = <<EOF
 //MINIFIED START
+UGLY DUCK IS UGLY
 /* ===========================================================================
    BPM Static Dependencies
    MANIFEST: uglyduck (1.0.0)
@@ -316,6 +318,7 @@ EOF
     file_path = home('minitest', 'lib', 'main.js')
     expected = <<EOF
 //MINIFIED START
+UGLY DUCK IS UGLY
 /* ===========================================================================
    BPM Static Dependencies
    MANIFEST: minitest (2.0.0)

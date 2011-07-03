@@ -1,4 +1,6 @@
+/*globals BPM_PLUGIN UGLYDUCK */
 
-exports.minify = function(body, pkg, moduleId, pathname) {
-  return "//MINIFIED START\n"+body+"\n//MINIFIED END\n";
+BPM_PLUGIN.minify = function(body, pkg, moduleId, pathname) {
+  var whatIsUglyDuck = 'undefined' === typeof UGLYDUCK ? '(main not loaded)' : UGLYDUCK;
+  return "//MINIFIED START\nUGLY DUCK "+UGLYDUCK+"\n"+body+"\n//MINIFIED END\n";
 };

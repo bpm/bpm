@@ -108,6 +108,23 @@ module BPM
       read && parse
     end
 
+    def expanded_deps(project)
+      ret  = []
+      seen = []
+      todo = [self]
+      while todo.size > 0
+        pkg = todo.shift
+        pkg.dependencies.each do |dep_name|
+          next if seen.include? dep_name
+          seen << dep_name
+          found = project.local_deps.find { |x| x.name == dep_name }
+          todo << found
+          ret  << found
+        end
+      end
+      ret
+    end
+    
     # TODO: Make better errors
     # TODO: This might not work well with conflicting versions
     def local_deps(search_path=nil)
