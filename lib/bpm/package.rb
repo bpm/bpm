@@ -114,13 +114,18 @@ module BPM
       todo = [self]
       while todo.size > 0
         pkg = todo.shift
-        pkg.dependencies.each do |dep_name|
+        pkg.dependencies.each do |dep_name, dep_vers|
           next if seen.include? dep_name
           seen << dep_name
           found = project.local_deps.find { |x| x.name == dep_name }
-          todo << found
-          ret  << found
+          if found
+            todo << found
+            ret  << found
+          else
+            puts "COULD NOT FIND DEP: #{dep_name}"
+          end
         end
+        
       end
       ret
     end
@@ -195,7 +200,13 @@ module BPM
           pkg.load_json
           pkg.name == pkg_name
         end
-        dep.attributes[key_name]
+        
+        if dep
+          dep.attributes[key_name]
+        else
+          puts "COULD NOT FIND DEP: #{pkg_name}"
+        end
+        
       end.compact
     end
       

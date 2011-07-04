@@ -11,7 +11,7 @@ module BPM
       transport_plugins = pkg.transport_plugins(project)
 
       # No transport, just return the existing data
-      return data if transport_plugins.empty?
+      return data if transport_plugins.size == 0
 
       if transport_plugins.size > 1
         # TODO: Maybe make custom error for this

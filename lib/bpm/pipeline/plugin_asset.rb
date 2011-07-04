@@ -34,9 +34,10 @@ module BPM
       pkg  = project.package_from_name pkg_name
 
       # Add in the generated header
-      body = "// BPM PLUGIN: #{logical_path}\n\n"
+      body = ["// BPM PLUGIN: #{logical_path}\n\n"]
 
-      deps = [] #pkg.expanded_deps project
+      pkg.load_json
+      deps = pkg.expanded_deps project
       deps << pkg # always load pkg too
 
       # Prime digest cache with data, since we happen to have it
@@ -58,11 +59,15 @@ module BPM
         end
       end
 
-      # require asset itself
+      # require asset itself - this should be included directly in the body
+      # we don't want to use any processors
       module_path = context.resolve project.path_from_module(logical_path)
-      context.require_asset(module_path)
+      context.depend_on module_path
+      body << "(function(exports) {"
+      body << File.read(module_path)
+      body << "})(BPM_PLUGIN);\n"
       
-      return context, body
+      return context, body.join("\n")
     end
 
   end

@@ -3,6 +3,12 @@ require 'v8'
 
 module BPM
 
+  class Console
+    def log(str)
+      puts str
+    end
+  end
+  
   # A BPM package-aware asset pipeline.  Asset lookup respects package.json
   # directory configurations as well as loading preprocessors, formats, and
   # postprocessors from the package config.
@@ -96,6 +102,9 @@ module BPM
       ctx = nil
       V8::C::Locker() do
         ctx = V8::Context.new do |ctx|
+          ctx['window'] = ctx # make browser-like environment
+          ctx['console'] = BPM::Console.new
+          
           ctx['BPM_PLUGIN'] = {}
           ctx.eval plugin_text
         end
