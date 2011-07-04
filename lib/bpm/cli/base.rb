@@ -128,7 +128,7 @@ module BPM
         
         begin
           project = find_project
-          project.fetch_dependencies options[:verbose]
+          project.rebuild_dependencies nil, options[:verbose]
           project.build options[:mode], options[:verbose]
         rescue Exception => e
           abort e.message
