@@ -22,4 +22,5 @@ end
 
 # The BPM constants need to be defined first
 require 'bpm/libgems_ext'
+require 'bpm/errors'
 

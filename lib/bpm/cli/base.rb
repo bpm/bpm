@@ -81,9 +81,12 @@ module BPM
         # find project
         project = find_project
 
-        # This was wrapped in a begin/rescue Exception, but we should be selective if we rescue
-        project.add_dependencies deps, true
-        project.build :debug, true
+        begin
+          project.add_dependencies deps, true
+          project.build :debug, true
+        rescue PackageNotFoundError => e
+          abort e.message
+        end
       end
 
       desc "remove [PACKAGE]", "Remove package from project"

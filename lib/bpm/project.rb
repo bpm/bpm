@@ -435,7 +435,7 @@ module BPM
         pkg = locate_package package_name, vers, verbose
 
         if pkg.nil?
-          raise "Could not find eligable package for '#{package_name}' (#{vers})"
+          raise PackageNotFoundError.new(package_name, vers)
         end
 
         # Add dependencies for found package to list
