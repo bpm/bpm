@@ -81,12 +81,9 @@ module BPM
         # find project
         project = find_project
 
-        begin
-          project.add_dependencies deps, true
-          project.build :debug, true
-        rescue Exception => e
-          abort e.message
-        end
+        # This was wrapped in a begin/rescue Exception, but we should be selective if we rescue
+        project.add_dependencies deps, true
+        project.build :debug, true
       end
 
       desc "remove [PACKAGE]", "Remove package from project"
