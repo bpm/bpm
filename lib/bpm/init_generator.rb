@@ -31,9 +31,8 @@ module BPM
       def convert_package(destination_root)
         package = BPM::Package.new(destination_root)
         package.load_json
-        File.open("#{name}.json", "w") do |f|
-          f.write JSON.pretty_generate(package.as_json)
-        end
+        new_json = JSON.pretty_generate(package.as_json)
+        File.open("#{name}.json", "w"){|f| f.write new_json }
         puts "created #{name}.json from package.json"
       end
 
