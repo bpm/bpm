@@ -1,4 +1,5 @@
 require 'json'
+require 'bpm/version'
 
 module BPM
 
