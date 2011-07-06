@@ -98,7 +98,6 @@ describe "bpm new" do
         cd fixtures
         with_env do
           installed = BPM::Remote.new.install("jquery-1.4.3.bpkg", ">= 0", false)
-          puts installed.inspect
         end
         cd home
       end

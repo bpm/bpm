@@ -10,7 +10,7 @@ describe 'bpm add' do
     FileUtils.cp_r(fixtures('hello_world'), '.')
     cd home('hello_world')
 
-    bpm 'compile'
+    bpm 'fetch'
     wait
   end
 

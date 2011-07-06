@@ -36,8 +36,8 @@ describe BPM::Pipeline, "asset_path" do
     start_fake(FakeGemServer.new)
     cd home('hello_world')
     
-    bpm 'compile'
-    wait
+    bpm 'fetch' and wait
+    bpm 'compile' and wait
   
     asset = subject.find_asset 'core-test/resources/runner.css'
     asset.pathname.should == home('hello_world', '.bpm', 'packages', 'core-test', 'resources', 'runner.css')
