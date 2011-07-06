@@ -1,0 +1,16 @@
+{
+  "directories": {
+    "lib": "lib",
+    "tests": "tests"
+  },
+  "name": "hello2",
+  "version": "0.0.1",
+  "description": "DESCRIPTION HERE",
+  "author": "YOUR NAME HERE",
+  "homepage": "URL",
+  "summary": null,
+  "dependencies": {
+    "a": ">= 0"
+  },
+  "bpm": "0.1.4"
+}
