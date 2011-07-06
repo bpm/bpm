@@ -115,7 +115,7 @@ module BPM
     # Builds assets directory for dependent packages
     def build(mode=:debug, verbose=false)
       puts "Building static assets..." if verbose
-      pipeline = BPM::Pipeline.new self
+      pipeline = BPM::Pipeline.new self, mode
       asset_root = File.join root_path, 'assets'
 
       pipeline.buildable_assets.each do |asset|

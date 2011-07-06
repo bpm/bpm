@@ -16,10 +16,12 @@ module BPM
   class Pipeline < Sprockets::Environment
     
     attr_reader :project
+    attr_reader :mode
     
     # Pass in the project you want the pipeline to manage.
-    def initialize(project)
+    def initialize(project, mode = :debug)
       @project = project
+      @mode    = mode
       @plugin_contexts = {}
       
       project_path = project.root_path

@@ -3,24 +3,11 @@ require 'sprockets'
 
 module BPM
 
-  class Trial
-    
-    def initialize(app)
-      @app = app
-    end
-    
-    def call(env)
-      puts env.to_json
-      ret = @app.call(env)
-      puts "RET = \n  #{ret * "\n  "}"
-      ret
-    end
-  end
-  
   class Server < Rack::Server
     
     def initialize(project, options=nil)
       @project = project
+      @mode    = (options && options[:mode]) || :debug 
       super options
     end
     
@@ -29,13 +16,15 @@ module BPM
     end
     
     attr_reader :project
+    attr_reader :mode
     
     def app
       cur_project = @project
+      cur_mode    = @mode
 
       @app ||= Rack::Builder.new do
         map '/assets' do
-          run BPM::Trial.new(BPM::Pipeline.new cur_project)
+          run BPM::Pipeline.new cur_project, cur_mode
         end
         
         map '/' do

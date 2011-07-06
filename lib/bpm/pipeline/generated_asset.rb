@@ -22,6 +22,7 @@ module BPM
     end
 
     def minify(body)
+      return body if environment.mode == :debug
       project = environment.project
       minifier_name = project.minifier_name
       if minifier_name && content_type == 'application/javascript' 

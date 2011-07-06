@@ -17,7 +17,7 @@ describe BPM::Pipeline, 'minifier' do
   
   subject do
     project = BPM::Project.new home('minitest')
-    BPM::Pipeline.new project
+    BPM::Pipeline.new project, :production
   end
   
   it "should wrap bpm_packages.js" do
@@ -59,6 +59,18 @@ EOF
     asset.to_s.should == expected
   end
 
+  subject do
+    project = BPM::Project.new home('minitest')
+    BPM::Pipeline.new project, :production
+  end
+  
+  it "should not wrap bpm_packages.js in debug mode" do
+    project  = BPM::Project.new home('minitest')
+    pipeline = BPM::Pipeline.new project, :debug
+    asset    = pipeline.find_asset 'minitest/app_package.js'
+    asset.to_s.should_not include('//MINIFIED START')
+  end
+  
 end
 
   

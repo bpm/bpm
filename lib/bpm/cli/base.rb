@@ -115,18 +115,17 @@ module BPM
       def autocompile
         
         project = find_project
-        puts project
-        BPM::Server.start project, :Port => options[:port]
+        BPM::Server.start project, :Port => options[:port], :mode => options[:mode].to_sym
         
       end
       
       desc "compile", "Build the bpm_package.js for development"
-      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
+      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Set build mode for compile (default production)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def compile
         project = find_project
         project.rebuild_dependencies nil, options[:verbose]
-        project.build options[:mode], options[:verbose]
+        project.build options[:mode].to_sym, options[:verbose]
       rescue PackageNotFoundError => e
         abort e.message
       end
