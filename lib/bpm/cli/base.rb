@@ -103,8 +103,7 @@ module BPM
           project.unbuild options[:verbose]
           project.remove_dependencies package_names, true
           project.build :debug, true
-          
-        rescue Exception => e
+        rescue PackageNotFoundError => e
           abort e.message
         end
       end
@@ -125,14 +124,11 @@ module BPM
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def compile
-        
-        begin
-          project = find_project
-          project.rebuild_dependencies nil, options[:verbose]
-          project.build options[:mode], options[:verbose]
-        rescue Exception => e
-          abort e.message
-        end
+        project = find_project
+        project.rebuild_dependencies nil, options[:verbose]
+        project.build options[:mode], options[:verbose]
+      rescue PackageNotFoundError => e
+        abort e.message
       end
       
       desc "login", "Log in with your BPM credentials"
