@@ -108,11 +108,11 @@ module BPM
         end
       end
 
-      desc "autocompile", "Preview server that will autocompile assets.  Useful for hacking"
+      desc "preview", "Preview server that will autocompile assets as you request them.  Useful for hacking"
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :port,       :type => :string,  :default => '4020', :desc => "Port to host server on"
-      def autocompile
+      def preview
         
         project = find_project
         BPM::Server.start project, :Port => options[:port], :mode => options[:mode].to_sym
