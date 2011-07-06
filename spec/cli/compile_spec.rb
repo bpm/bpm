@@ -29,6 +29,7 @@ describe 'bpm compile - complex dependencies' do
 // HELLO B
 
 // HELLO A
+
 EOF
 
     file.should == expected

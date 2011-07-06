@@ -241,7 +241,13 @@ module BPM
     def local_deps(verbose=false)
       @local_deps ||= build_local_deps
     end
-
+    
+    def sorted_deps
+      ret  = []
+      local_deps.each { |dep| add_sorted_dep dep, local_deps, ret }
+      ret
+    end
+    
 
     # Verifies that packages are available to meet all the dependencies
     def rebuild_dependencies(deps=nil, verbose=false)
@@ -470,6 +476,15 @@ module BPM
       end
       
       pkg
+    end
+
+    def add_sorted_dep(dep, deps, sorted)
+      return if sorted.include? dep
+      dep.dependencies.each do |dep_name, dep_vers|
+        found_dep = deps.find { |cur| cur.name == dep_name }
+        add_sorted_dep(found_dep, deps, sorted) if found_dep
+      end
+      sorted << dep unless sorted.include? dep
     end
     
   end
