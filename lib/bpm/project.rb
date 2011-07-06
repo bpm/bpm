@@ -422,6 +422,10 @@ module BPM
 
           # already seen - verify requirements are not in conflict
           pkg = ret.find { |p| p.name == package_name }
+          if pkg.nil?
+            raise "Required dependency #{package_name} not found"
+          end
+          
           unless satisfied_by? vers, pkg.version
             raise "Conflicting dependencies '#{package_name}' requires #{pkg.version} and #{vers}"
           end
