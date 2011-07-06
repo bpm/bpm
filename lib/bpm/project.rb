@@ -56,10 +56,18 @@ module BPM
       @bpm || BPM::VERSION
     end
 
-    def add_dependencies(new_deps, verbose=false)
+    def all_dependencies
+      (dependencies + development_dependencies).uniq
+    end
 
+
+    # Add a new dependency
+    #
+    # Adds to the project json and installs dependency
+
+    def add_dependencies(new_deps, verbose=false)
       old_deps  = build_local_deps(false) || []
-      
+
       hard_deps = dependencies.dup
       new_deps.each { |pkg_name, pkg_vers| hard_deps[pkg_name] = pkg_vers }
 
@@ -68,21 +76,25 @@ module BPM
 
       @dependencies = hard_deps
       rebuild_dependencies hard_deps, verbose
-      
+
       local_deps.each do |dep|
         next if old_deps.find { |pkg| (pkg.name == dep.name) && (pkg.version == dep.version) }
         puts "Added package '#{dep.name}' (#{dep.version})"
       end
 
       save!
-          
     end
+
+
+    # Remove a dependency
+    #
+    # Remove dependency from json. Does not remove from system.
 
     def remove_dependencies(package_names, verbose=false)
 
       hard_deps = dependencies.dup
       old_deps = build_local_deps false
-      
+
       package_names.each do |pkg_name|
         raise "'#{pkg_name}' is not a dependency" if hard_deps[pkg_name].nil?
         hard_deps.delete pkg_name
@@ -90,15 +102,18 @@ module BPM
 
       @dependencies = hard_deps
       rebuild_dependencies hard_deps, verbose
-      
+
       old_deps.each do |dep|
         next if local_deps.find { |pkg| (pkg.name == dep.name) && (pkg.version == dep.version) }
         puts "Removed package '#{dep.name}' (#{dep.version})"
       end
-        
+
       save!
-      
+
     end
+
+
+    # Save to json
 
     def save!
       @had_changes = false
@@ -106,13 +121,17 @@ module BPM
         fd.write JSON.pretty_generate as_json
       end
     end
-    
+
+
+    # Get dependencies from server if not installed
+
     def fetch_dependencies(verbose=false)
       exp_deps = expand_local_packages dependencies, true
       core_fetch_dependencies(exp_deps, :runtime, verbose)
     end
 
     # Builds assets directory for dependent packages
+
     def build(mode=:debug, verbose=false)
       puts "Building static assets..." if verbose
       pipeline = BPM::Pipeline.new self, mode
@@ -131,16 +150,18 @@ module BPM
           File.open(dst_path, 'w+') { |fd| fd << asset.to_s }
         end
       end
-      
+
       puts "\n" if verbose
     end
-      
+
+
     # Removes any built assets from the project.  Usually called before a
     # package is removed from the project to cleanup any assets
+
     def unbuild(verbose=false)
-      
+
       puts "Removing stale assets..." if verbose
-      
+
       pipeline = BPM::Pipeline.new self
       asset_root = File.join root_path, 'assets'
       pipeline.buildable_assets.each do |asset|
@@ -149,32 +170,39 @@ module BPM
         next unless File.exists? asset_path
         puts "~ Removing #{asset.logical_path}" if verbose
         FileUtils.rm asset_path
-        
+
         # cleanup empty directories
         while !File.exists?(asset_path)
           asset_path = File.dirname asset_path
           FileUtils.rmdir(asset_path) if File.directory?(asset_path)
-          if verbose && !File.exists?(asset_path) 
+          if verbose && !File.exists?(asset_path)
             puts "~ Removed empty directory #{File.basename asset_path}"
           end
         end
       end
-      
+
       puts "\n" if verbose
     end
-    
+
+
+    # Find package with name
+
     def package_from_name(package_name)
       return self if package_name == self.name
       local_deps.find { |pkg| pkg.name == package_name }
     end
-    
+
+
     # Returns the path on disk to reach a given package name
+
     def path_from_package(package_name)
       ret = package_from_name package_name
       ret && ret.root_path
     end
-    
+
+
     # Returns the path on disk for a given module id (relative to the project)
+
     def path_from_module(module_path)
       path_parts   = module_path.to_s.split '/'
       package_name = path_parts.shift
@@ -182,7 +210,7 @@ module BPM
       if module_path
         # expand package_name => package_name/main
         path_parts = ['main'] if path_parts.size == 0
-    
+
         # expand package_name/~dirname => package_name/mapped_dirname
         if path_parts.first && path_parts.first =~ /^~/
           dirname = path_parts.shift[1..-1]
@@ -192,16 +220,18 @@ module BPM
         pkg = BPM::Package.new(module_path)
         pkg.load_json
         dirname = (pkg && pkg.directories[dirname]) || dirname
-    
+
         # join the rest of the path
         module_path = [package_name, dirname, *path_parts] * '/'
       end
-      
+
       module_path
     end
-    
+
+
     # Returns the package object and module id for the path. Path must match
     # a package known to the project.
+
     def package_and_module_from_path(path)
       path = File.expand_path path.to_s
       pkg = local_deps.find {|cur| path =~ /^#{Regexp.escape cur.root_path.to_s}\//}
@@ -238,22 +268,29 @@ module BPM
       [pkg, parts.join('/')]
     end
 
+
+    # List local dependency names, rebuilds list first time
+
     def local_deps(verbose=false)
       @local_deps ||= build_local_deps
     end
-    
+
+
+    # List of local dependency names in order of dependency
+
     def sorted_deps
       ret  = []
       local_deps.each { |dep| add_sorted_dep dep, local_deps, ret }
       ret
     end
-    
+
 
     # Verifies that packages are available to meet all the dependencies
+
     def rebuild_dependencies(deps=nil, verbose=false)
-      
+
       puts "Selecting local dependencies..." if verbose
-      
+
       found = locate_dependencies deps||dependencies, verbose
 
       install_root = File.join root_path, '.bpm', 'packages'
@@ -264,21 +301,30 @@ module BPM
         dst_path = File.join install_root, pkg.name
         FileUtils.ln_s pkg.root_path, dst_path
       end
-      
+
       @local_deps = nil
     end
+
+
+    # Hash for conversion to json
 
     def as_json
       json = super
       json["bpm"] = self.bpm
       json
     end
-    
+
+
+    # Name of minifier
+
     def minifier_name
       @attributes['pipeline'] && @attributes['pipeline']['minifier']
     end
 
+
   private
+
+    # Read in data from json
 
     def read
       if File.exists? @json_path
@@ -289,6 +335,9 @@ module BPM
         @attributes["version"] = "0.0.1"
       end
     end
+
+
+    # Make sure fields are set up properly
 
     def validate_fields
       # TODO: Define other fields that are required for projects
@@ -301,24 +350,26 @@ module BPM
         end
       end
     end
-    
+
+
     # builds a set of dependencies that excludes locally installed packages
     # and includes their dependencies instead.
+
     def expand_local_packages(deps, verbose)
       ret = {}
-      
+
       todo = []
       seen = []
-      
+
       deps.each { |pkg_name, pkg_version| todo << [pkg_name, pkg_version] }
-      
+
       while todo.size > 0
         package_name, package_version = todo.shift
         next if seen.include? package_name
         seen << package_name
-        
+
         package_root = File.join(@root_path, 'packages', package_name)
-        
+
         if File.exists? package_root
           pkg = BPM::Package.new package_root
           pkg.load_json
@@ -327,30 +378,34 @@ module BPM
           unless req.satisfied_by? LibGems::Version.new(pkg.version)
             raise "Local package '#{pkg.name}' (#{pkg.version}) is not compatible with required version #{package_version}"
           end
-           
+
           puts "~ Using local package '#{pkg.name}' (#{pkg.version})" if verbose
-          pkg.dependencies.each do |pkg_name, pkg_vers| 
+          pkg.dependencies.each do |pkg_name, pkg_vers|
             todo << [pkg_name, pkg_vers]
           end
-          
+
         else
           ret[package_name] = package_version
         end
       end
-      
+
       ret
     end
-    
+
+
     # Fetch any dependencies into local cache for the passed set of deps
-    def core_fetch_dependencies(deps, kind, verbose)
+
+    def core_fetch_dependencies(deps, type, verbose)
       puts "Fetching packages from remote..." if verbose
       deps.each do |pkg_name, pkg_version|
-        core_fetch_dependency pkg_name, pkg_version, kind, verbose
+        core_fetch_dependency pkg_name, pkg_version, type, verbose
       end
-    end 
-  
-    def core_fetch_dependency(package_name, vers, kind, verbose)
-      
+    end
+
+
+    # Fetch a single dependency into local cache
+
+    def core_fetch_dependency(package_name, vers, type, verbose)
       prerelease = false
       if vers == '>= 0-pre'
         prerelease = true
@@ -359,7 +414,7 @@ module BPM
         prerelease = vers =~ /[a-zA-Z]/
       end
 
-      dep = LibGems::Dependency.new(package_name, vers, kind)
+      dep = LibGems::Dependency.new(package_name, vers, type)
       cur_installed = LibGems.source_index.search(dep)
 
       begin
@@ -374,18 +429,21 @@ module BPM
       end
 
       installed.each do |i|
-        puts "Fetched #{i.name} (#{i.version}) from remote" if verbose 
+        puts "Fetched #{i.name} (#{i.version}) from remote" if verbose
       end
-      
+
     end
+
+
+    # Get list of local dep names from the .bpm directory
+    #
+    # Pass +false+ to prevent the list from being rebuilt
 
     def build_local_deps(force=true)
       install_root = File.join root_path, '.bpm', 'packages'
-      unless File.exists? install_root
-        return nil if !force
-        rebuild_dependencies 
-      end
-      
+
+      rebuild_dependencies if force || !File.exists?(install_root)
+
       Dir[File.join(install_root, '*')].map do |package_name|
         pkg = BPM::Package.new package_name
         pkg.load_json
@@ -393,16 +451,25 @@ module BPM
       end
     end
 
+
+    # Tell if package is vendored
+
     def has_local_package?(package_name)
       package_root = File.join @root_path, 'packages', package_name
       File.exists? package_root
     end
 
+
+    # Tell if given version is satisfied by the passed version
+
     def satisfied_by?(req_vers, new_vers)
       req = LibGems::Requirement.new req_vers
       req_vers.sub(/^= /,'') == new_vers.sub(/^= /,'') ||
-      req.satisfied_by?(LibGems::Version.new(new_vers)) 
+      req.satisfied_by?(LibGems::Version.new(new_vers))
     end
+
+
+    # This is an odd method - PDW
 
     def clean_version(vers)
       if vers == '>= 0-pre'
@@ -413,17 +480,20 @@ module BPM
       end
       [vers, prerel]
     end
-    
+
+
+    # Get list of dependencies, raising if not found or conflicting
+
     def locate_dependencies(deps, verbose)
       todo = []
       seen = []
       ret  = []
-      
+
       deps.each { |package_name, vers| todo << [package_name, vers] }
-      
+
       while todo.size > 0
         package_name, vers = todo.shift
-        
+
         if seen.include? package_name
 
           # already seen - verify requirements are not in conflict
@@ -431,11 +501,11 @@ module BPM
           if pkg.nil?
             raise "Required dependency #{package_name} not found"
           end
-          
+
           unless satisfied_by? vers, pkg.version
             raise "Conflicting dependencies '#{package_name}' requires #{pkg.version} and #{vers}"
           end
-          
+
           next
         end
 
@@ -452,15 +522,18 @@ module BPM
         pkg.dependencies.each do |dep_name, dep_vers|
           todo << [dep_name, dep_vers]
         end
-        
+
         ret << pkg
       end
-      
+
       ret
     end
-    
+
+
+    # Find package locally or in global cache
+
     def locate_package(package_name, vers, verbose)
-      if has_local_package? package_name 
+      if has_local_package? package_name
         src_path = File.join root_path, 'packages', package_name
         pkg = BPM::Package.new src_path
         pkg.load_json
@@ -474,9 +547,12 @@ module BPM
           puts "~ Using fetched package '#{pkg.name}' (#{pkg.version})" if verbose
         end
       end
-      
+
       pkg
     end
+
+
+    # Method for help in sorting dependencies
 
     def add_sorted_dep(dep, deps, sorted)
       return if sorted.include? dep
@@ -486,7 +562,7 @@ module BPM
       end
       sorted << dep unless sorted.include? dep
     end
-    
+
   end
 
 end
