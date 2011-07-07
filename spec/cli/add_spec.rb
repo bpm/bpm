@@ -159,4 +159,16 @@ describe 'bpm add' do
   it "should work with .bpkg file"
   # i.e. `bpm add package.bpkg`
 
+  describe "--dev" do
+
+    it "should add as a development dependency" do
+      bpm "add", "custom_generator", "--dev" and wait
+      output = stdout.read
+      output.should include("Added development package 'custom_generator' (1.0)")
+      has_development_dependency 'custom_generator', '1.0'
+      no_dependency 'custom_generator', false
+    end
+
+  end
+
 end

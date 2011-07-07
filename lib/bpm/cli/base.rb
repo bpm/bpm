@@ -58,6 +58,7 @@ module BPM
       method_option :version,    :type => :string,  :default => nil, :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
+      method_option :development, :type => :boolean, :default => false, :aliases => ['--dev'], :desc => "Add as a development dependency"
       def add(*package_names)
         # map to dependencies
         if package_names.empty?
@@ -82,7 +83,7 @@ module BPM
         project = find_project
 
         begin
-          project.add_dependencies deps, true
+          project.add_dependencies deps, options[:development], true
           project.build :debug, true
         rescue PackageNotFoundError => e
           abort e.message

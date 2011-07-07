@@ -17,7 +17,8 @@ class FakeGemServer
         index("spade",     "0.5.0"),
         index("jquery",    "1.4.3"),
         index("ivory",     "0.0.1"),
-        index("optparse",  "1.0.1")
+        index("optparse",  "1.0.1"),
+        index("custom_generator", "1.0")
       ]
       [200, {"Content-Type" => "application/octet-stream"}, compress(latest_index)]
     elsif request.path =~ /prerelease_specs/
@@ -36,7 +37,8 @@ class FakeGemServer
         index("spade",     "0.5.0"),
         index("jquery",    "1.4.3"),
         index("ivory",     "0.0.1"),
-        index("optparse",  "1.0.1")
+        index("optparse",  "1.0.1"),
+        index("custom_generator", "1.0")
       ]
       [200, {"Content-Type" => "application/octet-stream"}, compress(big_index)]
     elsif request.path =~ /\/quick\/Marshal\.4\.8\/(.*)\.gemspec\.rz$/

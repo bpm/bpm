@@ -34,5 +34,9 @@ EOF
 
     file.should == expected
   end
-  
+
+  it "should build development dependencies separately"
+
+  it "should not include production dependencies in the development bundle"
+
 end

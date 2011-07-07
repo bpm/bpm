@@ -5,7 +5,8 @@ module BPM
     EXT      = "bpkg"
     METADATA = %w[keywords licenses engines main bin directories]
     FIELDS   = %w[name version description author homepage summary]
-    attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories, :dependencies, :root_path
+    attr_accessor :metadata, :lib_path, :tests_path, :errors, :json_path, :attributes, :directories,
+                    :dependencies, :development_dependencies, :root_path
     attr_accessor *FIELDS
 
     def self.from_spec(spec)
@@ -20,6 +21,7 @@ module BPM
       @email     = email
       @attributes = {}
       @dependencies = {}
+      @development_dependencies = {}
       @directories = {}
       @metadata = {}
     end
@@ -51,7 +53,8 @@ module BPM
         def spec.file_name
           "#{full_name}.#{EXT}"
         end
-        dependencies.each{|d,v| spec.add_dependency(d, v) } if dependencies
+        dependencies.each{|d,v| spec.add_dependency(d, v) }
+        development_dependencies.each{|d,v| spec.add_development_dependency(d, v) }
       end
     end
 
@@ -59,6 +62,9 @@ module BPM
       json = self.metadata.clone
       FIELDS.each{|key| json[key] = send(key)}
       json["dependencies"] = self.dependencies
+      unless self.development_dependencies.empty?
+        json["dependencies:development"] = self.development_dependencies
+      end
       json
     end
 
@@ -232,6 +238,7 @@ module BPM
       end
 
       self.dependencies = @attributes["dependencies"] || {}
+      self.development_dependencies = @attributes["dependencies:development"] || {}
       self.directories = @attributes["directories"] || {}
       self.metadata    = Hash[*@attributes.select { |k, v| METADATA.include?(k) }.flatten(1)]
     end
@@ -298,6 +305,9 @@ module BPM
 
       self.dependencies = {}
       spec.dependencies.each{|d| self.dependencies[d.name] = d.requirement.to_s }
+
+      self.development_dependencies = {}
+      spec.development_dependencies.each{|d| self.development_dependencies[d.name] = d.requirement.to_s }
 
       if spec.requirements && spec.requirements.size>0
         self.metadata = JSON.parse(spec.requirements.first)

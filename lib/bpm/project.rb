@@ -73,21 +73,22 @@ module BPM
     #
     # Adds to the project json and installs dependency
 
-    def add_dependencies(new_deps, verbose=false)
+    def add_dependencies(new_deps, development=false, verbose=false)
       old_deps  = build_local_dependency_list(false) || []
-
-      hard_deps = dependencies.dup
-      new_deps.each { |pkg_name, pkg_vers| hard_deps[pkg_name] = pkg_vers }
-
+      hard_deps = (development ? development_dependencies : dependencies).merge(new_deps)
       exp_deps = find_non_local_dependencies(hard_deps, true)
-      core_fetch_dependencies exp_deps, :runtime, true
+      core_fetch_dependencies(exp_deps, (development ? :development : :runtime), true)
 
-      @dependencies = hard_deps
-      rebuild_dependency_list hard_deps, verbose
+      if development
+        @development_dependencies = hard_deps
+      else
+        @dependencies = hard_deps
+      end
+      rebuild_dependency_list(hard_deps, verbose)
 
       local_deps.each do |dep|
         next if old_deps.find { |pkg| (pkg.name == dep.name) && (pkg.version == dep.version) }
-        puts "Added package '#{dep.name}' (#{dep.version})"
+        puts "Added #{development ? "development " : ""}package '#{dep.name}' (#{dep.version})"
       end
 
       save!
@@ -137,6 +138,15 @@ module BPM
       exp_deps = find_non_local_dependencies(dependencies, true)
       core_fetch_dependencies(exp_deps, :runtime, verbose)
     end
+
+
+    # Get development dependencies from server if not installed
+
+    def fetch_development_dependencies(verbose=false)
+      exp_deps = find_non_local_dependencies(development_dependencies, true)
+      core_fetch_dependencies(exp_deps, :development, verbose)
+    end
+
 
     # Builds assets directory for dependent packages
 
@@ -301,7 +311,7 @@ module BPM
       FileUtils.mkdir_p install_root
 
       found.each do |pkg|
-        dst_path = File.join install_root, pkg.name
+        dst_path = File.join(install_root, pkg.name)
         FileUtils.ln_s pkg.root_path, dst_path
       end
 

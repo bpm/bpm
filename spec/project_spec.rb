@@ -105,7 +105,13 @@ describe BPM::Project, "project metadata" do
         "core-test" => "0.4.9"
       }
     end
-    
+
+    it "should get development dependencies" do
+      subject.development_dependencies.should == {
+        "custom_generator" => "1.0"
+      }
+    end
+
   end
 
   describe "simple project" do
@@ -126,6 +132,7 @@ describe BPM::Project, "project metadata" do
       subject.version.should == "0.0.1"
     end
     
+    # FIXME: Is this test even useful?
     it "should get dependencies read from bpm_packages.js file" do
       subject.dependencies.should == {
       }
