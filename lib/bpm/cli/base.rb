@@ -124,7 +124,7 @@ module BPM
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def compile
         project = find_project
-        project.rebuild_dependencies nil, options[:verbose]
+        project.rebuild_dependency_list(nil, options[:verbose])
         project.build options[:mode].to_sym, options[:verbose]
       rescue PackageNotFoundError => e
         abort e.message

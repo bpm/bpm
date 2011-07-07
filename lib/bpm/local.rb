@@ -44,22 +44,17 @@ module BPM
       end
     end
     
-    def preferred_version(package, vers, prerelease)
+    def preferred_version(package, vers)
       dep = LibGems::Dependency.new package, vers
       specs = LibGems.source_index.search dep
       specs.last.version.to_s
     end
 
-    def source_root(package, vers, prerelease)
+    def source_root(package, vers)
       dep = LibGems::Dependency.new package, vers
       specs = LibGems.source_index.search dep
-
-      dep2 = LibGems::Dependency.new package, '>= 0'
-      specs2 = LibGems.source_index.search dep2 
-
       spec = specs.last
-      spec &&
-      File.join(spec.installation_path, 'gems', "#{spec.name}-#{spec.version}") 
+      spec && File.join(spec.installation_path, 'gems', "#{spec.name}-#{spec.version}")
     end
     
     private
