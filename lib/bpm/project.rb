@@ -442,7 +442,10 @@ module BPM
     def build_local_deps(force=true)
       install_root = File.join root_path, '.bpm', 'packages'
 
-      rebuild_dependencies if force || !File.exists?(install_root)
+      unless File.exists?(install_root)
+        return nil unless force
+        rebuild_dependencies
+      end
 
       Dir[File.join(install_root, '*')].map do |package_name|
         pkg = BPM::Package.new package_name
