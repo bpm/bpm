@@ -161,7 +161,7 @@ describe BPM::Project, "package_and_module_from_path" do
 
   subject do
     proj = BPM::Project.nearest_project('.')
-    proj.fetch_dependencies
+    with_env{ proj.fetch_dependencies }
     proj
   end
 
@@ -173,12 +173,12 @@ describe BPM::Project, "package_and_module_from_path" do
   end
 
   it "should find path in self" do
-    check_package_and_module(subject, File.join("css", "dummy.css"),
+    check_package_and_module(subject, home("hello_world", "css", "dummy.css"),
                               "hello_world", "~css/dummy")
   end
 
   it "should find path in dependencies" do
-    check_package_and_module(subject, File.join(".bpm", "packages", "core-test", "resources", "runner.css"),
+    check_package_and_module(subject, home("hello_world", ".bpm", "packages", "core-test", "resources", "runner.css"),
                               "core-test", "~resources/runner")
   end
 
@@ -190,19 +190,19 @@ describe BPM::Project, "package_and_module_from_path" do
   it "should not match partial directories" do
     # We're verifying that core-testing doesn't match core-test
     # Since there is no core-testing package it will fall back to the base package, hello_world
-    check_package_and_module(subject, File.join(".bpm", "packages", "core-testing", "resources", "runner.css"),
+    check_package_and_module(subject, home("hello_world", ".bpm", "packages", "core-testing", "resources", "runner.css"),
                               "hello_world", "~.bpm/packages/core-testing/resources/runner")
   end
 
   it "should handle directory reference in package directories array" do
-    check_package_and_module(subject, File.join("lib", "main.js"),
+    check_package_and_module(subject, home("hello_world", "lib", "main.js"),
                               "hello_world", "main")
-    check_package_and_module(subject, File.join("vendor", "lib", "something.js"),
+    check_package_and_module(subject, home("hello_world", "vendor", "lib", "something.js"),
                               "hello_world", "something")
   end
 
   it "should replace with directory names" do
-    check_package_and_module(subject, File.join("custom_dir", "custom.js"),
+    check_package_and_module(subject, home("hello_world", "custom_dir", "custom.js"),
                               "hello_world", "~custom/custom")
   end
 
