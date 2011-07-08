@@ -76,12 +76,14 @@ EOF
       pkgs.map do |pkg|
         pkg.load_json
         pkg.send(dir_method).each do |dir|
-          dir_name = pkg.directories[dir] || dir 
-          search_path = File.expand_path File.join(pkg.root_path, dir_name)
+          dir_names = Array(pkg.directories[dir] || dir)
+          dir_names.each do |dir_name|
+            search_path = File.expand_path File.join(pkg.root_path, dir_name)
 
-          Dir[File.join(search_path, '**', '*')].sort.each do |fn|
-            context.depend_on File.dirname(fn)
-            context.require_asset(fn) if context.asset_requirable? fn
+            Dir[File.join(search_path, '**', '*')].sort.each do |fn|
+              context.depend_on File.dirname(fn)
+              context.require_asset(fn) if context.asset_requirable? fn
+            end
           end
         end
       end
