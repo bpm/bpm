@@ -77,7 +77,7 @@ module BPM
       old_deps  = build_local_dependency_list(false) || []
       hard_deps = (development ? development_dependencies : dependencies).merge(new_deps)
       exp_deps = find_non_local_dependencies(hard_deps, true)
-      core_fetch_dependencies(exp_deps, (development ? :development : :runtime), true)
+      core_fetch_dependencies(exp_deps, (development ? :development : :runtime), verbose)
 
       if development
         @development_dependencies = hard_deps

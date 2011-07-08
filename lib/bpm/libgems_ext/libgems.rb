@@ -36,4 +36,13 @@ module LibGems
     set_home(ENV['BPM_HOME'] || LibGems.configuration.home || default_dir) unless @gem_home
     @gem_home
   end
+
+  def self.with_silence
+    original_verbose = LibGems.configuration.verbose
+    LibGems.configuration.verbose = false
+    yield
+  ensure
+    LibGems.configuration.verbose = original_verbose
+  end
+
 end

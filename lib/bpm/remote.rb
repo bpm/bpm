@@ -78,9 +78,11 @@ module BPM
     end
 
     def install(package, version, prerelease)
-      inst = LibGems::DependencyInstaller.new(:prerelease => prerelease)
-      inst.install package, LibGems::Requirement.new([version])
-      inst.installed_gems
+      LibGems.with_silence do
+        inst = LibGems::DependencyInstaller.new(:prerelease => prerelease)
+        inst.install package, LibGems::Requirement.new([version])
+        inst.installed_gems
+      end
     end
 
     private
