@@ -27,7 +27,7 @@ describe 'bpm remove' do
   it "should remove soft dependencies" do
     bpm 'remove', 'core-test'
     wait
-  
+
     output = stdout.read
     %w(core-test:0.4.9 ivory:0.0.1 optparse:1.0.1).each do |line|
       pkg_name, pkg_vers = line.split ':'

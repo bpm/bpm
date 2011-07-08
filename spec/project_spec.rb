@@ -87,10 +87,8 @@ describe BPM::Project, "project metadata" do
       BPM::Project.new fixtures('hello_world')
     end
 
-    it "should be valid" do
-      subject.valid?.should == true
-    end
-    
+    it { should be_valid }
+
     it "should get project name" do
       subject.name.should == "hello_world"
     end
@@ -119,10 +117,8 @@ describe BPM::Project, "project metadata" do
       BPM::Project.new fixtures('simple_hello')
     end
 
-    it "should be valid" do
-      subject.valid?.should == true
-    end
-    
+    it { should be_valid }
+
     it "should get project name" do
       subject.name.should == "simple_hello"
     end
@@ -154,20 +150,60 @@ end
 
 describe BPM::Project, "package_and_module_from_path" do
 
-  it "should find package in deps"
+  before do
+    # This seems a bit overkill, but we need our dependencies installed
+    goto_home
+    set_host
+    start_fake(FakeGemServer.new)
+    FileUtils.cp_r(fixtures('hello_world'), '.')
+    cd home('hello_world')
+  end
 
-  it "should fallback to self if not found in deps"
+  subject do
+    proj = BPM::Project.nearest_project('.')
+    proj.fetch_dependencies
+    proj
+  end
 
-  it "should throw error if no package"
+  # TODO: Make into a nice matcher
+  def check_package_and_module(proj, path, pkg_name, module_id)
+    pkg, id = proj.package_and_module_from_path(path)
+    pkg.name.should == pkg_name
+    id.should == module_id
+  end
 
-  it "should not match partial directories"
-  # i.e. packages/sproutcore should not match for packages/sproutcore-runtime
+  it "should find path in self" do
+    check_package_and_module(subject, File.join("css", "dummy.css"),
+                              "hello_world", "~css/dummy")
+  end
 
-  it "should handle and valid directory reference in package directories array"
-  # i.e. "lib": ["./lib", "./vendor/lib"]
+  it "should find path in dependencies" do
+    check_package_and_module(subject, File.join(".bpm", "packages", "core-test", "resources", "runner.css"),
+                              "core-test", "~resources/runner")
+  end
 
-  it "should replace with directory names"
+  it "should throw error if no package" do
+    l = lambda{ subject.package_and_module_from_path(fixtures("simple_hello")) }
+    l.should raise_error(/simple_hello is not within a known package/)
+  end
 
-  it "should not include lib directory in module name"
+  it "should not match partial directories" do
+    # We're verifying that core-testing doesn't match core-test
+    # Since there is no core-testing package it will fall back to the base package, hello_world
+    check_package_and_module(subject, File.join(".bpm", "packages", "core-testing", "resources", "runner.css"),
+                              "hello_world", "~.bpm/packages/core-testing/resources/runner")
+  end
+
+  it "should handle directory reference in package directories array" do
+    check_package_and_module(subject, File.join("lib", "main.js"),
+                              "hello_world", "main")
+    check_package_and_module(subject, File.join("vendor", "lib", "something.js"),
+                              "hello_world", "something")
+  end
+
+  it "should replace with directory names" do
+    check_package_and_module(subject, File.join("custom_dir", "custom.js"),
+                              "hello_world", "~custom/custom")
+  end
 
 end

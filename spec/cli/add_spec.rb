@@ -156,8 +156,13 @@ describe 'bpm add' do
 
   it "should verify working with config-less projects"
 
-  it "should work with .bpkg file"
-  # i.e. `bpm add package.bpkg`
+  it "should work with .bpkg file" do
+    FileUtils.cp fixtures("custom_generator-1.0.bpkg"), '.'
+    bpm "add", "custom_generator-1.0.bpkg" and wait
+    output = stdout.read
+    output.should include("Added package 'custom_generator' (1.0)")
+    has_dependency 'custom_generator', '1.0', '1.0'
+  end
 
   describe "--dev" do
 

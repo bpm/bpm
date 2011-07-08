@@ -8,8 +8,9 @@
   "homepage":     "URL",
 
   "directories": {
-    "lib":        "./lib",
-    "test":       "./tests"
+    "lib":        ["./lib", "./vendor/lib"],
+    "test":       "./tests",
+    "custom":     "./custom_dir"
   },
 
   "dependencies": {
