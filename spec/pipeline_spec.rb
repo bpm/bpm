@@ -176,7 +176,34 @@ describe BPM::Pipeline, "asset_path" do
 
     describe "hello_world/app_tests.js" do
 
-      it "should generate properly"
+      before do
+        FileUtils.mkdir_p home('hello_world', 'assets', 'hello_world')
+        FileUtils.touch home('hello_world', 'assets', 'hello_world', 'app_tests.js')
+      end
+
+      subject do
+        BPM::Pipeline.new(@project).find_asset 'hello_world/app_tests.js'
+      end
+
+      it "should return an asset of type BPM::GeneratedAsset" do
+        subject.class.should == BPM::GeneratedAsset
+      end
+
+      it "should find the app_tests.js" do
+        subject.pathname.should == home('hello_world', 'assets', 'hello_world', 'app_tests.js')
+      end
+
+      it "should find app_tests as well" do
+        BPM::Pipeline.new(@project).find_asset('hello_world/app_tests').should == subject
+      end
+
+      it "should have a manifest line" do
+        subject.to_s.should include('MANIFEST: hello_world (2.0.0)')
+      end
+
+      it "should include any required modules in the app_tests" do
+        subject.to_s.should include(File.read(home('hello_world', 'tests', 'main-test.js')))
+      end
 
     end
 
