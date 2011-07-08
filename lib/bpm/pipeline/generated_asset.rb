@@ -71,7 +71,11 @@ EOF
       context = blank_context
       context.require_asset(pathname) # start with self
 
-      dir_name, dir_method = FORMAT_METHODS[content_type] || ['lib', 'pipeline_libs']
+      if pathname.to_s =~ /_tests\.js$/
+        dir_name, dir_method = ['tests', 'pipeline_tests']
+      else
+        dir_name, dir_method = FORMAT_METHODS[content_type] || ['lib', 'pipeline_libs']
+      end
 
       pkgs.map do |pkg|
         pkg.load_json

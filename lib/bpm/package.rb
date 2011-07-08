@@ -230,6 +230,10 @@ module BPM
       (@attributes['pipeline'] && @attributes['pipeline']['assets']) || ['assets', 'resources']
     end
 
+    def pipeline_tests
+      (@attributes['pipeline'] && @attributes['pipeline']['tests']) || ['tests']
+    end
+
   private
   
     def parse

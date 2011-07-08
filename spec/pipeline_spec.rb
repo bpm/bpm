@@ -173,7 +173,13 @@ describe BPM::Pipeline, "asset_path" do
       end
 
     end
-      
+
+    describe "hello_world/app_tests.js" do
+
+      it "should generate properly"
+
+    end
+
   end
   
 end
