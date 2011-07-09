@@ -57,7 +57,7 @@ module BPM
     end
 
     def all_dependencies
-      (dependencies + dependencies_development).uniq
+      dependencies.merge(dependencies_development)
     end
 
     def local_package_root(package_name=nil)
@@ -76,6 +76,7 @@ module BPM
     def add_dependencies(new_deps, development=false, verbose=false)
       old_deps  = build_local_dependency_list(false) || []
       hard_deps = (development ? dependencies_development : dependencies).merge(new_deps)
+      all_hard_deps = all_dependencies.merge(new_deps)
       exp_deps = find_non_local_dependencies(hard_deps, true)
       core_fetch_dependencies(exp_deps, (development ? :development : :runtime), verbose)
 
@@ -84,7 +85,7 @@ module BPM
       else
         self.dependencies = hard_deps
       end
-      rebuild_dependency_list(hard_deps, verbose)
+      rebuild_dependency_list(all_hard_deps, verbose)
 
       local_deps.each do |dep|
         next if old_deps.find { |pkg| (pkg.name == dep.name) && (pkg.version == dep.version) }
@@ -136,13 +137,7 @@ module BPM
 
     def fetch_dependencies(verbose=false)
       exp_deps = find_non_local_dependencies(dependencies, true)
-      core_fetch_dependencies(exp_deps, :runtime, verbose)
-    end
-
-
-    # Get development dependencies from server if not installed
-
-    def fetch_development_dependencies(verbose=false)
+      return false unless core_fetch_dependencies(exp_deps, :runtime, verbose)
       exp_deps = find_non_local_dependencies(dependencies_development, true)
       core_fetch_dependencies(exp_deps, :development, verbose)
     end
@@ -287,15 +282,22 @@ module BPM
 
     # List local dependency names, rebuilds list first time
 
-    def local_deps(verbose=false)
+    def local_deps
       @local_deps ||= build_local_dependency_list
     end
-
 
     # List of local dependency names in order of dependency
 
     def sorted_deps
-      local_deps.inject([]){|ret, dep| add_sorted_dep(dep, local_deps, ret); ret }
+      local_deps.inject([]){|ret, dep| add_sorted_dep(dep, local_deps, :both, ret); ret }
+    end
+
+    def sorted_runtime_deps
+      local_deps.inject([]){|ret, dep| add_sorted_dep(dep, local_deps, :runtime, ret); ret }
+    end
+
+    def sorted_development_deps
+      local_deps.inject([]){|ret, dep| add_sorted_dep(dep, local_deps, :development, ret); ret }
     end
 
 
@@ -455,7 +457,6 @@ module BPM
       end
     end
 
-
     # Tell if package is vendored
 
     def has_local_package?(package_name)
@@ -475,7 +476,7 @@ module BPM
     # Get list of dependencies, raising if not found or conflicting
 
     def find_dependencies(deps=nil, verbose=false)
-      deps ||= dependencies
+      deps ||= all_dependencies
 
       search_list = Array(deps)
       found = []
@@ -530,11 +531,14 @@ module BPM
 
     # Method for help in sorting dependencies
 
-    def add_sorted_dep(dep, deps, sorted)
+    def add_sorted_dep(dep, deps, type, sorted)
       return if sorted.include? dep
-      dep.dependencies.each do |dep_name, dep_vers|
+      list = {}
+      list.merge!(dep.dependencies) if [:both, :runtime].include?(type)
+      list.merge!(dep.dependencies_development) if [:both, :development].include?(type)
+      list.each do |dep_name, dep_vers|
         found_dep = deps.find { |cur| cur.name == dep_name }
-        add_sorted_dep(found_dep, deps, sorted) if found_dep
+        add_sorted_dep(found_dep, deps, type, sorted) if found_dep
       end
       sorted << dep unless sorted.include? dep
     end

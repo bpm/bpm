@@ -23,8 +23,8 @@ describe BPM::Pipeline, "asset_path" do
     start_fake(FakeGemServer.new)
     cd home('hello_world')
     
-    bpm 'add', 'custom_package'
-    wait
+    bpm 'fetch' and wait
+    bpm 'add', 'custom_package' and wait
     
     asset = subject.find_asset 'custom_package/assets/dummy.txt'
     asset.pathname.should == home('hello_world', '.bpm', 'packages', 'custom_package', 'assets', 'dummy.txt')
@@ -51,8 +51,8 @@ describe BPM::Pipeline, "asset_path" do
       start_fake(FakeGemServer.new)
       cd home('hello_world')
 
-      bpm 'add', 'custom_package'
-      wait
+      bpm 'fetch' and wait
+      bpm 'add', 'custom_package' and wait
 
       @project = BPM::Project.new home('hello_world')
     end
@@ -76,7 +76,8 @@ describe BPM::Pipeline, "asset_path" do
       end
     
       it "should have a manifest line" do
-        subject.to_s.should include('MANIFEST: core-test (0.4.9) custom_package (2.0.0) ivory (0.0.1) optparse (1.0.1) rake (0.8.6) spade (0.5.0)')
+        # Right now we're including dev deps
+        subject.to_s.should include('MANIFEST: core-test (0.4.9) custom_generator (1.0) custom_package (2.0.0) ivory (0.0.1) optparse (1.0.1) rake (0.8.6) spade (0.5.0)')
       end
     
       it "should include any required modules in the bpm_package.js" do
@@ -223,8 +224,8 @@ describe BPM::Pipeline, "buildable_assets" do
     start_fake(FakeGemServer.new)
     cd home('hello_world')
 
-    bpm 'add', 'custom_package', '--verbose'
-    wait
+    bpm 'fetch' and wait
+    bpm 'add', 'custom_package', '--verbose' and wait
 
     @project = BPM::Project.new home('hello_world')
   end

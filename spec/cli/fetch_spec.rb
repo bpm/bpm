@@ -131,5 +131,7 @@ describe 'bpm fetch' do
       name.should be_unpacked
     end
   end
-    
+
+  it "fetches development dependencies"
+
 end

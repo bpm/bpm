@@ -55,8 +55,8 @@ module BPM
       
       # make sure the logical_path can be used to simply build into the 
       # assets directory when we are done
-      ret = ['bpm_packages.js', 'bpm_styles.css', "#{project.name}/app_package.js",
-              "#{project.name}/app_styles.css", "#{project.name}/app_tests.js"]
+      ret = ['bpm_packages.js', 'bpm_styles.css', "bpm_tests.js",
+              "#{project.name}/app_package.js", "#{project.name}/app_styles.css", "#{project.name}/app_tests.js"]
       
       project.local_deps.each do |pkg|
         pkg.load_json
@@ -77,7 +77,7 @@ module BPM
     # Detect whenever we are asked to build some of the magic files and swap
     # in a custom asset type that can generate the contents.
     def build_asset(logical_path, pathname, options)
-      magic_paths = %w(bpm_packages.js bpm_styles.css).map do |filename|
+      magic_paths = %w(bpm_packages.js bpm_styles.css bpm_tests.js).map do |filename|
         File.join project.root_path, 'assets', filename
       end
 
