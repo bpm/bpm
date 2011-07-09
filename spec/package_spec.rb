@@ -69,7 +69,6 @@ describe BPM::Package, "#to_spec" do
 
   it "packs metadata into requirements" do
     metadata = JSON.parse(subject.requirements.first)
-    metadata["keywords"].should == %w[javascript testing]
     metadata["licenses"].should == [
       {"type" => "MIT",
        "url"  => "https://github.com/strobecorp/core-test/raw/master/LICENSE"}
@@ -111,7 +110,7 @@ describe BPM::Package, "#to_s" do
   end
 
   it "gives the name and version" do
-    subject.to_full_name.should == "core-test-0.4.9"
+    subject.full_name.should == "core-test-0.4.9"
   end
 end
 
@@ -122,15 +121,16 @@ describe BPM::Package, "converting" do
 
   subject do
     package = BPM::Package.new
-    package.bpkg = fixtures("core-test-0.4.9.bpkg")
+    package.fill_from_gemspec(fixtures("core-test-0.4.9.bpkg"))
     package.as_json
   end
 
-  it "can recreate the same package.json from the package"
-
-  # it "can recreate the same package.json from the package" do
-  #   subject.should == JSON.parse(File.read(fixtures("core-test", "package.json")))
-  # end
+  it "can recreate the same package.json from the package" do
+    # These don't come out in the same order
+    actual = Hash[subject.sort]
+    expected = Hash[JSON.parse(File.read(fixtures("core-test", "package.json"))).sort].reject{|k,v| v.empty? }
+    actual.should == expected
+  end
 end
 
 describe BPM::Package, "validating" do

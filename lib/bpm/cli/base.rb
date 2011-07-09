@@ -245,7 +245,7 @@ module BPM
         package = local.pack(File.join(package_path, "package.json"), options[:email])
 
         if package.errors.empty?
-          puts "Successfully built package: #{package.to_ext}"
+          puts "Successfully built package: #{package.file_name}"
         else
           failure_message = "BPM encountered the following problems building your package:"
           package.errors.each do |error|
@@ -263,7 +263,7 @@ module BPM
         paths.each do |path|
           begin
             package     = local.unpack(path, options[:target])
-            unpack_path = File.expand_path(File.join(Dir.pwd, options[:target], package.to_full_name))
+            unpack_path = File.expand_path(File.join(Dir.pwd, options[:target], package.full_name))
             puts "Unpacked package into: #{unpack_path}"
           rescue Errno::EACCES, LibGems::FilePermissionError => ex
             abort "There was a problem unpacking #{path}:\n#{ex.message}"

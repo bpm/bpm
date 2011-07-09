@@ -57,7 +57,7 @@ module BPM
     end
 
     def all_dependencies
-      (dependencies + development_dependencies).uniq
+      (dependencies + dependencies_development).uniq
     end
 
     def local_package_root(package_name=nil)
@@ -75,14 +75,14 @@ module BPM
 
     def add_dependencies(new_deps, development=false, verbose=false)
       old_deps  = build_local_dependency_list(false) || []
-      hard_deps = (development ? development_dependencies : dependencies).merge(new_deps)
+      hard_deps = (development ? dependencies_development : dependencies).merge(new_deps)
       exp_deps = find_non_local_dependencies(hard_deps, true)
       core_fetch_dependencies(exp_deps, (development ? :development : :runtime), verbose)
 
       if development
-        @development_dependencies = hard_deps
+        self.dependencies_development = hard_deps
       else
-        @dependencies = hard_deps
+        self.dependencies = hard_deps
       end
       rebuild_dependency_list(hard_deps, verbose)
 
@@ -143,7 +143,7 @@ module BPM
     # Get development dependencies from server if not installed
 
     def fetch_development_dependencies(verbose=false)
-      exp_deps = find_non_local_dependencies(development_dependencies, true)
+      exp_deps = find_non_local_dependencies(dependencies_development, true)
       core_fetch_dependencies(exp_deps, :development, verbose)
     end
 
@@ -331,24 +331,19 @@ module BPM
     # Name of minifier
 
     def minifier_name
-      @attributes['pipeline'] && @attributes['pipeline']['minifier']
+      pipeline && pipeline['minifier']
+    end
+
+    def load_json
+      return super if has_json?
+      FIELDS.keys.each{|f| send("#{c2u(f)}=", DEFAULT_CONFIG[f]) }
+      self.name = File.basename(@json_path, '.json')
+      self.version = "0.0.1"
+      true
     end
 
 
   private
-
-    # Read in data from json
-
-    def read
-      if File.exists? @json_path
-        super
-      else
-        @attributes = DEFAULT_CONFIG.dup
-        @attributes["name"] = File.basename(@json_path, '.json')
-        @attributes["version"] = "0.0.1"
-      end
-    end
-
 
     # Make sure fields are set up properly
 

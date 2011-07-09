@@ -105,7 +105,7 @@ describe BPM::Project, "project metadata" do
     end
 
     it "should get development dependencies" do
-      subject.development_dependencies.should == {
+      subject.dependencies_development.should == {
         "custom_generator" => "1.0"
       }
     end

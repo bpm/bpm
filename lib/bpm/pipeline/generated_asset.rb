@@ -27,11 +27,11 @@ module BPM
       minifier_name = project.minifier_name
       if minifier_name && content_type == 'application/javascript' 
         pkg = project.package_from_name minifier_name
-        minifier_plugin_name = pkg.minifier_plugins(project).first
+        minifier_plugin_name = pkg.plugin_minifier
         plugin_ctx = environment.plugin_context_for minifier_plugin_name
         
         V8::C::Locker() do
-          plugin_ctx["PACKAGE_INFO"] = pkg.attributes
+          plugin_ctx["PACKAGE_INFO"] = pkg.as_json
           plugin_ctx["DATA"]         = body
           body = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, PACKAGE_INFO)")
         end

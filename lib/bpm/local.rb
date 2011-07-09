@@ -29,9 +29,9 @@ module BPM
     end
 
     def unpack(path, target)
-      package       = BPM::Package.new
-      package.bpkg  = path
-      unpack_dir    = File.expand_path(File.join(Dir.pwd, target, package.to_full_name))
+      package = BPM::Package.new
+      package.fill_from_gemspec(path)
+      unpack_dir = File.expand_path(File.join(Dir.pwd, target, package.full_name))
       LibGems::Installer.new(path, :unpack => true).unpack unpack_dir
       package
     end

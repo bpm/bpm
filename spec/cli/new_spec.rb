@@ -52,13 +52,8 @@ describe "bpm new" do
 
       before do
         goto_home
-
-        # Install package
-        cd fixtures
-        with_env do
-          BPM::Remote.new.install("custom_generator-1.0.bpkg", ">= 0", false)
-        end
-        cd home
+        set_host
+        start_fake(FakeGemServer.new)
       end
 
       it "should create custom files" do
@@ -82,9 +77,9 @@ describe "bpm new" do
       end
 
       it "should create custom project.json without explicit generator" do
-        bpm 'new', 'BpmTest', '--package=custom_generator' and wait
+        bpm 'new', 'BpmTest', '--package=core-test' and wait
 
-        File.read(home("bpm_test", "BpmTest.json")).should =~ /"spade": ">= 0"/
+        File.read(home("bpm_test", "BpmTest.json")).should =~ /"core-test": "0.4.9"/
       end
 
     end
@@ -93,13 +88,8 @@ describe "bpm new" do
 
       before do
         goto_home
-
-        # Install package
-        cd fixtures
-        with_env do
-          installed = BPM::Remote.new.install("jquery-1.4.3.bpkg", ">= 0", false)
-        end
-        cd home
+        set_host
+        start_fake(FakeGemServer.new)
       end
 
       it "should add package as a dependency even if it doesn't have custom generator" do

@@ -8,7 +8,7 @@ module BPM
       environment = context.environment
       project = environment.project
       pkg, module_id = project.package_and_module_from_path file
-      transport_plugins = pkg.transport_plugins(project)
+      transport_plugins = pkg.find_transport_plugins(project)
 
       # No transport, just return the existing data
       return data if transport_plugins.size == 0
@@ -24,7 +24,7 @@ module BPM
       out = ''
 
       V8::C::Locker() do
-        plugin_ctx["PACKAGE_INFO"] = pkg.attributes
+        plugin_ctx["PACKAGE_INFO"] = pkg.as_json
         plugin_ctx["DATA"]         = data
         out = plugin_ctx.eval("BPM_PLUGIN.compileTransport(DATA, PACKAGE_INFO, '#{module_id}', '#{filepath}');")
       end
