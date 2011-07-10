@@ -287,7 +287,7 @@ module BPM
 
           project = BPM::Project.new(path, name)
           project.fetch_dependencies true
-          project.build :debug, true
+          project.build :production, true
         end
 
         def report_arity_error(name)
