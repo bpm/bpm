@@ -8,11 +8,12 @@
   "homepage":     "URL",
 
   "directories": {
-    "lib":        "./lib",
-    "tests":      "./tests"
+    "lib":        "app",
+    "tests":      "tests"
   },
 
   "dependencies": {
     <%= %["#{package.name}": "#{package.version}"] if package %>
   }
 }
+

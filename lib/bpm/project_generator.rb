@@ -7,19 +7,27 @@ module BPM
       return false if directory_exists?
 
       empty_directory '.', :verbose => false
+      empty_directory 'app'
 
       create_files
 
       true
     end
 
+    def company_name
+      ENV['COMPANY_NAME'] || "My Company Inc."
+    end
+    
     private
 
       def create_files
         template "LICENSE"
         template "README.md"
         template "index.html"
-        template "app.js"
+        
+        inside 'app' do
+          template 'main.js'
+        end
       end
 
       def directory_exists?
