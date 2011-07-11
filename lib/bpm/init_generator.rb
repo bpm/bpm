@@ -16,8 +16,6 @@ module BPM
         template "project.json", "#{name}.json"
       end
 
-      empty_directory "assets"
-
       inside "assets" do
         template "bpm_packages.js"
         template "bpm_styles.css"
