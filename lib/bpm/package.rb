@@ -208,6 +208,10 @@ module BPM
       self.dependencies_development = Hash[spec.development_dependencies.map{|d| [d.name, d.requirement.to_s ]}]
     end
 
+    # Collects an expanded list of all dependencies this package depends on 
+    # directly or indirectly.  This assume the project has already resolved
+    # any needed dependencies and therefore will raise an exception if a 
+    # dependency cannot be found locally in the project.
     def expanded_deps(project)
       ret  = []
       seen = []
@@ -222,8 +226,7 @@ module BPM
             todo << found
             ret  << found
           else
-            # FIXME: I don't like this, it seems wrong - PDW
-            puts "COULD NOT FIND DEP: #{dep_name}"
+            raise "Required local dependency not found #{dep_name}"
           end
         end
       end
