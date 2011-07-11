@@ -18,6 +18,7 @@ class FakeGemServer
         index("jquery",    "1.4.3"),
         index("ivory",     "0.0.1"),
         index("optparse",  "1.0.1"),
+        index("uglify-js",  "1.0.4"),
         index("custom_generator", "1.0")
       ]
       [200, {"Content-Type" => "application/octet-stream"}, compress(latest_index)]
@@ -38,6 +39,7 @@ class FakeGemServer
         index("jquery",    "1.4.3"),
         index("ivory",     "0.0.1"),
         index("optparse",  "1.0.1"),
+        index("uglify-js",  "1.0.4"),
         index("custom_generator", "1.0")
       ]
       [200, {"Content-Type" => "application/octet-stream"}, compress(big_index)]
