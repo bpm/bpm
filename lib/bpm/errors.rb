@@ -6,4 +6,10 @@ module BPM
     end
   end
 
+  class PackageConflictError < StandardError
+    def initialize(name, version_a, version_b)
+      super("Conflicting requirement for '#{name}' (requires #{version_a} and #{version_b})")
+    end
+  end
+  
 end

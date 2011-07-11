@@ -488,7 +488,7 @@ module BPM
         if dup = found.find{|p| p.name == name}
           # already found, check for conflicts
           next if satisfied_by?(version, dup.version)
-          raise "Conflicting dependencies '#{name}' requires #{dup.version} and #{version}"
+          raise PackageConflictError.new(name, dup.version, version)
         end
 
         pkg = locate_package(name, version, verbose)
