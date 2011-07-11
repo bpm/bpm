@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Charles Jolley", "Peter Wagenet"]
   s.email       = ["charles@sproutcore.com", "peterw@strobecorp.com"]
-  s.homepage    = "http://github.com/strobecorp/spade"
-  s.summary = s.description = "Package Manager for JavaScript"
+  s.homepage    = "http://github.com/getbpm/bpm"
+  s.summary = s.description = "Browser Package Manager"
 
   mswin = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
   mri = !mswin && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby")
