@@ -30,11 +30,23 @@ module BPM
         minifier_plugin_name = pkg.plugin_minifier
         plugin_ctx = environment.plugin_context_for minifier_plugin_name
         
+        # slice out the header at the top - we don't want the minifier to 
+        # touch it.
+        lines = body.split "\n"
+        header = body.match /^(\/\* ====.+====\*\/)$/m
+        if header
+          header = header[0] + "\n"
+          body   = body[header.size..-1]
+        end
+        
         V8::C::Locker() do
           plugin_ctx["PACKAGE_INFO"] = pkg.as_json
           plugin_ctx["DATA"]         = body
           body = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, PACKAGE_INFO)")
         end
+
+        body = header+body if header
+        
       end
       
       body
