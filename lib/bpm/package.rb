@@ -46,7 +46,11 @@ module BPM
 
     def initialize(root_path=nil, email = "")
       @root_path   = root_path || Dir.pwd
-      @json_path   = File.join @root_path, 'package.json'
+      @json_path   = File.join @root_path, 'bpm_package.json'
+      unless File.exists? @json_path
+        @json_path   = File.join @root_path, 'package.json'
+      end
+      
       @email       = email
       @errors      = []
       # Set defaults
