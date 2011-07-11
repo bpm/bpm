@@ -7,7 +7,7 @@ describe 'bpm remove' do
     goto_home
     set_host
     start_fake(FakeGemServer.new)
-    FileUtils.cp_r(fixtures('hello_world'), '.')
+    FileUtils.cp_r(project_fixture('hello_world'), '.')
     cd home('hello_world')
     bpm 'fetch' # make sure existing packages are installed 
     wait

@@ -4,7 +4,7 @@ describe BPM::Pipeline, "asset_path" do
 
   before do
     goto_home
-    FileUtils.cp_r(fixtures('hello_world'), '.')
+    FileUtils.cp_r(project_fixture('hello_world'), '.')
   end
   
   subject do
@@ -218,7 +218,7 @@ describe BPM::Pipeline, "buildable_assets" do
   before do
     set_host
     goto_home
-    FileUtils.cp_r(fixtures('hello_world'), '.')
+    FileUtils.cp_r(project_fixture('hello_world'), '.')
     reset_libgems bpm_dir.to_s
 
     start_fake(FakeGemServer.new)

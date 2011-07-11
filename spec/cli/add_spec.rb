@@ -7,7 +7,7 @@ describe 'bpm add' do
     goto_home
     set_host
     start_fake(FakeGemServer.new)
-    FileUtils.cp_r(fixtures('hello_world'), '.')
+    FileUtils.cp_r(project_fixture('hello_world'), '.')
     cd home('hello_world')
 
     bpm 'fetch'
@@ -157,7 +157,7 @@ describe 'bpm add' do
   it "should verify working with config-less projects"
 
   it "should work with .bpkg file" do
-    FileUtils.cp fixtures("custom_generator-1.0.bpkg"), '.'
+    FileUtils.cp fixtures('gems', "custom_generator-1.0.bpkg"), '.'
     bpm "add", "custom_generator-1.0.bpkg" and wait
     output = stdout.read
     output.should include("Added package 'custom_generator' (1.0)")

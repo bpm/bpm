@@ -8,7 +8,7 @@ describe BPM::Pipeline, 'transport processor' do
     reset_libgems bpm_dir.to_s
     start_fake(FakeGemServer.new)
     
-    FileUtils.cp_r fixtures('transporter'), '.'
+    FileUtils.cp_r project_fixture('transporter'), '.'
     cd home('transporter')
 
     bpm 'compile'

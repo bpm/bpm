@@ -3,23 +3,23 @@ require "spec_helper"
 describe BPM::Project, "project_file_path" do
 
   it "should return project file path" do
-    path = fixtures('hello_world')
+    path = project_fixture('hello_world')
     expected = File.join(path, 'hello_world.json')
     BPM::Project.project_file_path(path).should == expected
   end
 
   it "should return nil on a package" do
-    path = fixtures('core-test')
+    path = package_fixture('core-test')
     BPM::Project.project_file_path(path).should == nil
   end
 
   it "should return nil on a project with no file" do
-    path = fixtures('simple_hello')
+    path = project_fixture('simple_hello')
     BPM::Project.project_file_path(path).should == nil
   end
 
   it "should return project path with different name" do
-    path = fixtures('custom_name')
+    path = project_fixture('custom_name')
     expected = File.join(path, 'MyProject.json')
     BPM::Project.project_file_path(path).should == expected
   end
@@ -29,15 +29,15 @@ end
 describe BPM::Project, "is_project_root?" do
 
   it "should return true for a project path" do
-    BPM::Project.is_project_root?(fixtures('hello_world')).should == true
+    BPM::Project.is_project_root?(project_fixture('hello_world')).should == true
   end
 
   it "should return false for a package" do
-    BPM::Project.is_project_root?(fixtures('core-test')).should == false
+    BPM::Project.is_project_root?(package_fixture('core-test')).should == false
   end
   
   it "should return true for a project with no project file" do
-    BPM::Project.is_project_root?(fixtures('simple_hello')).should == true
+    BPM::Project.is_project_root?(project_fixture('simple_hello')).should == true
   end
 
 end
@@ -46,7 +46,7 @@ describe BPM::Project, "nearest_project" do
 
   describe "standard project" do
     subject do
-      fixtures('hello_world').to_s # string not Pathname
+      project_fixture('hello_world').to_s # string not Pathname
     end
     
     it "should return project instance for project path" do
@@ -61,7 +61,7 @@ describe BPM::Project, "nearest_project" do
 
   describe "simple project" do
     subject do
-      fixtures('simple_hello').to_s # string not Pathname
+      project_fixture('simple_hello').to_s # string not Pathname
     end
     
     it "should return project instance for project path" do
@@ -75,7 +75,7 @@ describe BPM::Project, "nearest_project" do
   end
 
   it "should return nil for a package" do
-    BPM::Project.nearest_project(fixtures('core-test')).should == nil
+    BPM::Project.nearest_project(package_fixture('core-test')).should == nil
   end
   
 end
@@ -84,7 +84,7 @@ describe BPM::Project, "project metadata" do
 
   describe "standard project" do
     subject do
-      BPM::Project.new fixtures('hello_world')
+      BPM::Project.new project_fixture('hello_world')
     end
 
     it { should be_valid }
@@ -114,7 +114,7 @@ describe BPM::Project, "project metadata" do
 
   describe "simple project" do
     subject do
-      BPM::Project.new fixtures('simple_hello')
+      BPM::Project.new project_fixture('simple_hello')
     end
 
     it { should be_valid }
@@ -140,7 +140,7 @@ end
 
 describe BPM::Project, "converting" do
   subject do
-    BPM::Project.nearest_project(fixtures("hello_world")).as_json
+    BPM::Project.nearest_project(project_fixture("hello_world")).as_json
   end
 
   it "should have bpm set to current version" do
@@ -155,7 +155,7 @@ describe BPM::Project, "package_and_module_from_path" do
     goto_home
     set_host
     start_fake(FakeGemServer.new)
-    FileUtils.cp_r(fixtures('hello_world'), '.')
+    FileUtils.cp_r(project_fixture('hello_world'), '.')
     cd home('hello_world')
   end
 
@@ -183,7 +183,7 @@ describe BPM::Project, "package_and_module_from_path" do
   end
 
   it "should throw error if no package" do
-    l = lambda{ subject.package_and_module_from_path(fixtures("simple_hello")) }
+    l = lambda{ subject.package_and_module_from_path(project_fixture("simple_hello")) }
     l.should raise_error(/simple_hello is not within a known package/)
   end
 

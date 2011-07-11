@@ -10,7 +10,7 @@ describe "bpm build when logged in" do
   end
 
   it "builds a bpm from a given package.json" do
-    FileUtils.cp_r fixtures("core-test"), "."
+    FileUtils.cp_r package_fixture("core-test"), "."
     cd "core-test"
     bpm "build"
 
@@ -31,7 +31,7 @@ describe "bpm build without logging in" do
   end
 
   it "builds a bpm from a given package.json" do
-    FileUtils.cp_r fixtures("core-test"), "."
+    FileUtils.cp_r package_fixture("core-test"), "."
     cd "core-test"
     bpm "build", "-e", "joe@example.com"
 
@@ -43,7 +43,7 @@ describe "bpm build without logging in" do
   end
 
   it "builds a bpm when given a path to a package" do
-    FileUtils.cp_r fixtures("core-test"), "."
+    FileUtils.cp_r package_fixture("core-test"), "."
     bpm "build", "core-test", "-e", "joe@example.com"
 
     exit_status.should be_success
@@ -55,7 +55,7 @@ describe "bpm build without logging in" do
   end
 
   it "sets the email address if one is given" do
-    FileUtils.cp_r fixtures("core-test"), "."
+    FileUtils.cp_r package_fixture("core-test"), "."
     cd "core-test"
     bpm "build", "-e", "lucy@allen.com"
 

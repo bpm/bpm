@@ -22,7 +22,7 @@ describe BPM::Package, "#to_spec" do
 
   subject do
     package = BPM::Package.new(nil, email)
-    package.json_path = fixtures("core-test", "package.json")
+    package.json_path = package_fixture("core-test", "package.json")
     if spec = package.to_spec
       spec
     else
@@ -104,7 +104,7 @@ describe BPM::Package, "#to_s" do
 
   subject do
     package = BPM::Package.new
-    package.json_path = fixtures("core-test","package.json")
+    package.json_path = package_fixture("core-test","package.json")
     package.valid?
     package
   end
@@ -121,14 +121,14 @@ describe BPM::Package, "converting" do
 
   subject do
     package = BPM::Package.new
-    package.fill_from_gemspec(fixtures("core-test-0.4.9.bpkg"))
+    package.fill_from_gemspec(fixtures('gems', "core-test-0.4.9.bpkg"))
     package.as_json
   end
 
   it "can recreate the same package.json from the package" do
     # These don't come out in the same order
     actual = Hash[subject.sort]
-    expected = Hash[JSON.parse(File.read(fixtures("core-test", "package.json"))).sort].reject{|k,v| v.empty? }
+    expected = Hash[JSON.parse(File.read(package_fixture("core-test", "package.json"))).sort].reject{|k,v| v.empty? }
     actual.should == expected
   end
 end
@@ -166,7 +166,7 @@ describe BPM::Package, "validating" do
 
   context "json can't be read" do
     before do
-      FileUtils.cp fixtures("core-test", "package.json"), "."
+      FileUtils.cp package_fixture("core-test", "package.json"), "."
       FileUtils.chmod 0000, "package.json"
       subject.json_path = "package.json"
     end
@@ -197,7 +197,7 @@ describe BPM::Package, "validation errors" do
 
   def write_package
     path    = home("package.json")
-    package = JSON.parse(File.read(fixtures("core-test","package.json")))
+    package = JSON.parse(File.read(package_fixture("core-test","package.json")))
     yield package
     File.open(path, "w") do |file|
       file.write package.to_json
@@ -307,13 +307,13 @@ end
 describe BPM::Package, "templates" do
 
   subject do
-    package = BPM::Package.new(fixtures("custom_generator"))
+    package = BPM::Package.new(package_fixture("custom_generator"))
     package.load_json
     package
   end
 
   it "should have project template" do
-    subject.template_path('project').should == fixtures("custom_generator", "templates", "project").to_s
+    subject.template_path('project').should == package_fixture("custom_generator", "templates", "project").to_s
   end
 
 end

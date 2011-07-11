@@ -34,6 +34,14 @@ module SpecHelpers
     root.join('spec/fixtures', *path)
   end
 
+  def project_fixture(*path)
+    fixtures 'projects', *path
+  end
+  
+  def package_fixture(*path)
+    fixtures 'packages', *path
+  end
+  
   def tmp(*path)
     root.join("tmp", *path)
   end

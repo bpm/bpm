@@ -67,8 +67,8 @@ class FakeGemServer
   private
 
     def gem_or_bpkg(name)
-      fixture = fixtures("#{name}.gem")
-      fixture = fixtures("#{name}.bpkg") unless File.exist?(fixture)
+      fixture = fixtures('gems', "#{name}.gem")
+      fixture = fixtures('gems', "#{name}.bpkg") unless File.exist?(fixture)
       fixture
     end
 

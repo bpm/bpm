@@ -4,7 +4,7 @@ describe 'bpm fetch' do
   
   before do
     goto_home
-    FileUtils.cp_r(fixtures('hello_world'), '.')
+    FileUtils.cp_r(project_fixture('hello_world'), '.')
     set_host
     start_fake(FakeGemServer.new)
   end

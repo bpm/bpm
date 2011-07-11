@@ -8,7 +8,7 @@ describe BPM::Pipeline, 'minifier' do
     reset_libgems bpm_dir.to_s
     start_fake(FakeGemServer.new)
     
-    FileUtils.cp_r fixtures('minitest'), '.'
+    FileUtils.cp_r project_fixture('minitest'), '.'
     cd home('minitest')
 
     bpm 'compile'
