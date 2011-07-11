@@ -89,7 +89,7 @@ module BPM
 
     def raw_request(method, path, &block)
       require 'net/http'
-      host = ENV['SPADE_HOST'] || LibGems.host
+      host = ENV['BPM_HOST'] || LibGems.host
       uri = URI.parse "#{host}/#{path}"
 
       request_method = Net::HTTP.const_get method.to_s.capitalize
