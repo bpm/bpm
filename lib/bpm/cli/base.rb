@@ -219,6 +219,12 @@ module BPM
         success = generator.new(self, name, path, template_path, package).run
 
         run_init(name, path, package) if success
+
+      rescue PackageNotFoundError => e
+        abort e.message
+      
+      rescue LibGems::InstallError => e
+        abort e.message
       end
 
       desc "init [PATHS]", "Configure a project to use bpm for management"
