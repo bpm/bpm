@@ -56,10 +56,9 @@ module BPM
       # Add in the generated header
       body = <<EOF
 /* ===========================================================================
-   BPM Static Dependencies
+   BPM Combined Asset File
    MANIFEST: #{manifest}
    This file is generated automatically by the bpm (http://www.bpmjs.org)    
-   To use this file, load this file in your HTML head.
    =========================================================================*/
 
 EOF
