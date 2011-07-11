@@ -28,6 +28,14 @@ module BPM
         inside 'app' do
           template 'main.js'
         end
+
+        empty_directory 'assets'
+        inside 'assets' do
+          empty_directory name
+          template "app/app_package.js", "#{name}/app_package.js"
+          template "app/app_tests.js", "#{name}/app_tests.js"
+          template "app/app_styles.css", "#{name}/app_styles.css"
+        end
       end
 
       def directory_exists?

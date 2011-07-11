@@ -21,12 +21,6 @@ module BPM
       inside "assets" do
         template "bpm_packages.js"
         template "bpm_styles.css"
-        
-        empty_directory name
-        template "app/app_package.js", "#{name}/app_package.js"
-        template "app/app_tests.js", "#{name}/app_tests.js"
-        template "app/app_styles.css", "#{name}/app_styles.css"
-        
       end
 
       true
