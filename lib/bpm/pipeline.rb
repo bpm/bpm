@@ -85,11 +85,7 @@ module BPM
         File.join project.root_path, 'assets', project.name, filename
       end
       
-      plugin_path = File.join project.root_path, '.bpm', 'plugins'
-      
-      if pathname.to_s =~ /^#{Regexp.escape plugin_path}/
-         BPM::PluginAsset.new(self, "spade/~transports/spade", pathname, options)     
-      elsif magic_paths.include? pathname.to_s
+      if magic_paths.include? pathname.to_s
         BPM::GeneratedAsset.new(self, logical_path, pathname, options)
       else
         super logical_path, pathname, options
