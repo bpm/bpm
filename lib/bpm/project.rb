@@ -293,11 +293,31 @@ module BPM
     end
 
     def sorted_runtime_deps
-      local_deps.inject([]){|ret, dep| add_sorted_dep(dep, local_deps, :runtime, ret); ret }
+      
+      dep_names = dependencies.map { |name, vers| name }
+      deps = local_deps.reject { |dep| !dep_names.include?(dep.name) }
+      
+      deps.inject([]) do |ret, dep| 
+        add_sorted_dep(dep, local_deps, :runtime, ret)
+        ret
+      end
+      
     end
 
     def sorted_development_deps
-      local_deps.inject([]){|ret, dep| add_sorted_dep(dep, local_deps, :development, ret); ret }
+      dep_names = dependencies_development.map { |name, vers| name }
+      deps = local_deps.reject { |dep| !dep_names.include?(dep.name) }
+      
+      deps = deps.inject([]) do |ret, dep| 
+        add_sorted_dep(dep, local_deps, :both, ret)
+        ret
+      end
+      
+      # development deps should include all dependencies of dev deps excluding
+      # those that are bonafide runtime deps
+      runtime_deps = sorted_runtime_deps
+      deps.reject! { |pkg| runtime_deps.include?(pkg) }
+      deps
     end
 
 

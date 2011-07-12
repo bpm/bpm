@@ -55,7 +55,16 @@ module BPM
     def build_dependency_context_and_body
 
       project = environment.project
-      pkgs = pathname.to_s =~ /app_/ ? [project] : project.sorted_deps
+      
+      case pathname.basename.to_s
+      when /^app_/
+        pkgs = [project]
+      when /^dev_/
+        pkgs = project.sorted_development_deps
+      else
+        pkgs = project.sorted_runtime_deps
+      end
+
       if pkgs.size > 0
         manifest = pkgs.sort { |a,b| a.name <=> b.name } 
         manifest = manifest.map do |x| 
