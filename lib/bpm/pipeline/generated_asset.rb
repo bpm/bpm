@@ -25,8 +25,15 @@ module BPM
       return body if environment.mode == :debug
       project = environment.project
       minifier_name = project.minifier_name
+      minifier_name = minifier_name.keys.first if minifier_name.is_a? Hash
+      
       if minifier_name && content_type == 'application/javascript' 
+        
         pkg = project.package_from_name minifier_name
+        if pkg.nil?
+          raise "Minifier package #{minifier_name} was not found.  Try running bpm update to refresh."
+        end
+        
         minifier_plugin_name = pkg.plugin_minifier
         plugin_ctx = environment.plugin_context_for minifier_plugin_name
         

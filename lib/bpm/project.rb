@@ -57,7 +57,7 @@ module BPM
     end
 
     def all_dependencies
-      dependencies.merge(dependencies_development)
+      dependencies.merge(dependencies_development).merge(dependencies_build)
     end
 
     def local_package_root(package_name=nil)

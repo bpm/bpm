@@ -150,6 +150,21 @@ module BPM
     def pipeline_tests
       (pipeline && pipeline['tests']) || ['tests']
     end
+    
+    # Returns a hash of dependencies inferred from the build settings.
+    def dependencies_build
+      minifier = pipeline && pipeline['minifier']
+      ret      = {}
+      
+      case minifier
+      when Hash
+        ret.merge! minifier
+      when String
+        ret[minifier] = '>= 0'
+      end
+      
+      ret
+    end
 
     def template_path(name)
       path = File.join(root_path, 'templates', name.to_s)
