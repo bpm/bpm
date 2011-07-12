@@ -7,7 +7,16 @@ bpm(1) -- browser package manager
 
 ## DESCRIPTION
 
-## OPTIONS
+## WORKFLOW
+
+bpm init | bpm new - create the new project
+bpm add spade - adds the dependency, fetches, compiles.
+bpm remove spade - removes the dependency, compiles
+
+bpm fetch - fetches any dependencies locally
+bpm compile - rebuilds the project; uses any current dependencies 
+bpm preview - allows you to preview the files. creates any needed files
+
 
 ## DISCUSSION
 
