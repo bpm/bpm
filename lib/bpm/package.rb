@@ -186,7 +186,11 @@ module BPM
       end
 
       FIELDS.keys.each do |field|
-        send("#{c2u(field)}=", json[field] || fd(field))
+        if field == 'pipeline'
+          self.pipeline = json['build'] || fd(field)
+        else
+          send("#{c2u(field)}=", json[field] || fd(field))
+        end
       end
 
       true

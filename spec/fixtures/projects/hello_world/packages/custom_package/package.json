@@ -16,7 +16,7 @@
     "not-normal": "custom_dir"
   },
   
-  "pipeline": {
+  "build": {
     "libs": ["lib", "not-normal"]
   }
 }

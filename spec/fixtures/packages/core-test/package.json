@@ -37,7 +37,7 @@
     "optparse": "= 1.0.1"
   },
   
-  "pipeline": {
+  "build": {
     "css": ["resources"]
   }
 }
