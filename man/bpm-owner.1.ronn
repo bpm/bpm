@@ -1,0 +1,22 @@
+bpm-owner(1) -- Manage users for a package
+==================================================================
+
+## SYNOPSIS
+
+`bpm owner` <PATH> <flags>
+
+## DESCRIPTION
+
+## OPTIONS
+
+## DISCUSSION
+
+## COPYRIGHT
+
+2011 Strobe Inc. and contributors.  Available under MIT license.
+
+## SEE ALSO
+
+bpm-add(1)  bpm-remove(1)
+
+

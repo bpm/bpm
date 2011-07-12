@@ -1,0 +1,22 @@
+bpm-unpack(1) -- converts a project to use bpm
+==================================================================
+
+## SYNOPSIS
+
+`bpm unpack` <PATH> <flags>
+
+## DESCRIPTION
+
+## OPTIONS
+
+## DISCUSSION
+
+## COPYRIGHT
+
+2011 Strobe Inc. and contributors.  Available under MIT license.
+
+## SEE ALSO
+
+bpm-add(1)  bpm-remove(1)
+
+

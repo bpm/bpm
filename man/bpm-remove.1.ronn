@@ -1,0 +1,22 @@
+bpm-remove(1) -- Removes one or more packages from a bpm project
+==================================================================
+
+## SYNOPSIS
+
+`bpm remove` <PATH> <flags>
+
+## DESCRIPTION
+
+## OPTIONS
+
+## DISCUSSION
+
+## COPYRIGHT
+
+2011 Strobe Inc. and contributors.  Available under MIT license.
+
+## SEE ALSO
+
+bpm-add(1)  bpm-init(1)
+
+

@@ -1,0 +1,22 @@
+bpm-fetched(1) -- Displays what bpm packages have been fetched
+==================================================================
+
+## SYNOPSIS
+
+`bpm fetched`
+
+## DESCRIPTION
+
+## OPTIONS
+
+## DISCUSSION
+
+## COPYRIGHT
+
+2011 Strobe Inc. and contributors.  Available under MIT license.
+
+## SEE ALSO
+
+bpm-fetch(1)  bpm-list(1)
+
+

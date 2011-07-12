@@ -47,14 +47,14 @@ module BPM
       end
 
 
-      desc "fetched [PACKAGE]", "Shows what bpm packages are fetched"
+      desc "fetched [PACKAGE]", "Display locally fetched bpm packages"
       def fetched(*packages)
         local = BPM::Local.new
         index = local.installed(packages)
         print_specs(packages, index)
       end
 
-      desc "add [PACKAGE]", "Add package to project"
+      desc "add [PACKAGE]", "Add one or more packages to a bpm project"
       method_option :version,    :type => :string,  :default => nil, :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
@@ -90,7 +90,7 @@ module BPM
         end
       end
 
-      desc "remove [PACKAGE]", "Remove package from project"
+      desc "remove [PACKAGE]", "Remove one or more packages from a bpm project"
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def remove(*package_names)
 
