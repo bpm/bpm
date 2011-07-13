@@ -11,7 +11,7 @@ describe "bpm new" do
     it "should create files" do
       bpm 'new', 'BpmTest'
 
-      files = %w(LICENSE README.md index.html app/main.js BpmTest.json assets assets/bpm_packages.js assets/bpm_styles.css assets/BpmTest/app_package.js assets/BpmTest/app_styles.css)
+      files = %w(LICENSE README.md index.html app/main.js BpmTest.json assets/bpm_packages.js assets/bpm_styles.css assets/BpmTest/app_package.js assets/BpmTest/app_styles.css)
 
       # output without coloration
       output = stdout.read.gsub(/\e\[\d+m/,'')
@@ -59,7 +59,7 @@ describe "bpm new" do
       it "should create custom files" do
         bpm 'new', 'BpmTest', '--package=custom_generator'
   
-        files = %w(lib lib/main.js app.js BpmTest.json assets assets/bpm_packages.js assets/bpm_styles.css)
+        files = %w(lib lib/main.js app.js BpmTest.json assets/bpm_packages.js assets/bpm_styles.css)
   
         # output without coloration
         output = stdout.read.gsub(/\e\[\d+m/,'')

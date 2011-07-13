@@ -87,6 +87,7 @@ module BPM
     def as_json
       FIELDS.keys.inject({}) do |json, key|
         val = send(c2u(key))
+        key = 'build' if key == 'pipeline'
         json[key] = val if val && !val.empty?
         json
       end

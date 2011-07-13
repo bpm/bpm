@@ -69,7 +69,7 @@ module BPM
       when /^dev_/
         pkgs = project.sorted_development_deps
       else
-        pkgs = project.sorted_runtime_deps
+        pkgs = (environment.mode == :debug) ? project.sorted_deps : project.sorted_runtime_deps
       end
 
       if pkgs.size > 0

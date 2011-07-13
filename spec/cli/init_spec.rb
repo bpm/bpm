@@ -11,7 +11,7 @@ describe "bpm init" do
   it "should create files" do
     bpm 'init'
 
-    files = %w(new_project.json assets assets/bpm_packages.js assets/bpm_styles.css)
+    files = %w(new_project.json assets/bpm_packages.js assets/bpm_styles.css)
 
     output = stdout.read.gsub(/\e\[\d+m/,'') #without colors
 

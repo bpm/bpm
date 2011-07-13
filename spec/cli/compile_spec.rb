@@ -48,9 +48,6 @@ describe 'bpm compile' do
 
       bpm 'fetch'
       wait
-      
-      bpm 'compile', '--mode=debug' # do not minify
-      wait
     end
     
     def test_include(does_include, build_file, *source_file)
@@ -65,40 +62,61 @@ describe 'bpm compile' do
         
     end
     
-    def in_dev_packages(*source_file)
-      test_include(true,  'dev_packages.js', *source_file)
-      test_include(false, 'bpm_packages.js', *source_file)
+    def test_development_dependencies(should_include)
+      
+      js_reg = [
+        # fetch regular dependency
+        %w(.bpm packages spade lib main.js)
+      ]
+      
+      js_dev = [
+        # fetched development dependency
+        %w(.bpm packages uglify-js lib parse-js.js),
+        
+        # required dependency of development dependency
+        %w(.bpm packages optparse lib optparse.js)
+      ]
+      
+      css_dev = [
+        # css of a locally installed development dependency
+        %w(packages style_package css some_style.css)
+      ]
+    
+      if should_include
+        expected_manifest = 'optparse (1.0.1) spade (0.5.0) style_package (1.0.0) uglify-js (1.0.4)'
+      else
+        expected_manifest = 'spade (0.5.0)'
+      end
+      
+      # validate manifest
+      expected_manifest = "MANIFEST: #{expected_manifest}"
+      File.read(home('hello_dev', 'assets', 'bpm_packages.js')).should include(expected_manifest)
+      
+      js_reg.each do |path|
+        test_include true, 'bpm_packages.js', *path
+      end
+      
+      js_dev.each do |path|
+        test_include(should_include, 'bpm_packages.js', *path)
+      end
+      
+      css_dev.each do |path|
+        test_include(should_include, 'bpm_styles.css', *path)
+      end
+    end
+    
+    it "building in debug mode" do
+      bpm 'compile', '--mode=debug'
+      wait
+      
+      test_development_dependencies true
     end
 
-    def in_bpm_packages(*source_file)
-      test_include(false,  'dev_packages.js', *source_file)
-      test_include(true, 'bpm_packages.js', *source_file)
-    end
-    
-    def in_dev_styles(*source_file)
-      test_include(true,  'dev_styles.css', *source_file)
-      test_include(false, 'bpm_styles.css', *source_file)
-    end
-
-    def in_bpm_styles(*source_file)
-      test_include(false,  'dev_styles.css', *source_file)
-      test_include(true, 'bpm_styles.css', *source_file)
-    end
-          
-    it "should add dev gems into dev js file" do
-      in_dev_packages '.bpm', 'packages', 'uglify-js', 'lib', 'parse-js.js'
-    end
-    
-    it "should not add main dependency to dev file" do
-      in_bpm_packages '.bpm', 'packages', 'spade', 'lib', 'main.js'
-    end
-    
-    it "should add dev css into dev css file" do
-      in_dev_styles 'packages', 'style_package', 'css', 'some_style.css'
-    end
-    
-    it "should include required deps not in main deps" do
-      in_dev_packages '.bpm', 'packages', 'optparse', 'lib', 'optparse.js'
+    it "building in production mode" do
+      bpm 'compile', '--mode=production'
+      wait
+      
+      test_development_dependencies false
     end
     
   end
