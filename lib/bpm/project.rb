@@ -57,7 +57,8 @@ module BPM
     end
 
     def all_dependencies
-      dependencies.merge(dependencies_development).merge(dependencies_build)
+      deps = dependencies.merge(dependencies_development || {})
+      deps.merge(dependencies_build)
     end
 
     def local_package_root(package_name=nil)
@@ -68,7 +69,56 @@ module BPM
       File.join([@root_path, BPM_DIR, 'packages', package_name].compact)
     end
 
-
+    def assets_root(*paths)
+      File.join @root_path, 'assets', *paths
+    end
+    
+    def build_app?
+      !!(pipeline && pipeline['app'])
+    end
+    
+    def build_app=(value)
+      if value
+        @pipeline = {} if @pipeline.nil?
+        @pipeline['app'] = true
+      else
+        @pipeline.delete('app') unless @pipeline.nil?
+      end
+      value
+    end
+    
+    # returns array of all assets that should be generated for this project
+    def buildable_asset_filenames
+      ret = %w(bpm_packages.js bpm_styles.css)
+      if self.build_app?
+        %w(app_package.js app_styles.css).each do |filename|
+          ret << File.join(name, filename)
+        end
+      end
+      ret
+    end
+    
+    # Validates that all required files are present in the project needed
+    # for compile to run.  This will not fetch new dependencies from remote.
+    def verify_and_repair(verbose=false)
+      
+      # only fetch dependencies if no .bpm dir has been created yet
+      # indicating that we haven't yet processed this project
+      fetch_dependencies(verbose) unless File.exists? internal_package_root
+      
+      # make sure .bpm/packages is up to date
+      rebuild_dependency_list nil, verbose
+      
+      # make sure all required files exist
+      buildable_asset_filenames.each do |filename|
+        next if File.exists? assets_root(filename)
+        puts "Creating #{filename}" if verbose
+        FileUtils.mkdir_p File.dirname(assets_root(filename))
+        FileUtils.touch assets_root(filename)
+      end
+      
+    end
+    
     # Add a new dependency
     #
     # Adds to the project json and installs dependency
@@ -146,6 +196,9 @@ module BPM
     # Builds assets directory for dependent packages
 
     def build(mode=:debug, verbose=false)
+      
+      verify_and_repair
+      
       puts "Building static assets..." if verbose
       pipeline = BPM::Pipeline.new self, mode
       asset_root = File.join root_path, 'assets'
@@ -322,7 +375,6 @@ module BPM
 
 
     # Verifies that packages are available to meet all the dependencies
-
     def rebuild_dependency_list(deps=nil, verbose=false)
       puts "Selecting local dependencies..." if verbose
 
@@ -493,8 +545,9 @@ module BPM
     end
 
 
-    # Get list of dependencies, raising if not found or conflicting
-
+    # Get list of dependencies, searching only the project and fetched 
+    # packages.  Does not query remote server.  Raises if not found or 
+    # conflicting.
     def find_dependencies(deps=nil, verbose=false)
       deps ||= all_dependencies
 
@@ -530,6 +583,7 @@ module BPM
 
     def locate_package(package_name, vers, verbose)
       local = has_local_package?(package_name)
+      
       # It's true that we don't have a prerelase check here, but the
       # previous one we had didn't do anything, so it's better to have
       # none than one that doesn't work

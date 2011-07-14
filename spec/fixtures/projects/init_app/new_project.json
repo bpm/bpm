@@ -1,0 +1,8 @@
+{
+  "name": "new_project",
+  "bpm":  "0.1.4",
+  "build": {
+    "minifier": "uglify-js",
+    "app":      true
+  }
+}

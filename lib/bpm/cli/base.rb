@@ -210,6 +210,7 @@ module BPM
       desc "new [NAME]", "Generate a new project skeleton"
       method_option :path, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
       method_option :package, :type => :string, :default => nil, :desc => 'Specify a package template to build from'
+      method_option :app, :type => :boolean, :default => true, :desc => 'Manage app as well as packages'
       def new(name)
         package = install_package(options[:package])
         template_path = package ? package.template_path(:project) : nil
@@ -218,7 +219,7 @@ module BPM
         generator = get_generator(:project, package)
         success = generator.new(self, name, path, template_path, package).run
 
-        run_init(name, path, package) if success
+        run_init(name, options[:app], path) if success
 
       rescue PackageNotFoundError => e
         abort e.message
@@ -230,6 +231,7 @@ module BPM
       desc "init [PATHS]", "Configure a project to use bpm for management"
       method_option :name, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
       method_option :skip, :type => :boolean, :default => false, :desc => 'Skip any conflicting files'
+      method_option :app, :type => :boolean, :default => false, :desc => 'Manage app as well as packages'
       def init(*paths)
         paths = [Dir.pwd] if paths.empty?
         paths.map!{|p| File.expand_path(p) }
@@ -239,7 +241,7 @@ module BPM
         end
 
         paths.each do |path|
-          run_init(options[:name] || File.basename(path), path)
+          run_init(options[:name] || File.basename(path), options[:app], path)
         end
       end
 
@@ -285,13 +287,26 @@ module BPM
           package ? package.generator_for(type) : BPM.generator_for(type)
         end
 
-        def run_init(name, path, package=nil)
-          template_path = package ? package.template_path(:init) : nil
+        def run_init(name, include_app, path, package=nil)
 
-          generator = get_generator(:init, package)
-          generator.new(self, name, path, template_path, package).run
+          # we only need to create a new project.json if one does not 
+          # already exist.
+          unless BPM::Project.is_project_root? path
+            template_path = package ? package.template_path(:init) : nil
 
+            generator = get_generator(:init, package)
+            generator.new(self, name, path, template_path, package).run
+          end
+
+          # make sure the project app status matches
           project = BPM::Project.new(path, name)
+
+          if project.build_app? != !!include_app
+            project.build_app = include_app
+            project.save!
+          end
+
+          
           project.fetch_dependencies true
           project.build :production, true
         end

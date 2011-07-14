@@ -85,12 +85,29 @@ module BPM
     end
 
     def as_json
-      FIELDS.keys.inject({}) do |json, key|
+
+      seen_keys = @read_keys || []
+      json   = {}
+      
+      # keep order of keys read in
+      seen_keys.each do |key|
+        if FIELDS.include?(key)
+          val = send(c2u(key == 'build' ? 'pipeline' : key))
+        else
+          val = @attributes[key]
+        end
+        
+        json[key] = val if val && !val.empty?
+      end
+      
+      FIELDS.keys.each do |key|
+        next if seen_keys.include?(key)
         val = send(c2u(key))
         key = 'build' if key == 'pipeline'
         json[key] = val if val && !val.empty?
-        json
       end
+
+      json
     end
 
     def to_json
@@ -201,6 +218,9 @@ module BPM
         return false
       end
 
+      @read_keys = json.keys.dup # to retain order on save
+      @attributes = json # save for saving
+      
       FIELDS.keys.each do |field|
         if field == 'pipeline'
           self.pipeline = json['build'] || fd(field)

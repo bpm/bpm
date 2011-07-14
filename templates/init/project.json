@@ -1,26 +1,7 @@
 {
-  "name":         "<%= name %>",
-  "version":      "0.0.1",
-  "bpm":          "<%= bpm_version %>",
-
-  "description":  "DESCRIPTION HERE",
-  "author":       "YOUR NAME HERE",
-  "homepage":     "URL",
-
-  "directories": {
-    "lib":        "app",
-    "tests":      "tests"
-  },
-
-  "dependencies": {
-    <%= %["#{package.name}": "#{package.version}"] if package %>
-  },
-  
-  "dependencies:development": {
-    "uglify-js": ">= 0"
-  },
-  
-  "pipeline": {
+  "name":  "<%= name %>",
+  "bpm":   "<%= bpm_version %>",
+  "build": {
     "minifier": "uglify-js"
   }
 }
