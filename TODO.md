@@ -50,5 +50,36 @@
                     
     bpm update      # invoke if you modify the bpm.json to update settings
     
+## User working with unit tests in their app
+
+    # to enable unit testing add a unit testing framework as a dev dependency
+    bpm add qunit --dev
     
+    # you can also use the generator to introduce a unit test
+    bpm gen qunit test foo_test  # creates tests/foo_test.js
+    
+    # next time you update it will add a assets/app_name/bpm_tests.js file
+    # this isn't really necessary though because bpm preview runs this.
+    bpm update --no-fetch
+    
+    # start the preview app and then navigate to the qunit
+    bpm preview
+    
+    # then to run the unit tests - load the qunit viewer...
+    visit: http://localhost:4020/assets/qunit 
+    
+## Developer hacking on a package they intend to redistribute
+
+This works the same way whether you intend to redistribute or not; just put
+it inside of a project and name your development dependencies there.  Workflow
+is the same as unit testing an app except that the tests should be in the 
+package and the tests will be built into `assets/package_name/bpm_tests.js`
+
+## Including a developer package inside of another project
+
+All packages must be developed inside of a project - this means that a package
+you intend to distribute via bpm must itself be developed inside of a project.
+
+If you just want to include a developer package just add the project to your 
+'vendor' directory.
      
