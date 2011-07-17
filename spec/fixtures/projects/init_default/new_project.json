@@ -1,6 +1,6 @@
 {
   "name": "new_project",
-  "bpm":  "0.1.4",
+  "bpm":  "1.0.0.beta.1.pre",
 
   "bpm:build": {
     "bpm_libs.js": {
