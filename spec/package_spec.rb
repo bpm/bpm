@@ -78,12 +78,12 @@ describe BPM::Package, "#to_spec" do
     metadata["bin"].should == {"cot" => "./bin/cot"}
   end
 
-  it "expands paths from the directories" do
+  it "expands paths from the directories and bpm:build" do
     others     = ["tmp/blah.js", "tmp/whee.txt"]
-    files      = ["bin/cot", "lib/main.js", "lib/core.js", "lib/test.js", "package.json", "resources/additions.css", "resources/runner.css"]
+    files      = ["bin/cot", "lib/main.js", "lib/core.js", "lib/test.js", "package.json", "resources/additions.css", "resources/runner.css", "index.html", "extras/extra_file.html"]
     test_files = ["tests/apis/core-test.js", "tests/system/test/assert-test.js"]
 
-    FileUtils.mkdir_p(["bin/", "resources/", "lib/", "tests/apis", "tests/system/test", "tmp/"])
+    FileUtils.mkdir_p(["bin/", "resources/", "lib/", "tests/apis", "tests/system/test", "tmp/", "extras/"])
     FileUtils.touch(files + test_files + others)
 
     expand_sort(subject.files).should == expand_sort(files + test_files)

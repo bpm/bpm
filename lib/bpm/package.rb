@@ -126,7 +126,14 @@ module BPM
     end
 
     def directory_files
-      directories.reject{|k,_| k == 'tests' }.values.map{|dir| glob_files(dir) }.flatten
+      dir_names = directories.reject { |k,_| k == 'tests' }.values
+      build_names = bpm_build.values.map do |hash|
+        hash['directories'] || hash['assets']
+      end
+      
+      (dir_names+build_names).flatten.compact.uniq.map do |dir| 
+        glob_files(dir)
+      end.flatten
     end
 
     def bin_files
@@ -371,6 +378,7 @@ module BPM
       end
 
       def glob_files(path)
+        return path if File.exists?(path) && !File.directory?(path)
         Dir[File.join(path, "**", "*")].reject{|f| File.directory?(f) }
       end
 

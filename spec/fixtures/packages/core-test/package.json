@@ -22,7 +22,7 @@
 
   "directories": {
     "lib": "./lib",
-    "resources": "./resources",
+    "resources": "resources",
     "tests": "./tests"
   },
 
@@ -40,7 +40,11 @@
   "bpm:build": {
     "bpm_styles.css": {
       "directories": ["resources"]
-    }    
+    },
+    
+    "core-test": {
+      "assets": ["index.html", "extras"]
+    }
   }
 }
 
