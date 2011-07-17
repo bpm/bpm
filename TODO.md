@@ -1,11 +1,17 @@
 
+* you should be able to place other projects into a vendor directory and 
+  have their packages appear.
+
 * Multiple format support.  Format processors supplied by dependencies should
   be used to resolve formats.
   
 * minify then transport -> this will allow for string loading.
 
-* you should be able to place other projects into a vendor directory and 
-  have their packages appear.
+* HTML manifest support [in general we need a way for packages to generate new assets]
+
+* cache-friendly URLs
+
+* HTML files should be able to process as templates using a template plugin
 
 ----------------
 
