@@ -28,6 +28,8 @@ module BPM
       "bpm:minifier"      => :string
     }
 
+    PLUGIN_FIELDS = %w[bpm:formats bpm:minifier bpm:transport bpm:use:transport]
+    
     # Fields that can be loaded straight into the gemspec
     SPEC_FIELDS = %w[name email homepage summary description]
 
@@ -130,7 +132,14 @@ module BPM
       build_names = bpm_build.values.map do |hash|
         hash['directories'] || hash['assets']
       end
-      
+
+      build_names += PLUGIN_FIELDS.map do |field_name|
+        val = self.send(c2u(field_name))
+        val = val && val =~ /^#{name}\// ? val[name.size+1..-1]+'.js' : nil
+        puts "FIELD: #{field_name} #{self.send(c2u(field_name))} val=#{val}"
+        val
+      end
+
       (dir_names+build_names).flatten.compact.uniq.map do |dir| 
         glob_files(dir)
       end.flatten
