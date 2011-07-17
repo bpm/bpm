@@ -28,7 +28,7 @@ Then add jquery as a dependency:
 
     bpm add jquery
     
-This will create a file called `assets/bpm_packages.js` which will include
+This will create a file called `assets/bpm_libs` which will include
 jquery.  You can then create an index.html and reference that js.  Everytime
 you add a dependency, it will be based into this JS file . 
 

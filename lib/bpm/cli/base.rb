@@ -1,4 +1,5 @@
 require 'thor'
+require 'json'
 
 module BPM
   module CLI
@@ -59,6 +60,7 @@ module BPM
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
       method_option :development, :type => :boolean, :default => false, :aliases => ['--dev'], :desc => "Add as a development dependency"
+      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile (default production)"
       def add(*package_names)
         # map to dependencies
         if package_names.empty?
@@ -84,7 +86,7 @@ module BPM
 
         begin
           project.add_dependencies deps, options[:development], true
-          project.build :debug, true
+          project.build options[:mode], true
         rescue PackageNotFoundError => e
           abort e.message
         end
@@ -92,6 +94,7 @@ module BPM
 
       desc "remove [PACKAGE]", "Remove one or more packages from a bpm project"
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile (default production)"
       def remove(*package_names)
 
         # map to dependencies
@@ -103,31 +106,40 @@ module BPM
           project = find_project
           project.unbuild options[:verbose]
           project.remove_dependencies package_names, true
-          project.build :debug, true
+          project.build options[:mode], true
         rescue PackageNotFoundError => e
           abort e.message
         end
       end
 
       desc "preview", "Preview server that will autocompile assets as you request them.  Useful for hacking"
-      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Set build mode for compile (default debug)'
+      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode for compile (default debug)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :port,       :type => :string,  :default => '4020', :desc => "Port to host server on"
       def preview
-        
         project = find_project
+        project.verify_and_repair options[:mode], options[:verbose]
         BPM::Server.start project, :Port => options[:port], :mode => options[:mode].to_sym
-        
       end
       
-      desc "compile", "Build the bpm_package.js for development"
-      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Set build mode for compile (default production)'
+      desc "update", "Update packages to the latest compatible versions"
+      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile (default production)'
+      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      def update 
+        find_project.fetch_dependencies true
+        compile
+      rescue PackageNotFoundError => e
+        abort e.message
+      end
+
+      desc "compile", "Rebuilds bpm assets, does not update versions"
+      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile (default production)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def compile
         project = find_project
         project.rebuild_dependency_list(nil, options[:verbose])
-        project.build options[:mode].to_sym, options[:verbose]
-      rescue PackageNotFoundError => e
+        project.build options[:mode].to_sym, true
+      rescue BPM::Error => e
         abort e.message
       end
       
@@ -210,7 +222,6 @@ module BPM
       desc "new [NAME]", "Generate a new project skeleton"
       method_option :path, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
       method_option :package, :type => :string, :default => nil, :desc => 'Specify a package template to build from'
-      method_option :app, :type => :boolean, :default => true, :desc => 'Manage app as well as packages'
       def new(name)
         package = install_package(options[:package])
         template_path = package ? package.template_path(:project) : nil
@@ -219,13 +230,13 @@ module BPM
         generator = get_generator(:project, package)
         success = generator.new(self, name, path, template_path, package).run
 
-        run_init(name, options[:app], path) if success
+        run_init(name, true, path, package) if success
 
-      rescue PackageNotFoundError => e
-        abort e.message
-      
-      rescue LibGems::InstallError => e
-        abort e.message
+      # rescue PackageNotFoundError => e
+      #   abort e.message
+      # 
+      # rescue LibGems::InstallError => e
+      #   abort e.message
       end
 
       desc "init [PATHS]", "Configure a project to use bpm for management"
@@ -243,6 +254,9 @@ module BPM
         paths.each do |path|
           run_init(options[:name] || File.basename(path), options[:app], path)
         end
+      
+      rescue BPM::Error => e
+        abort e.message
       end
 
       desc "build [PACKAGE]", "Build a bpm package from a package.json"
@@ -279,6 +293,21 @@ module BPM
         end
       end
 
+      desc "debug [OPTION]", "Display various options for debugging"
+      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode (default debug)'
+      def debug(option)
+        case option
+        when 'build'
+          say JSON.pretty_generate find_project.build_settings(options[:mode].to_sym)
+        when 'repair'
+          say "Verifying and repairing project..."
+          find_project.verify_and_repair options[:mode].to_sym, true
+        else
+          abort "Do not know how to display #{option}"
+        end
+      end
+      
       private
 
         def get_generator(type, package=nil)
@@ -306,9 +335,14 @@ module BPM
             project.save!
           end
 
-          
-          project.fetch_dependencies true
           project.build :production, true
+
+          if package
+            deps = {}
+            deps[package.name] = package.version
+            project.add_dependencies deps, false, true
+          end
+
         end
 
         def report_arity_error(name)

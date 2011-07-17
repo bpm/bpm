@@ -15,7 +15,6 @@ describe 'bpm remove' do
   
   it "should remove direct dependency from project" do
     bpm 'remove', 'spade'
-    wait
     
     output = stdout.read
     output.should include("Removed package 'spade'")
@@ -27,7 +26,7 @@ describe 'bpm remove' do
   it "should remove soft dependencies" do
     bpm 'remove', 'core-test'
     wait
-
+  
     output = stdout.read
     %w(core-test:0.4.9 ivory:0.0.1 optparse:1.0.1).each do |line|
       pkg_name, pkg_vers = line.split ':'
@@ -78,9 +77,7 @@ describe 'bpm remove' do
     no_dependency 'custom_package'
     File.exists?(home('hello_world', 'packages', 'custom_package', 'package.json')).should be_true
   end
-
+  
   it "should remove development dependencies"
-
-  it "should verify working with config-less projects"
   
 end

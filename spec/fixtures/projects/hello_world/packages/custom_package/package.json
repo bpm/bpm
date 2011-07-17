@@ -16,7 +16,9 @@
     "not-normal": "custom_dir"
   },
   
-  "build": {
-    "libs": ["lib", "not-normal"]
+  "bpm:build": {
+    "bpm_libs.js": {
+      "directories": ["lib", "not-normal"]
+    }
   }
 }

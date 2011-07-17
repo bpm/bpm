@@ -24,7 +24,7 @@ module BPM
 
       @app ||= Rack::Builder.new do
         map '/assets' do
-          run BPM::Pipeline.new cur_project, cur_mode
+          run BPM::Pipeline.new cur_project, cur_mode, true
         end
         
         map '/' do

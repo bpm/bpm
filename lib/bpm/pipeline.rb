@@ -17,9 +17,9 @@ module BPM
     
     attr_reader :project
     attr_reader :mode
-    
+
     # Pass in the project you want the pipeline to manage.
-    def initialize(project, mode = :debug)
+    def initialize(project, mode = :debug, include_preview = false)
       @project = project
       @mode    = mode
       @plugin_contexts = {}
@@ -35,6 +35,7 @@ module BPM
       end
 
       register_postprocessor 'application/javascript', BPM::TransportProcessor
+      #register_postprocessor 'application/javascript', BPM::SourceURLProcessor
 
       # This gunks things up. I'm not a fan - PDW
       unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
@@ -42,7 +43,8 @@ module BPM
       # configure search paths
       append_path File.join project_path, '.bpm', 'packages'
       append_path File.dirname project_path
-      append_path File.join project_path, 'assets'
+      append_path project.assets_root
+      append_path project.preview_root if include_preview
     end    
       
     def plugin_context_for(module_id)
@@ -55,18 +57,27 @@ module BPM
       
       # make sure the logical_path can be used to simply build into the 
       # assets directory when we are done
-      ret = ['bpm_packages.js', 'bpm_styles.css', "bpm_tests.js",
-              "#{project.name}/app_package.js", "#{project.name}/app_styles.css", "#{project.name}/app_tests.js"]
+      ret = project.buildable_asset_filenames mode
       
-      project.local_deps.each do |pkg|
-        pkg.load_json
-        pkg.pipeline_assets.each do |dir|
-          dir_name = pkg.directories[dir] || dir
-          dir_name.sub! /^\.?\//, ''
-          pkg_root = File.join(pkg.root_path, dir_name)
-          Dir[File.join(pkg_root, '**', '*')].each do |fn|
-            fn.sub! /^#{Regexp.escape pkg_root}\//, ''
-            ret << File.join(pkg.name, dir_name, fn)
+      # Add in the static assets that we just need to copy
+      project.build_settings(mode).each do |target_name, opts|
+        next unless opts.is_a? Array
+        opts.each do |dir_name| 
+          
+          dep = project.local_deps.find { |dep| dep.name == target_name }
+          dep = project if project.name == target_name
+          
+          dir_paths = File.join(dep.root_path, dir_name)
+          if File.directory? dir_paths
+            dir_paths = Dir[File.join(dir_paths, '**', '*')]
+          else
+            dir_paths = [dir_paths]
+          end
+
+          dir_paths.each do |dir_path|
+            if File.exist?(dir_path) && !File.directory?(dir_path)
+              ret << File.join(target_name, dir_path[dep.root_path.size+1..-1])
+            end
           end
         end
       end
@@ -77,14 +88,14 @@ module BPM
     # Detect whenever we are asked to build some of the magic files and swap
     # in a custom asset type that can generate the contents.
     def build_asset(logical_path, pathname, options)
-      magic_paths = %w(bpm_packages.js bpm_styles.css).map do |filename|
-        File.join project.root_path, 'assets', filename
+      magic_paths = project.buildable_asset_filenames(mode).map do |filename|
+        project.assets_root filename
       end
 
-      magic_paths += %w(app_package.js app_styles.css app_tests.js).map do |filename|
-        File.join project.root_path, 'assets', project.name, filename
+      magic_paths += project.buildable_asset_filenames(mode).map do |filename|
+        project.preview_root filename
       end
-      
+
       if magic_paths.include? pathname.to_s
         BPM::GeneratedAsset.new(self, logical_path, pathname, options)
       else

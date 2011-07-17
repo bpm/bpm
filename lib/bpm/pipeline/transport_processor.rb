@@ -8,7 +8,9 @@ module BPM
       environment = context.environment
       project = environment.project
       pkg, module_id = project.package_and_module_from_path file
-      transport_plugins = pkg.find_transport_plugins(project)
+      transport_plugins = Array(pkg.bpm_use_transport || pkg.find_transport_plugins(project))
+      
+      transport_plugins = [] if transport_plugins.first == 'none'
 
       # No transport, just return the existing data
       return data if transport_plugins.size == 0
@@ -16,7 +18,7 @@ module BPM
       if transport_plugins.size > 1
         # TODO: Maybe make custom error for this
         raise "#{pkg.name} depends on #{transport_plugins.size} packages that define transport plugins. " \
-                "Select a plugin by adding a `plugin:transport` property to the package.json"
+                "Select a plugin by adding a `bpm:use:transport` property to the package.json"
       end
       
       plugin_ctx = environment.plugin_context_for transport_plugins.first

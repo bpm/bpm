@@ -33,11 +33,6 @@ module BPM
           template 'main.css'
         end
 
-        inside 'assets' do
-          template "app/app_package.js", "#{name}/app_package.js"
-          template "app/app_tests.js", "#{name}/app_tests.js"
-          template "app/app_styles.css", "#{name}/app_styles.css"
-        end
       end
 
       def directory_exists?

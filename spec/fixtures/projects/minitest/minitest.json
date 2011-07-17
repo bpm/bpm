@@ -11,8 +11,16 @@
     "lib":        "lib"
   },
 
-  "build": {
-    "minifier": { "uglyduck": ">= 0" }
+  "bpm:build": {
+    
+    "bpm_libs.js": {
+      "minifier": { "uglyduck": ">= 0" }  
+    },
+    
+    "minitest/bpm_libs.js": {
+      "directories": ["lib"],
+      "minifier": { "uglyduck": ">= 0" }
+    }
   }
   
 }

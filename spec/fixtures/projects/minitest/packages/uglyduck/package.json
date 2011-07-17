@@ -16,6 +16,6 @@
   "dependencies": {
   },
   
-  "plugin:minifier": "uglyduck/~minifier/main"
+  "bpm:minifier": "uglyduck/minifier/main"
   
 }

@@ -20,6 +20,21 @@
 
   "dependencies:development": {
     "custom_generator": "1.0"
+  },
+  
+  "bpm:build": {
+    
+    "hello_world/bpm_libs.js": {
+      "directories": ["lib", "custom"]
+    },
+    
+    "hello_world/bpm_styles.css": {
+      "directories": ["css"]
+    },
+    
+    "hello_world/bpm_tests.js": {
+      "directories": ["test"]
+    }
   }
 
 }

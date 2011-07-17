@@ -19,17 +19,20 @@ module BPM
       "author"      => :string,
       "homepage"    => :string,
       "summary"     => :string,
-      "plugin:transport" => :string,
-      "plugin:minifier"  => :string,
       "dependencies"             => :hash,
-      "dependencies:development" => :hash
+      "dependencies:development" => :hash,
+      "bpm:build"         => :hash,
+      "bpm:formats"       => :hash,
+      "bpm:transport"     => :string,
+      "bpm:use:transport" => :string,
+      "bpm:minifier"      => :string
     }
 
     # Fields that can be loaded straight into the gemspec
     SPEC_FIELDS = %w[name email homepage summary description]
 
     # Fields that should be bundled up into JSON in the gemspec
-    METADATA_FIELDS = %w[keywords licenses engines main bin directories pipeline plugin:transport plugin:minifier]
+    METADATA_FIELDS = %w[keywords licenses engines main bin directories pipeline bpm:build bpm:formats bpm:transport]
 
     REQUIRED_FIELDS = %w[name description summary homepage author version directories]
 
@@ -149,7 +152,7 @@ module BPM
           pkg.name == pkg_name
         end
         raise "Could not find dependency: #{pkg_name}" unless dep
-        dep.plugin_transport
+        dep.bpm_transport
       end.compact
     end
 
@@ -171,19 +174,22 @@ module BPM
     
     # Returns a hash of dependencies inferred from the build settings.
     def dependencies_build
-      minifier = pipeline && pipeline['minifier']
-      ret      = {}
-      
-      case minifier
-      when Hash
-        ret.merge! minifier
-      when String
-        ret[minifier] = '>= 0'
+      ret = {}
+        
+      bpm_build.each do |target_name, opts|
+        next unless opts.is_a?(Hash)
+        
+        minifier = opts['minifier']
+        case minifier
+        when String
+          ret[minifier] = '>= 0'
+        when Hash
+          ret.merge! minifier
+        end
       end
-      
       ret
     end
-
+    
     def template_path(name)
       path = File.join(root_path, 'templates', name.to_s)
       File.exist?(path) ? path : nil

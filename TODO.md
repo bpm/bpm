@@ -22,14 +22,14 @@
 
 ## New user with existing app using bpm to manage dependencies
 
-    bpm init .         # creates bpm.json, assets/bpm_packages.js etc.
+    bpm init .         # creates bpm.json, assets/bpm_libs.js etc.
     
     bpm add sproutcore # updates json & packages with sproutcore
     > Fetching sproutcore...
-    > Building bpm_packages.js
+    > Building bpm_libs.js
     > New library size ~24Kb
     
-    # now just load assets/bpm_packages.js to get it all
+    # now just load assets/bpm_libs.js to get it all
     
     bpm remove sproutcore # updates json & packages to remove...
     ...

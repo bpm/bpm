@@ -17,6 +17,7 @@ module BPM
   autoload :DirectiveProcessor,   'bpm/pipeline/directive_processor'
   autoload :GeneratedAsset,       'bpm/pipeline/generated_asset'
   autoload :TransportProcessor,   'bpm/pipeline/transport_processor'
+  autoload :SourceURLProcessor,   'bpm/pipeline/source_url_processor'
   autoload :PluginAsset,          'bpm/pipeline/plugin_asset'
 end
 

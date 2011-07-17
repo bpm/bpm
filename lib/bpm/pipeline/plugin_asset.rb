@@ -9,6 +9,12 @@ module BPM
 
     def initialize(environment, module_name)
       pathname = Pathname.new(File.join(environment.project.root_path, '.bpm', 'plugins', module_name+'.js'))
+      
+      unless File.exists? pathname
+        FileUtils.mkdir_p File.dirname(pathname)
+        FileUtils.touch pathname
+      end
+      
       super(environment, module_name, pathname, {})
     end
     
@@ -41,7 +47,7 @@ module BPM
       deps << pkg # always load pkg too
 
       # Prime digest cache with data, since we happen to have it
-      environment.file_digest(pathname, body)
+      environment.file_digest(pathname, body.join("\n"))
 
       # add requires for each depedency to context
       context = blank_context
@@ -61,7 +67,7 @@ module BPM
 
       # require asset itself - this should be included directly in the body
       # we don't want to use any processors
-      module_path = context.resolve project.path_from_module(logical_path)
+      module_path = context.resolve logical_path
       context.depend_on module_path
       body << "(function(exports) {"
       body << File.read(module_path)

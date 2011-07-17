@@ -15,7 +15,7 @@
         
         "homepage": "http://github.com/getbpm/UglifyJS",
         
-        "plugin:minifier": "uglify-js/~plugins/minifier",
+        "bpm:minifier": "uglify-js/plugins/minifier",
         
         "directories": {
           "lib": "lib",

@@ -1,8 +1,27 @@
 {
-  "name": "new_project",
-  "bpm":  "0.1.4",
-  "build": {
-    "minifier": "uglify-js",
-    "app":      true
+  "name":     "new_project",
+  "bpm":      "0.1.4",
+
+  "bpm:build": {
+    "bpm_libs.js": {
+      "directories": [
+      ],
+      "minifier": "uglify-js"
+    },
+    "bpm_styles.css": {
+      "directories": [
+      ]
+    },
+    "new_project/bpm_libs.js": {
+      "directories": [
+        "app"
+      ],
+      "minifier": "uglify-js"
+    },
+    "new_project/bpm_styles.css": {
+      "directories": [
+        "css"
+      ]
+    }
   }
 }

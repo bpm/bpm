@@ -170,6 +170,8 @@ describe 'bpm add' do
       bpm "add", "custom_generator", "--dev" and wait
       output = stdout.read
       output.should include("Added development package 'custom_generator' (1.0)")
+      
+      bpm 'compile', '--mode=debug' and wait
       has_development_dependency 'custom_generator', '1.0'
       no_dependency 'custom_generator', false
     end

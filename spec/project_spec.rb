@@ -129,7 +129,7 @@ describe BPM::Project, "project metadata" do
     end
     
     # FIXME: Is this test even useful?
-    it "should get dependencies read from bpm_packages.js file" do
+    it "should get dependencies read from bpm_libs.js file" do
       subject.dependencies.should == {
       }
     end

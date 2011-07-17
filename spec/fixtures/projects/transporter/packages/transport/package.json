@@ -16,6 +16,6 @@
     
   },
   
-  "plugin:transport": "transport/~transports/wrapper"
+  "bpm:transport": "transport/transports/wrapper"
   
 }

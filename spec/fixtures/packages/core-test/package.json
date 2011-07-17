@@ -37,8 +37,10 @@
     "optparse": "= 1.0.1"
   },
   
-  "build": {
-    "css": ["resources"]
+  "bpm:build": {
+    "bpm_styles.css": {
+      "directories": ["resources"]
+    }    
   }
 }
 

@@ -1,8 +1,16 @@
 {
   "name":  "<%= name %>",
   "bpm":   "<%= bpm_version %>",
-  "build": {
-    "minifier": "uglify-js"
+
+  "bpm:build": {
+    "bpm_libs.js": {
+      "directories": [],
+      "minifier": "uglify-js"
+    },
+    
+    "bpm_styles.css": {
+      "directories": []
+    }
   }
 }
 

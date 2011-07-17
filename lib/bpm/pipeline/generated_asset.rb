@@ -21,56 +21,82 @@ module BPM
       minify super
     end
 
-    def minify(body)
-      return body if environment.mode == :debug
-      project = environment.project
-      minifier_name = project.minifier_name
-      minifier_name = minifier_name.keys.first if minifier_name.is_a? Hash
+    def minify(hash)
+      return hash if environment.mode == :debug
       
-      if minifier_name && content_type == 'application/javascript' 
-        
-        pkg = project.package_from_name minifier_name
-        if pkg.nil?
-          raise "Minifier package #{minifier_name} was not found.  Try running bpm update to refresh."
-        end
-        
-        minifier_plugin_name = pkg.plugin_minifier
-        plugin_ctx = environment.plugin_context_for minifier_plugin_name
-        
-        # slice out the header at the top - we don't want the minifier to 
-        # touch it.
-        lines = body.split "\n"
-        header = body.match /^(\/\* ====.+====\*\/)$/m
-        if header
-          header = header[0] + "\n"
-          body   = body[header.size..-1]
-        end
-        
-        V8::C::Locker() do
-          plugin_ctx["PACKAGE_INFO"] = pkg.as_json
-          plugin_ctx["DATA"]         = body
-          body = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, PACKAGE_INFO)")
-        end
+      hash = environment.cache_hash("#{pathname}:minify", id) do
+        project = environment.project
+        minifier_name = project.minifier_name asset_name
+        minifier_name = minifier_name.keys.first if minifier_name
 
-        body = header+body if header
-        
+        if minifier_name && content_type == 'application/javascript'
+          pkg = project.package_from_name minifier_name
+          if pkg.nil?
+            raise MinifierNotFoundError.new(minifier_name)
+          end
+
+          minifier_plugin_name = pkg.bpm_minifier
+          if minifier_plugin_name.nil?
+            raise MinifierNotFoundError.new(minifier_name)
+          end
+
+          plugin_ctx = environment.plugin_context_for minifier_plugin_name
+
+          # slice out the header at the top - we don't want the minifier to 
+          # touch it.
+          data     = hash['source']
+          header   = data.match /^(\/\* ====.+====\*\/)$/m
+          if header
+            header = header[0] + "\n"
+            data   = data[header.size..-1]
+          end
+
+          V8::C::Locker() do
+            plugin_ctx["PACKAGE_INFO"] = pkg.as_json
+            plugin_ctx["DATA"]         = data
+            data = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, PACKAGE_INFO)")
+          end
+
+          data = header+data if header
+          
+          { 'length' => Rack::Utils.bytesize(data),
+            'digest' => environment.digest.update(data).hexdigest,
+            'source' => data }
+        else
+          hash
+        end
       end
-      
-      body
+
+      hash['length'] = Integer(hash['length']) if hash['length'].is_a?(String)
+
+      @length = hash['length']
+      @digest = hash['digest']
+      @source = hash['source']
+
+      hash
+    end
+    
+    def asset_name
+      project = environment.project
+      if pathname.to_s.include?(project.assets_root)
+        pathname.relative_path_from(Pathname.new(project.assets_root)).to_s
+      elsif pathname.to_s.include?(project.preview_root)
+        pathname.relative_path_from(Pathname.new(project.preview_root)).to_s
+      end
     end
     
     def build_dependency_context_and_body
 
-      project = environment.project
-      
-      case pathname.basename.to_s
-      when /^app_/
-        pkgs = [project]
-      when /^dev_/
-        pkgs = project.sorted_development_deps
-      else
-        pkgs = (environment.mode == :debug) ? project.sorted_deps : project.sorted_runtime_deps
-      end
+      project       = environment.project
+      settings = project.build_settings(environment.mode)[asset_name]
+      pkgs     = settings.keys.map do |pkg_name| 
+        next if pkg_name == 'bpm:minifier'
+        if pkg_name == project.name
+          project
+        else
+          project.local_deps.find { |dep| dep.name == pkg_name } 
+        end
+      end.compact
 
       if pkgs.size > 0
         manifest = pkgs.sort { |a,b| a.name <=> b.name } 
@@ -105,8 +131,7 @@ EOF
       end
 
       pkgs.map do |pkg|
-        pkg.load_json
-        pkg.send(dir_method).each do |dir|
+        settings[pkg.name].each do |dir|
           dir_names = Array(pkg.directories[dir] || dir)
           dir_names.each do |dir_name|
             search_path = File.expand_path File.join(pkg.root_path, dir_name)

@@ -4,6 +4,10 @@ require 'json'
 describe "bpm init" do
 
   before do
+    goto_home
+    set_host
+    start_fake(FakeGemServer.new)
+    
     @project_path = home("new_project").to_s
     FileUtils.mkdir @project_path
     cd @project_path
@@ -18,7 +22,7 @@ describe "bpm init" do
     bpm 'init' and wait
     compare_to 'init_default'
   end
-
+  
   it "should create app files with --app option" do
     bpm 'init', '--app' and wait
     compare_to 'init_app'
@@ -34,7 +38,7 @@ describe "bpm init" do
     output.should =~ /skip\s+new_project.json/
     File.read("new_project.json").should == "Valuable info!"
   end
-
+  
   it "should update the project with app but save other settings" do
     bpm 'init' and wait
     
@@ -43,21 +47,23 @@ describe "bpm init" do
     json = JSON.load File.read(project_json)
     json["custom_property"] = "I haz it"
     File.open(project_json, 'w') { |fd| fd << json.to_json }
-
-    bpm 'init', '--skip', '--app' and wait
+  
+    bpm 'init', '--app' and wait
     
-    app_package = home 'new_project', 'assets', 'new_project', 'app_package.js'
+    app_package = home 'new_project', 'assets', 'new_project', 'bpm_libs.js'
     File.exists?(app_package).should be_true
     
     json = JSON.load File.read(project_json)
     json["custom_property"].should == "I haz it"
-    json["build"]["app"].should == true
+    json["bpm:build"]["bpm_libs.js"].should_not be_nil
     
   end
   
   it "should rebuild assets" do
-
-    files = %w(bpm_packages.js bpm_styles.css).map do |fn| 
+  
+    bpm 'init' and wait
+    
+    files = %w(bpm_libs.js bpm_styles.css).map do |fn| 
       File.join(@project_path, 'assets', fn)
     end
     
@@ -66,7 +72,7 @@ describe "bpm init" do
       File.open(path, 'w') { |fd| fd.print "Not valuable info!" }
     end
     
-    bpm 'init', '--skip' and wait
+    bpm 'init' and wait
     
     files.each do |path|
       File.read(path).should_not include("Not valuable info!")
