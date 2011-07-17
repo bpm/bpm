@@ -1,5 +1,5 @@
 require "spec_helper"
-
+require "json"
 describe 'bpm fetch' do
   
   before do
@@ -11,12 +11,21 @@ describe 'bpm fetch' do
 
   it "fetches all dependencies in a project when called without command" do
     cd home('hello_world')
-    bpm "fetch"
 
-    stdout.read.should include("Fetched dependent packages for hello_world")
+    # add custom_package as a dependency to test local deps with fetching
+    package_info = JSON.load File.read(home('hello_world', 'hello_world.json'))
+    package_info['dependencies']['custom_package'] = '>= 0'
+    File.open(home('hello_world', 'hello_world.json'), 'w+') { |fd| fd << package_info.to_json }
+    
+    bpm "fetch", '--verbose'
+    out = stdout.read
+    puts out
+    out.should include("Fetched dependent packages for hello_world")
 
     # note: ivory is a soft dependency from core-test
-    %w(spade-0.5.0 core-test-0.4.9 ivory-0.0.1 optparse-1.0.1).each do |package_name|
+    #       jquery is a development dependency of hello_world
+    #       rake is a dependency of custom_package (a dep of hello_world)
+    %w(spade-0.5.0 core-test-0.4.9 ivory-0.0.1 optparse-1.0.1 jquery-1.4.3 uglify-js-1.0.4 rake-0.8.6).each do |package_name|
       package_name.should be_fetched
       package_name.should be_unpacked
     end
@@ -131,7 +140,5 @@ describe 'bpm fetch' do
       name.should be_unpacked
     end
   end
-
-  it "fetches development dependencies"
 
 end

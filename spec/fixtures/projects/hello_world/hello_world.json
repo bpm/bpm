@@ -19,7 +19,8 @@
   },
 
   "dependencies:development": {
-    "custom_generator": "1.0"
+    "custom_generator": "1.0",
+    "jquery":  "1.4.3"
   },
   
   "bpm:build": {

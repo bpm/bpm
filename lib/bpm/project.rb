@@ -169,7 +169,7 @@ module BPM
       exp_deps = find_non_local_dependencies(hard_deps, true)
 
       puts "Fetching packages from remote..." if verbose
-      core_fetch_dependencies(exp_deps, (development ? :development : :runtime), verbose)
+      core_fetch_dependencies(exp_deps, verbose)
 
       if development
         self.dependencies_development = hard_deps
@@ -228,12 +228,8 @@ module BPM
 
     def fetch_dependencies(verbose=false)
       puts "Fetching packages from remote..." if verbose
-      exp_deps = find_non_local_dependencies(dependencies, true)
-      return false unless core_fetch_dependencies(exp_deps, :runtime, verbose)
-      exp_deps = find_non_local_dependencies(dependencies_development, true)
-      return false unless core_fetch_dependencies(exp_deps, :development, verbose)
-      exp_deps = find_non_local_dependencies(dependencies_build, true)
-      core_fetch_dependencies(exp_deps, :runtime, verbose)
+      exp_deps = find_non_local_dependencies(all_dependencies, true)
+      core_fetch_dependencies(exp_deps, verbose)
     end
 
 
@@ -522,6 +518,8 @@ module BPM
           puts "~ Using local package '#{pkg.name}' (#{pkg.version})" if verbose
 
           search_list += Array(pkg.dependencies)
+          search_list += Array(pkg.dependencies_development)
+          search_list += Array(pkg.dependencies_build)
         else
           ret[name] = version
         end
@@ -533,9 +531,9 @@ module BPM
 
     # Fetch any dependencies into local cache for the passed set of deps
 
-    def core_fetch_dependencies(deps, type, verbose)
+    def core_fetch_dependencies(deps, verbose)
       deps.each do |pkg_name, pkg_version|
-        core_fetch_dependency pkg_name, pkg_version, type, verbose
+        core_fetch_dependency pkg_name, pkg_version, :runtime, verbose
       end
     end
 

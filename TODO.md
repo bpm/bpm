@@ -4,8 +4,6 @@
   
 * minify then transport -> this will allow for string loading.
 
-* bpm fetch ignores development and indirect development and build dependencies.  it shouldn't.
-
 * you should be able to place other projects into a vendor directory and 
   have their packages appear.
 
