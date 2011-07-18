@@ -253,9 +253,9 @@ module BPM
         abort e.message
       end
 
-      desc "build [PACKAGE]", "Build a bpm package from a package.json"
+      desc "pack [PACKAGE]", "Build a bpm package from a package.json"
       method_option :email, :type => :string,  :default => nil,   :aliases => ['-e'],    :desc => 'Specify an author email address'
-      def build(package_path=nil)
+      def pack(package_path=nil)
         package_path ||= Dir.pwd
         local = BPM::Local.new
         package = local.pack(File.join(package_path, "package.json"), options[:email])
@@ -269,6 +269,8 @@ module BPM
           end
           abort failure_message
         end
+      rescue BPM::Error => e
+        abort e.message
       end
 
       desc "unpack [PACKAGE]", "Extract files from a bpm package"
