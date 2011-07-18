@@ -53,7 +53,7 @@ module BPM
     end
 
     def bpm
-      @bpm || BPM::VERSION
+      @bpm || BPM::COMPAT_VERSION
     end
 
     # Returns a fully normalized hash of build settings

@@ -1,7 +1,7 @@
 {
   "name":         "hello_dev",
   "version":      "0.0.1",
-  "bpm":          "1.0.0.beta.1.pre",
+  "bpm":          "1.0.0",
 
   "description":  "DESCRIPTION HERE",
   "author":       "YOUR NAME HERE",

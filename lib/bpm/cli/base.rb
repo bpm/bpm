@@ -224,30 +224,11 @@ module BPM
         print_specs(packages, index)
       end
 
-      desc "new [NAME]", "Generate a new project skeleton"
-      method_option :path, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
-      method_option :package, :type => :string, :default => nil, :desc => 'Specify a package template to build from'
-      def new(name)
-        package = install_package(options[:package])
-        template_path = package ? package.template_path(:project) : nil
-
-        path = File.expand_path(options[:path] || underscore(name))
-        generator = get_generator(:project, package)
-        success = generator.new(self, name, path, template_path, package).run
-
-        run_init(name, true, path, package) if success
-
-      # rescue PackageNotFoundError => e
-      #   abort e.message
-      # 
-      # rescue LibGems::InstallError => e
-      #   abort e.message
-      end
-
       desc "init [PATHS]", "Configure a project to use bpm for management"
       method_option :name, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
       method_option :skip, :type => :boolean, :default => false, :desc => 'Skip any conflicting files'
       method_option :app, :type => :boolean, :default => false, :desc => 'Manage app as well as packages'
+      method_option :package, :type => :string, :default => nil, :desc => 'Specify a package template to build from'
       def init(*paths)
         paths = [Dir.pwd] if paths.empty?
         paths.map!{|p| File.expand_path(p) }
@@ -257,7 +238,25 @@ module BPM
         end
 
         paths.each do |path|
-          run_init(options[:name] || File.basename(path), options[:app], path)
+          name = options[:name] || File.basename(path)
+
+          # if someone specified both a name and path assume they meant 
+          # exactly what they said and don't normalize it.
+          if name == File.basename(path)
+            underscored = File.join(File.dirname(path), underscore(File.basename(path)))
+            path = underscored if !File.directory?(path)
+          end
+
+          if File.directory?(path)
+            run_init(name, options[:app], path)
+          else
+            package = install_package(options[:package])
+            template_path = package ? package.template_path(:project) : nil
+            generator = get_generator(:project, package)
+            success = generator.new(self, name, path, template_path, package).run
+            run_init(name, true, path, package) if success
+          end
+          
         end
       
       rescue BPM::Error => e

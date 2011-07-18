@@ -6,7 +6,7 @@ module BPM
     source_root File.join(::BPM::TEMPLATES_DIR, 'init')
 
     def bpm_version
-      BPM::VERSION
+      BPM::COMPAT_VERSION
     end
 
     def run
