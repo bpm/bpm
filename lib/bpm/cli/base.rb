@@ -11,6 +11,11 @@ module BPM
         :aliases => ['-V'],
         :desc => 'Show additional debug information while running'
 
+      def self.help(shell, subcommand = false)
+        shell.say "\nbpm (v#{BPM::VERSION}) - the browser package manager\n\n"
+        super shell, subcommand
+      end
+      
       desc "owner", "Manage users for a package"
       subcommand "owner", BPM::CLI::Owner
 
@@ -307,7 +312,7 @@ module BPM
           abort "Do not know how to display #{option}"
         end
       end
-      
+
       private
 
         def get_generator(type, package=nil)
