@@ -17,10 +17,13 @@
 
 * Can we use YAML instead of JSON?
 
-* Changing a dependency in a package.json should rebuild all files (in case 
-  the transport was modified)
+* Changing a dependency in a package.json should rebuild all files in preview mode (in case the transport was modified)
 
 * Need to run bpm update before bpm preview for the first time
+
+* combine bpm update and bpm compile - make compile update unless you use --no-update
+
+* "directories" should be optional in package.json - we can infer it.
 
 ----------------
 
