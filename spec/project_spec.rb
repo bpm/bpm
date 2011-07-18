@@ -106,12 +106,32 @@ describe BPM::Project, "project metadata" do
 
     it "should get development dependencies" do
       subject.dependencies_development.should == {
-        "custom_generator" => "1.0"
+        "custom_generator" => "1.0",
+        "jquery" => "1.4.3"
       }
     end
 
   end
 
+  describe "project with different name" do
+    before do
+      goto_home
+      FileUtils.cp_r project_fixture('hello_world'), 'HelloWorld2'
+    end
+    
+    subject do
+      BPM::Project.new home('HelloWorld2')
+    end
+    
+    # packages do not allow the directory and "name" to be different. make 
+    # sure project doesn't inherit this.
+    it "should not raise exception when loading json" do
+      lambda {
+        subject.load_json
+      }.should_not raise_error
+    end
+  end
+  
   describe "simple project" do
     subject do
       BPM::Project.new project_fixture('simple_hello')
@@ -143,8 +163,8 @@ describe BPM::Project, "converting" do
     BPM::Project.nearest_project(project_fixture("hello_world")).as_json
   end
 
-  it "should have bpm set to current version" do
-    subject["bpm"].should == BPM::VERSION
+  it "should have bpm set to current compatible version" do
+    subject["bpm"].should == BPM::COMPAT_VERSION
   end
 end
 

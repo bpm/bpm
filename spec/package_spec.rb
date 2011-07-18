@@ -321,6 +321,15 @@ describe BPM::Package, 'InvalidPackageError' do
     }.should raise_error(BPM::InvalidPackageError)
   end
   
+  it "should raise exception when loading a package whose name does not package the one in the package.json" do
+    goto_home
+    FileUtils.cp_r package_fixture('jquery'), 'jquery2'
+    package = BPM::Package.new home('jquery2')
+    lambda {
+      package.load_json
+    }.should raise_error(BPM::InvalidPackageNameError)
+  end
+  
 end
 
 # describe BPM::Package, "templates" do

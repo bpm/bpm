@@ -232,6 +232,13 @@ module BPM
       File.exist?(json_path)
     end
 
+    def validate_name_and_path
+      filename = File.basename(root_path)
+      unless filename==name || filename=="#{name}-#{version}"
+        raise BPM::InvalidPackageNameError.new self
+      end
+    end
+    
     def load_json
       begin
         json = JSON.parse(File.read(@json_path))
@@ -250,6 +257,8 @@ module BPM
         end
       end
 
+      validate_name_and_path
+      
       true
     end
 

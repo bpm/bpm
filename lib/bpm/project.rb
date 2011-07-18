@@ -56,6 +56,10 @@ module BPM
       @bpm || BPM::COMPAT_VERSION
     end
 
+    def validate_name_and_path
+      # do nothing. never an error
+    end
+
     # Returns a fully normalized hash of build settings
     def build_settings(mode=:debug)
       ret = {}

@@ -20,13 +20,6 @@
 
 * Can we use YAML instead of JSON?
 
-* Mismatch between directory name and the name specified in package.json 
-  causes an error when running bpm update:
-
-    /Users/tomdale/.rvm/gems/ruby-1.9.2-p180/gems/bpm-1.0.0.beta.3.pre
-    /lib/bpm/project.rb:676:in `add_sorted_dep': undefined method 
-    `dependencies' for nil:NilClass (NoMethodError)
-
 * Changing a dependency in a package.json should rebuild all files (in case 
   the transport was modified)
 

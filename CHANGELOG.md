@@ -1,4 +1,7 @@
 
+  * BPM now complains if you load a package whose directory name does not 
+    match the name in the package.json (this was causing exceptions in some
+    cases)
   * BPM is more whiny now when it tries to load a package with invalid or
     missing package.json.
   * the version stored in the `bpm` key on new projects is a compatible 
