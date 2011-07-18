@@ -121,6 +121,41 @@ EOF
     
   end
   
+  describe "update" do
+    
+    before do
+      goto_home
+      set_host
+      start_fake(FakeGemServer.new)
+      FileUtils.cp_r project_fixture('needs_rake'), '.'
+      cd home('needs_rake')
+    end
+  
+    it "should not update dependencies with no-update if they can be met" do
+      bpm 'fetch', 'rake', '--version=0.8.6' and wait
+      bpm 'compile', '--no-update', '--verbose'
+      out = stdout.read
+      out.should_not include('Fetching packages from remote...')
+      out.should include("'rake' (0.8.6)")
+    end
+
+    it "should update dependencies without no-update if they can be met" do
+      bpm 'fetch', 'rake', '--version=0.8.6' and wait
+      bpm 'compile', '--update', '--verbose'
+      out = stdout.read
+      out.should include('Fetching packages from remote...')
+      out.should include("'rake' (0.8.7)")
+    end
+
+    it "should update dependencies with no-update if they cannot be met" do
+      bpm 'compile', '--no-update', '--verbose'
+      out = stdout.read
+      out.should include('Fetching packages from remote...')
+      out.should include("'rake' (0.8.7)")
+    end
+    
+  end
+  
   describe "error conditions" do
     
     before do
@@ -132,7 +167,7 @@ EOF
     end
       
     it "should automatically recover if packages are damaged" do
-      bpm 'update' and wait 
+      bpm 'compile' and wait 
       out = stdout.read
       out.should include('~ Building bpm_libs.js')
       

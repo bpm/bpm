@@ -1,0 +1,7 @@
+{
+  "name": "needs_rake",
+  "bpm":  "1.0.0",
+  "dependencies": {
+    "rake": ">= 0"
+  }
+}
