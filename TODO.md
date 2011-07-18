@@ -21,8 +21,6 @@
 
 * Need to run bpm update before bpm preview for the first time
 
-* combine bpm update and bpm compile - make compile update unless you use --no-update
-
 * "directories" should be optional in package.json - we can infer it.
 
 ----------------
