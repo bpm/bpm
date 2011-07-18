@@ -141,11 +141,9 @@ module BPM
       method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile (default production)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def compile
-        project = find_project
-        project.rebuild_dependency_list(nil, options[:verbose])
-        project.build options[:mode].to_sym, true
-      rescue BPM::Error => e
-        abort e.message
+        find_project.build options[:mode].to_sym, true
+      # rescue BPM::Error => e
+      #   abort e.message
       end
       
       desc "login", "Log in with your BPM credentials"

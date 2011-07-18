@@ -128,15 +128,9 @@ module BPM
     # Validates that all required files are present in the project needed
     # for compile to run.  This will not fetch new dependencies from remote.
     def verify_and_repair(mode=:debug, verbose=false)
-      
-      # only fetch dependencies if no .bpm dir has been created yet
-      # indicating that we haven't yet processed this project
-      fetch_dependencies(verbose) unless File.exists? internal_package_root
-      
-      # make sure .bpm/packages is up to date
+      valid_deps = find_dependencies rescue nil
+      fetch_dependencies(verbose) if valid_deps.nil?
       rebuild_dependency_list nil, verbose
-      
-      # make sure all required files exist in .bpm/preview
       rebuild_preview verbose
     end
     
@@ -180,6 +174,7 @@ module BPM
       else
         self.dependencies = hard_deps
       end
+
       rebuild_dependency_list(all_hard_deps, verbose)
 
       local_deps.each do |dep|
@@ -242,9 +237,11 @@ module BPM
     def build(mode=:debug, verbose=false)
       
       verify_and_repair mode, verbose
-      
+
       puts "Building static assets..." if verbose
 
+      report_package_locations if verbose
+      
       # Seed the project with any required files to ensure they are built
       buildable_asset_filenames(mode).each do |filename|
         dst_path = assets_root filename
@@ -439,7 +436,6 @@ module BPM
 
     # Verifies that packages are available to meet all the dependencies
     def rebuild_dependency_list(deps=nil, verbose=false)
-      puts "Selecting local dependencies..." if verbose
 
       found = find_dependencies(deps, verbose)
 
@@ -519,8 +515,6 @@ module BPM
             raise LocalPackageConflictError.new(pkg.name, version, pkg.version)
           end
 
-          puts "~ Using local package '#{pkg.name}' (#{pkg.version})" if verbose
-
           search_list += Array(pkg.dependencies)
           search_list += Array(pkg.dependencies_development)
           search_list += Array(pkg.dependencies_build)
@@ -568,7 +562,7 @@ module BPM
       end
 
       installed.each do |i|
-        puts "Fetched #{i.name} (#{i.version}) from remote" if verbose
+        puts "~ Fetched #{i.name} (#{i.version}) from remote" if verbose
       end
 
     end
@@ -596,7 +590,7 @@ module BPM
     # Tell if package is vendored
 
     def has_local_package?(package_name)
-      File.exists?(local_package_root(package_name))
+      File.directory?(local_package_root(package_name))
     end
 
 
@@ -662,14 +656,19 @@ module BPM
       return nil unless src_path
 
       pkg = BPM::Package.new(src_path)
-      pkg.load_json
-
-      puts "~ Using #{local ? "local" : "fetched"} package '#{pkg.name}' (#{pkg.version})" if verbose
-
+      pkg.load_json # throws exception if json invalid
       pkg
     end
 
-
+    # pass in a hash of dependencies and versions
+    def report_package_locations(deps=nil)
+      deps ||= local_deps
+      deps.each do |dep|
+        is_local = has_local_package?(dep.name) ? 'local' : 'fetched'
+        puts "~ Using #{is_local} package '#{dep.name}' (#{dep.version})"
+      end
+    end
+      
     # Method for help in sorting dependencies
 
     def add_sorted_dep(dep, deps, type, sorted, seen=[])

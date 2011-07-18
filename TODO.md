@@ -13,9 +13,6 @@
 
 * HTML files should be able to process as templates using a template plugin
 
-* Deleting everything and then trying to compile will fail if packages are not 
-  already installed locally 
-
 * Should log clearly when fetching from remotes
 
 * Can we use YAML instead of JSON?

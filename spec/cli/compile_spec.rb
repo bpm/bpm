@@ -120,4 +120,27 @@ EOF
     end
     
   end
+  
+  describe "error conditions" do
+    
+    before do
+      goto_home
+      set_host
+      start_fake(FakeGemServer.new)
+      FileUtils.cp_r(project_fixture('hello_dev'), '.')
+      cd home('hello_dev')
+    end
+      
+    it "should automatically recover if packages are damaged" do
+      bpm 'update' and wait 
+      out = stdout.read
+      out.should include('~ Building bpm_libs.js')
+      
+      FileUtils.rm_r home('.bpm') # delete linked directories.
+      bpm 'compile', '--verbose', :track_stderr => true
+      err = stderr.read
+      err.should_not include('Could not find eligible')
+    end
+  end
+      
 end

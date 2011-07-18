@@ -1,4 +1,6 @@
 
+  * Fixed issue with compile that would cause exceptions if you deleted the
+    global .bpm directory
   * BPM now complains if you load a package whose directory name does not 
     match the name in the package.json (this was causing exceptions in some
     cases)
