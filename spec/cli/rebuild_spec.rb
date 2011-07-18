@@ -14,7 +14,7 @@ describe 'bpm compile' do
     end
 
     it "should order the packages property with dependencies" do
-      bpm 'compile', '--mode=debug' # avoid minification.
+      bpm 'rebuild', '--mode=debug' # avoid minification.
       wait
     
       file = File.read home('hello2', 'assets', 'bpm_libs.js')
@@ -106,14 +106,14 @@ EOF
     end
     
     it "building in debug mode" do
-      bpm 'compile', '--mode=debug'
+      bpm 'rebuild', '--mode=debug'
       wait
       
       test_development_dependencies true
     end
 
     it "building in production mode" do
-      bpm 'compile', '--mode=production'
+      bpm 'rebuild', '--mode=production'
       wait
       
       test_development_dependencies false
@@ -133,7 +133,7 @@ EOF
   
     it "should not update dependencies with no-update if they can be met" do
       bpm 'fetch', 'rake', '--version=0.8.6' and wait
-      bpm 'compile', '--no-update', '--verbose'
+      bpm 'rebuild', '--no-update', '--verbose'
       out = stdout.read
       out.should_not include('Fetching packages from remote...')
       out.should include("'rake' (0.8.6)")
@@ -141,14 +141,14 @@ EOF
 
     it "should update dependencies without no-update if they can be met" do
       bpm 'fetch', 'rake', '--version=0.8.6' and wait
-      bpm 'compile', '--update', '--verbose'
+      bpm 'rebuild', '--update', '--verbose'
       out = stdout.read
       out.should include('Fetching packages from remote...')
       out.should include("'rake' (0.8.7)")
     end
 
     it "should update dependencies with no-update if they cannot be met" do
-      bpm 'compile', '--no-update', '--verbose'
+      bpm 'rebuild', '--no-update', '--verbose'
       out = stdout.read
       out.should include('Fetching packages from remote...')
       out.should include("'rake' (0.8.7)")
@@ -167,12 +167,12 @@ EOF
     end
       
     it "should automatically recover if packages are damaged" do
-      bpm 'compile' and wait 
+      bpm 'rebuild' and wait 
       out = stdout.read
       out.should include('~ Building bpm_libs.js')
       
       FileUtils.rm_r home('.bpm') # delete linked directories.
-      bpm 'compile', '--verbose', :track_stderr => true
+      bpm 'rebuild', '--verbose', :track_stderr => true
       err = stderr.read
       err.should_not include('Could not find eligible')
     end

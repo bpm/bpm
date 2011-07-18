@@ -127,11 +127,11 @@ module BPM
         BPM::Server.start project, :Port => options[:port], :mode => options[:mode].to_sym
       end
       
-      desc "compile", "Rebuilds bpm assets, does not update versions"
+      desc "rebuild", "Rebuilds bpm assets, does not update versions"
       method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile (default production)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :update, :type => :boolean, :default => true, :aliases => ['-u'], :desc => 'Updates dependencies to latest compatible version'
-      def compile
+      def rebuild
         find_project.fetch_dependencies(true) if options[:update]
         find_project.build options[:mode].to_sym, true
       rescue BPM::Error => e
