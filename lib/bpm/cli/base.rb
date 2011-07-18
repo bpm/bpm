@@ -1,5 +1,6 @@
 require 'thor'
 require 'json'
+require 'bpm/version'
 
 module BPM
   module CLI
