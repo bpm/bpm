@@ -11,6 +11,13 @@ module BPM
     end
   end
     
+  class InvalidPackageError < BPM::Error
+    def format_message(package, msg=nil)
+      msg = msg.nil? ? '' : ": #{msg}"
+      "There was a problem parsing #{File.basename(package.json_path)}#{msg}"
+    end
+  end
+  
   class PackageNotFoundError < BPM::Error
     def format_message(name, version)
       "Could not find eligible package for '#{name}' (#{version})"

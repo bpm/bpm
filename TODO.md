@@ -13,12 +13,8 @@
 
 * HTML files should be able to process as templates using a template plugin
 
-* Error for invalid packages in packages directory should be different.
-
 * Deleting everything and then trying to compile will fail if packages are not 
   already installed locally 
-
-* Should complain loudly if the JSON file is invalid
 
 * Should log clearly when fetching from remotes
 

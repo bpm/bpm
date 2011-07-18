@@ -1,4 +1,6 @@
 
+  * BPM is more whiny now when it tries to load a package with invalid or
+    missing package.json.
   * the version stored in the `bpm` key on new projects is a compatible 
     version instead of the actual version.  Right now this means it is frozen
     at 1.0.0
