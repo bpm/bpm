@@ -130,7 +130,7 @@ module BPM
       desc "rebuild", "Rebuilds bpm assets, does not update versions"
       method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile (default production)'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      method_option :update, :type => :boolean, :default => true, :aliases => ['-u'], :desc => 'Updates dependencies to latest compatible version'
+      method_option :update, :type => :boolean, :default => false, :aliases => ['-u'], :desc => 'Updates dependencies to latest compatible version'
       def rebuild
         find_project.fetch_dependencies(true) if options[:update]
         find_project.build options[:mode].to_sym, true
