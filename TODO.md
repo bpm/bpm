@@ -1,5 +1,4 @@
 
-
 * Multiple format support.  Format processors supplied by dependencies should
   be used to resolve formats.
   
@@ -45,11 +44,9 @@
                     # also we could publish a rails plugin that bakes in to 
                     # rails app
     
-    bpm compile     # generates a built app when you are ready to go to prod
+    bpm rebuild     # generates a built app when you are ready to go to prod
                     # maybe should build the entire thing into a different 
                     # loc?
-                    
-    bpm update      # invoke if you modify the bpm.json to update settings
     
 ## User working with unit tests in their app
 
