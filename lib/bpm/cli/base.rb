@@ -207,12 +207,27 @@ module BPM
       end
 
       desc "list", "View available packages for download"
-      method_option :all,        :type => :boolean, :default => false, :aliases => ['-a'],    :desc => 'List all versions available'
-      method_option :prerelease, :type => :boolean, :default => false, :aliases => ['--pre'], :desc => 'List prerelease versions available'
+      method_option :remote,     :type => :boolean, :default => false, :aliases => ['-r'], :desc => 'List packages on remote server'
+      method_option :all,        :type => :boolean, :default => false, :aliases => ['-a'],    :desc => 'List all versions available (remote only)'
+      method_option :prerelease, :type => :boolean, :default => false, :aliases => ['--pre'], :desc => 'List prerelease versions available (remote only)'
+      method_option :development, :type => :boolean, :default => false,
+:aliases => ['--dev'], :desc => 'List development dependencies instead of runtime (local only)'
       def list(*packages)
-        remote = BPM::Remote.new
-        index  = remote.list_packages(packages, options[:all], options[:prerelease])
-        print_specs(packages, index)
+        if options[:remote]
+          remote = BPM::Remote.new
+          index  = remote.list_packages(packages, options[:all], options[:prerelease])
+          print_specs(packages, index)
+        else
+          packages = nil if packages.size == 0
+          project  = find_project
+          project.verify_and_repair
+          
+          deps = options[:development] ? project.sorted_development_deps : project.sorted_runtime_deps
+          deps.each do |dep|
+            next if packages && !packages.include?(dep.name)
+            say "#{dep.name} (#{dep.version})"
+          end
+        end
       end
 
       desc "init [PATHS]", "Configure a project to use bpm for management"

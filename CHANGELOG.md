@@ -1,4 +1,6 @@
 
+  * bpm list now shows local dependencies by default.  Use bpm list --remote
+    to get remote.
   * better compatibility with npm - "summary" field is optional and "url" is
     mapped to "homepage"
   * fixed some failing unit tests
