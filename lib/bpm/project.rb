@@ -95,7 +95,9 @@ module BPM
     end
     
     def build_app?
-      !!(bpm_build && bpm_build["#{name}/bpm_libs.js"])
+      !!(bpm_build && bpm_build["bpm_libs.js"] && 
+                      bpm_build["bpm_libs.js"]["directories"] && 
+                      bpm_build["bpm_libs.js"]["directories"].size>0)
     end
     
     def build_app=(value)
@@ -106,14 +108,15 @@ module BPM
       if value
         bpm_build[bpm_libs] ||= {}
         hash = bpm_build[bpm_libs]
-        hash['directories'] ||= ['lib']
+        hash['directories'] ||= []
+        hash['directories'] << 'lib' if hash['directories'].size==0
         hash['minifier']    ||= 'uglify-js'
-
+        
         bpm_build[bpm_styles] ||= {}
         hash = bpm_build[bpm_styles]
-        hash['directories'] ||= ['css']
-        hash['minifier']    ||= 'uglify-js'
-
+        hash['directories'] ||= []
+        hash['directories'] << 'css' if hash['directories'].size==0
+        
         directories ||= {}
         directories['lib'] ||= ['app']
       else
@@ -138,9 +141,9 @@ module BPM
     end
     
     def rebuild_preview(verbose=false)
-
+      
       needs_rebuild = true
-
+      
       if File.directory?(preview_root)
         cur_previews  = Dir[preview_root('**', '*')].sort.reject { |x| File.directory?(x) }
         exp_filenames = buildable_asset_filenames(:debug)
@@ -162,22 +165,22 @@ module BPM
     # Add a new dependency
     #
     # Adds to the project json and installs dependency
-
+    
     def add_dependencies(new_deps, development=false, verbose=false)
       old_deps  = build_local_dependency_list(false) || []
       hard_deps = (development ? dependencies_development : dependencies).merge(new_deps)
       all_hard_deps = all_dependencies.merge(new_deps)
       exp_deps = find_non_local_dependencies(all_hard_deps, true)
-
+      
       puts "Fetching packages from remote..." if verbose
       core_fetch_dependencies(exp_deps, verbose)
-
+      
       if development
         self.dependencies_development = hard_deps
       else
         self.dependencies = hard_deps
       end
-
+      
       rebuild_dependency_list(all_hard_deps, verbose)
 
       local_deps.each do |dep|

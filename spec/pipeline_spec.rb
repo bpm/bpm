@@ -16,7 +16,7 @@ describe BPM::Pipeline, "asset_path" do
   end
   
   it "should find any asset in the assets directory" do
-    bpm 'update' and wait
+    bpm 'rebuild', '--update' and wait
     asset = subject.find_asset 'papa-smurf.jpg'
     asset.pathname.should == home('hello_world', 'assets', 'papa-smurf.jpg')
   end
@@ -31,7 +31,7 @@ describe BPM::Pipeline, "asset_path" do
   
   it "should find any asset in installed packages" do
     bpm 'fetch' and wait
-    bpm 'compile' and wait
+    bpm 'rebuild' and wait
   
     asset = subject.find_asset 'core-test/resources/runner.css'
     asset.pathname.should == home('hello_world', '.bpm', 'packages', 'core-test', 'resources', 'runner.css')
@@ -66,7 +66,7 @@ describe BPM::Pipeline, "asset_path" do
     
       it "should have a manifest line" do
         # Right now we're including dev deps
-        subject.to_s.should include('MANIFEST: core-test (0.4.9) custom_generator (1.0) custom_package (2.0.0) ivory (0.0.1) optparse (1.0.1) rake (0.8.6) spade (0.5.0)')
+        subject.to_s.should include('MANIFEST: core-test (0.4.9) custom_generator (1.0) custom_package (2.0.0) ivory (0.0.1) jquery (1.4.3) optparse (1.0.1) rake (0.8.6) spade (0.5.0)')
       end
     
       it "should include any required modules in the bpm_package.js" do
@@ -245,9 +245,9 @@ describe BPM::Pipeline, "buildable_assets" do
   end
   
   it "should include installed package assets" do
-    asset = find_asset 'core-test/resources/runner.css'
+    asset = find_asset 'core-test/extras/extra_file.html'
     asset.should_not be_nil
-    asset.pathname.should == project('.bpm', 'packages', 'core-test', 'resources', 'runner.css')
+    asset.pathname.should == project('.bpm', 'packages', 'core-test', 'extras', 'extra_file.html')
   end
   
   it "should exclude libs" do

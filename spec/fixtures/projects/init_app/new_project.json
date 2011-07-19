@@ -5,20 +5,11 @@
   "bpm:build": {
     "bpm_libs.js": {
       "directories": [
+        "lib"
       ],
       "minifier": "uglify-js"
     },
     "bpm_styles.css": {
-      "directories": [
-      ]
-    },
-    "new_project/bpm_libs.js": {
-      "directories": [
-        "app"
-      ],
-      "minifier": "uglify-js"
-    },
-    "new_project/bpm_styles.css": {
       "directories": [
         "css"
       ]

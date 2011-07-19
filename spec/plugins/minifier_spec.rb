@@ -11,7 +11,7 @@ describe BPM::Pipeline, 'minifier' do
     FileUtils.cp_r project_fixture('minitest'), '.'
     cd home('minitest')
 
-    bpm 'compile'
+    bpm 'rebuild'
     wait
   end
   

@@ -25,18 +25,21 @@ describe "bpm init on existing directory" do
   
   it "should create app files with --app option" do
     bpm 'init', '--app' and wait
+    puts stdout.read
     compare_to 'init_app'
   end
   
   it "should not overwrite existing project file" do
-    File.open("new_project.json", 'w'){|f| f.print "Valuable info!" }
+    
+    dummy_project = {
+      "name" => "custom_project",
+      "bpm"  => "1.0.0"
+    }
+    
+    File.open("new_project.json", 'w'){|f| f.print dummy_project.to_json }
   
-    bpm 'init', '--skip' # skip, since we can't test the prompt
-  
-    output = stdout.read.gsub(/\e\[\d+m/,'') # without colors
-  
-    output.should =~ /skip\s+new_project.json/
-    File.read("new_project.json").should == "Valuable info!"
+    bpm 'init', '--skip' and wait # skip, since we can't test the prompt
+    File.read("new_project.json").should == dummy_project.to_json
   end
   
   it "should update the project with app but save other settings" do
@@ -49,9 +52,6 @@ describe "bpm init on existing directory" do
     File.open(project_json, 'w') { |fd| fd << json.to_json }
   
     bpm 'init', '--app' and wait
-    
-    app_package = home 'new_project', 'assets', 'new_project', 'bpm_libs.js'
-    File.exists?(app_package).should be_true
     
     json = JSON.load File.read(project_json)
     json["custom_property"].should == "I haz it"
@@ -104,7 +104,7 @@ describe "bpm init on a non-existant directory" do
       
 
       files = %w(LICENSE README.md index.html app/main.js BpmTest.json)
-      generated_files = %w(assets/bpm_libs.js assets/bpm_styles.css assets/BpmTest/bpm_libs.js assets/BpmTest/bpm_styles.css)
+      generated_files = %w(assets/bpm_libs.js assets/bpm_styles.css)
 
       # output without coloration
       output = stdout.read.gsub(/\e\[\d+m/,'')

@@ -19,7 +19,6 @@ describe 'bpm fetch' do
     
     bpm "fetch", '--verbose'
     out = stdout.read
-    puts out
     out.should include("Fetched dependent packages for hello_world")
 
     # note: ivory is a soft dependency from core-test

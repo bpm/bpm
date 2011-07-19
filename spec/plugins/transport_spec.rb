@@ -11,7 +11,7 @@ describe BPM::Pipeline, 'transport processor' do
     FileUtils.cp_r project_fixture('transporter'), '.'
     cd home('transporter')
 
-    bpm 'compile'
+    bpm 'rebuild'
     wait
   end
   
