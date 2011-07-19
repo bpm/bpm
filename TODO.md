@@ -1,27 +1,29 @@
+# Things To Do
 
-* Multiple format support.  Format processors supplied by dependencies should
-  be used to resolve formats.
-  
-* minify then transport -> this will allow for string loading.
+## Important Features
 
-* HTML manifest support [in general we need a way for packages to generate new assets]
+  * Multiple format support.  Format processors supplied by dependencies 
+    should
+    be used to resolve formats.
+  * minify then transport -> this will allow for string loading.
+  * HTML manifest support [in general we need a way for packages to generate 
+    new assets]
+  * cache-friendly URLs
+  * HTML files should be able to process as templates using a template plugin
+  * Can we use YAML instead of JSON?
+  * Changing a dependency in a package.json should rebuild all files in 
+    preview mode (in case the transport was modified)
 
-* cache-friendly URLs
+## Lower Priority
 
-* HTML files should be able to process as templates using a template plugin
-
-* Can we use YAML instead of JSON?
-
-* Changing a dependency in a package.json should rebuild all files in preview mode (in case the transport was modified)
-
-* make work with JS that is placed at the root of the package. (i.e. lib = .)
-
-* figure out why requiring LibGems takes so long; really slows down launch
-
+  * figure out why requiring LibGems takes so long; really slows down launch
+  * Make LibGems & bpm compatible with ruby 1.8.7
+  * make work with JS that is placed at the root of the package. 
+    (i.e. lib = .)
 
 ----------------
 
-# SCENARIOS
+# Usage Scenarios
 
 ## New user with existing app using bpm to manage dependencies
 
