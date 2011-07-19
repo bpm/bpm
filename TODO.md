@@ -16,6 +16,9 @@
 
 * make work with JS that is placed at the root of the package. (i.e. lib = .)
 
+* figure out why requiring LibGems takes so long; really slows down launch
+
+
 ----------------
 
 # SCENARIOS
