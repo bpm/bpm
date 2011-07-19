@@ -78,6 +78,10 @@ module BPM
       File.join([@root_path, 'packages', package_name].compact)
     end
 
+    def vendor_root(*paths)
+      File.join @root_path, 'vendor', *paths
+    end
+    
     def internal_package_root(package_name=nil)
       File.join([@root_path, BPM_DIR, 'packages', package_name].compact)
     end
@@ -163,7 +167,7 @@ module BPM
       old_deps  = build_local_dependency_list(false) || []
       hard_deps = (development ? dependencies_development : dependencies).merge(new_deps)
       all_hard_deps = all_dependencies.merge(new_deps)
-      exp_deps = find_non_local_dependencies(hard_deps, true)
+      exp_deps = find_non_local_dependencies(all_hard_deps, true)
 
       puts "Fetching packages from remote..." if verbose
       core_fetch_dependencies(exp_deps, verbose)
@@ -505,8 +509,8 @@ module BPM
         next if seen.include?(name)
         seen << name
 
-        package_root = local_package_root(name)
-        if File.exists?(package_root)
+        package_root = locate_local_package(name)
+        if package_root
           pkg = BPM::Package.new(package_root)
           pkg.load_json
 
@@ -589,7 +593,7 @@ module BPM
     # Tell if package is vendored
 
     def has_local_package?(package_name)
-      File.directory?(local_package_root(package_name))
+      !!locate_local_package(package_name)
     end
 
 
@@ -639,6 +643,16 @@ module BPM
     end
 
 
+    def locate_local_package(package_name)
+      src_path = local_package_root package_name
+      unless File.directory?(src_path)
+        src_path = Dir[vendor_root('*','packages','*')].find do |path|
+          File.basename(path)==package_name && File.directory?(path)
+        end
+      end
+      src_path
+    end
+
     # Find package locally or in global cache
 
     def locate_package(package_name, vers, verbose)
@@ -648,9 +662,8 @@ module BPM
       # previous one we had didn't do anything, so it's better to have
       # none than one that doesn't work
       vers = ">= 0" if vers == ">= 0-pre"
-      src_path = local ?
-        local_package_root(package_name) :
-        BPM::Local.new.source_root(package_name, vers)
+      src_path = local ? locate_local_package(package_name) :  
+                         BPM::Local.new.source_root(package_name, vers)
 
       return nil unless src_path
 

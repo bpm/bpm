@@ -127,7 +127,7 @@ describe 'bpm add' do
   end
 
   it "should make a soft dependency a hard dependency" do
-    bpm 'compile'
+    bpm 'rebuild'
     wait
     has_soft_dependency 'ivory', '0.0.1'  # precond
 
@@ -154,8 +154,6 @@ describe 'bpm add' do
     no_dependency 'custom_package'
   end
 
-  it "should verify working with config-less projects"
-
   it "should work with .bpkg file" do
     FileUtils.cp fixtures('gems', "custom_generator-1.0.bpkg"), '.'
     bpm "add", "custom_generator-1.0.bpkg" and wait
@@ -171,7 +169,7 @@ describe 'bpm add' do
       output = stdout.read
       output.should include("Added development package 'custom_generator' (1.0)")
       
-      bpm 'compile', '--mode=debug' and wait
+      bpm 'rebuild', '--mode=debug' and wait
       has_development_dependency 'custom_generator', '1.0'
       no_dependency 'custom_generator', false
     end
@@ -179,3 +177,23 @@ describe 'bpm add' do
   end
 
 end
+
+describe "bpm add using a vendor directory" do
+  before do 
+    goto_home
+    set_host
+    start_fake(FakeGemServer.new)
+    FileUtils.cp_r project_fixture('hello_dev'), '.'
+    FileUtils.mkdir_p home('hello_dev', 'vendor')
+    FileUtils.cp_r project_fixture('hello_world'), home('hello_dev', 'vendor', 'hello_world')
+    cd home('hello_dev')
+  end
+  
+  it "should include custom_package defined in a project found vendor" do
+    bpm 'add', 'custom_package' and wait
+    
+    File.read(home('hello_dev', 'assets', 'bpm_libs.js')).should include("custom_package (2.0.0)")
+  end
+    
+end
+

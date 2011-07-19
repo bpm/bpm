@@ -1,6 +1,4 @@
 
-* you should be able to place other projects into a vendor directory and 
-  have their packages appear.
 
 * Multiple format support.  Format processors supplied by dependencies should
   be used to resolve formats.

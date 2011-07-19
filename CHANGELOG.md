@@ -1,4 +1,10 @@
 
+  * you can now place other projects into a vendor directory and have their 
+    packages appear in the local package.  This is useful if you want to 
+    import another project which holds multiple packages for development.
+  
+# 1.0.0.beta.4
+
   * Fixed issue with compile that would cause exceptions if you deleted the
     global .bpm directory
   * BPM now complains if you load a package whose directory name does not 

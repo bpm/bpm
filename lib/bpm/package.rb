@@ -136,7 +136,6 @@ module BPM
       build_names += PLUGIN_FIELDS.map do |field_name|
         val = self.send(c2u(field_name))
         val = val && val =~ /^#{name}\// ? val[name.size+1..-1]+'.js' : nil
-        puts "FIELD: #{field_name} #{self.send(c2u(field_name))} val=#{val}"
         val
       end
 
