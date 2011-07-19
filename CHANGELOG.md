@@ -1,4 +1,5 @@
 
+  * fixed some failing unit tests
   * you can now place other projects into a vendor directory and have their 
     packages appear in the local package.  This is useful if you want to 
     import another project which holds multiple packages for development.
