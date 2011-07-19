@@ -13,15 +13,15 @@
 
 * HTML files should be able to process as templates using a template plugin
 
-* Should log clearly when fetching from remotes
-
 * Can we use YAML instead of JSON?
 
 * Changing a dependency in a package.json should rebuild all files in preview mode (in case the transport was modified)
 
-* Need to run bpm update before bpm preview for the first time
-
 * "directories" should be optional in package.json - we can infer it.
+
+* "summary" should be optional in package.json if a description is provided
+
+* make work with JS that is placed at the root of the package. (i.e. lib = .)
 
 ----------------
 
