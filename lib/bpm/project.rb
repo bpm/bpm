@@ -96,26 +96,25 @@ module BPM
     
     def build_app=(value)
       
-      bpm_libs = "#{name}/bpm_libs.js"
-      bpm_styles = "#{name}/bpm_styles.css"
+      bpm_libs = "bpm_libs.js"
+      bpm_styles = "bpm_styles.css"
       
       if value
-        if bpm_build[bpm_libs].nil?
-          bpm_build[bpm_libs] = {
-            "directories" => ["app"],
-            "minifier" =>    "uglify-js"
-          }
-        end
-        
-        if bpm_build[bpm_styles].nil?
-          bpm_build[bpm_styles] = {
-            "directories" => ["css"]
-          }
-        end
+        bpm_build[bpm_libs] ||= {}
+        hash = bpm_build[bpm_libs]
+        hash['directories'] ||= ['lib']
+        hash['minifier']    ||= 'uglify-js'
 
+        bpm_build[bpm_styles] ||= {}
+        hash = bpm_build[bpm_styles]
+        hash['directories'] ||= ['css']
+        hash['minifier']    ||= 'uglify-js'
+
+        directories ||= {}
+        directories['lib'] ||= ['app']
       else
-        bpm_build.delete bpm_libs
-        bpm_build.delete bpm_styles
+        bpm_build[bpm_libs]['directories'] = []
+        bpm_build[bpm_styles]['directories'] = []
       end
       value
     end
