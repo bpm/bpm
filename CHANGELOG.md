@@ -1,4 +1,6 @@
 
+  * better compatibility with npm - "summary" field is optional and "url" is
+    mapped to "homepage"
   * fixed some failing unit tests
   * you can now place other projects into a vendor directory and have their 
     packages appear in the local package.  This is useful if you want to 

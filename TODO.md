@@ -15,10 +15,6 @@
 
 * Changing a dependency in a package.json should rebuild all files in preview mode (in case the transport was modified)
 
-* "directories" should be optional in package.json - we can infer it.
-
-* "summary" should be optional in package.json if a description is provided
-
 * make work with JS that is placed at the root of the package. (i.e. lib = .)
 
 ----------------

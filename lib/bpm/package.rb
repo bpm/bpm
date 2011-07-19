@@ -19,6 +19,7 @@ module BPM
       "author"      => :string,
       "homepage"    => :string,
       "summary"     => :string,
+      "url"         => :string,
       "dependencies"             => :hash,
       "dependencies:development" => :hash,
       "bpm:build"         => :hash,
@@ -31,12 +32,12 @@ module BPM
     PLUGIN_FIELDS = %w[bpm:formats bpm:minifier bpm:transport bpm:use:transport]
     
     # Fields that can be loaded straight into the gemspec
-    SPEC_FIELDS = %w[name email homepage summary description]
+    SPEC_FIELDS = %w[name email]
 
     # Fields that should be bundled up into JSON in the gemspec
     METADATA_FIELDS = %w[keywords licenses engines main bin directories pipeline bpm:build bpm:formats bpm:transport]
 
-    REQUIRED_FIELDS = %w[name description summary homepage author version directories]
+    REQUIRED_FIELDS = %w[name author version]
 
     attr_accessor *FIELDS.keys.map{|f| f.gsub(':', '_') }
 
@@ -73,6 +74,10 @@ module BPM
         spec.bindir       = bin_path
         spec.licenses     = licenses.map{|l| l["type"]}
         spec.executables  = bin_files.map{|p| File.basename(p) } if bin_path
+
+        spec.homepage     = homepage || url
+        spec.description  = description || summary
+        spec.summary      = summary || description
 
         metadata = Hash[METADATA_FIELDS.map{|f| [f, send(c2u(f)) ] }]
         spec.requirements = [metadata.to_json]
@@ -220,7 +225,7 @@ module BPM
     end
 
     def validate
-      validate_fields && validate_version && validate_paths
+      validate_fields && validate_version && validate_paths && validate_summary && validate_homepage
     end
 
     def valid?
@@ -389,6 +394,14 @@ module BPM
         end
       end
 
+      def validate_summary
+        summary || description
+      end
+      
+      def validate_homepage
+        homepage || url
+      end
+      
       def add_error(message)
         self.errors << message
       end
