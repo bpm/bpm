@@ -25,7 +25,6 @@ describe "bpm init on existing directory" do
   
   it "should create app files with --app option" do
     bpm 'init', '--app' and wait
-    puts stdout.read
     compare_to 'init_app'
   end
   
@@ -40,6 +39,22 @@ describe "bpm init on existing directory" do
   
     bpm 'init', '--skip' and wait # skip, since we can't test the prompt
     File.read("new_project.json").should == dummy_project.to_json
+  end
+
+  it "should not overwrite existing project file (with different name)" do
+    
+    dummy_project = {
+      "name" => "custom_project",
+      "bpm"  => "1.0.0"
+    }
+    
+    File.open("package.json", 'w'){|f| f.print dummy_project.to_json }
+  
+    bpm 'init' and wait
+    exit_status.should be_success
+    
+    File.read("package.json").should == dummy_project.to_json
+    File.exists?('new_project.json').should_not be_true
   end
   
   it "should update the project with app but save other settings" do

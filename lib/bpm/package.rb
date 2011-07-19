@@ -195,7 +195,7 @@ module BPM
     # Returns a hash of dependencies inferred from the build settings.
     def dependencies_build
       ret = {}
-        
+
       bpm_build.each do |target_name, opts|
         next unless opts.is_a?(Hash)
         

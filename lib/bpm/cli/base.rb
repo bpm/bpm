@@ -325,7 +325,7 @@ module BPM
           end
 
           # make sure the project app status matches
-          project = BPM::Project.new(path, name)
+          project = BPM::Project.new path
 
           if project.build_app? != !!include_app
             project.build_app = include_app
@@ -349,7 +349,7 @@ module BPM
         def find_project
           if options[:project]
             project_path = File.expand_path options[:project]
-            if BPM::Project.is_project_root? project_path
+            if !BPM::Project.is_project_root?(project_path)
               abort "#{project_path} does not appear to be managed by bpm"
             else
               project = BPM::Project.new project_path

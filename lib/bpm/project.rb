@@ -44,10 +44,12 @@ module BPM
         # If no name, try to find project json and get name from it
         project_file = self.class.project_file_path(root_path)
         name = File.basename(project_file, '.json') if project_file
+      else
+        project_file = File.join root_path, "#{name}.json"
       end
 
       @name = name || File.basename(root_path)
-      @json_path = File.join(root_path, "#{@name}.json")
+      @json_path = project_file
 
       load_json && validate
     end
