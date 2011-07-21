@@ -8,6 +8,62 @@ module BPM
       'text/css' => ['css', 'pipeline_css'],
       'application/javascript' => ['lib', 'pipeline_libs']
     }
+    
+    def self.generating_asset
+      @generating_asset && @generating_asset.last
+    end
+    
+    def self.push_generating_asset(asset)
+      @generating_asset ||= []
+      @generating_asset.push asset
+    end
+    
+    def self.pop_generating_asset
+      @generating_asset && @generating_asset.pop
+    end
+
+    def build_settings
+      ret = environment.project.build_settings[asset_name] 
+      (ret && ret['bpm:settings']) || {}
+    end
+    
+    def minify_body(data)
+      
+      project = environment.project
+      minifier_name = project.minifier_name asset_name
+      minifier_name = minifier_name.keys.first if minifier_name
+
+      if minifier_name && content_type == 'application/javascript'
+        pkg = project.package_from_name minifier_name
+        if pkg.nil?
+          raise MinifierNotFoundError.new(minifier_name)
+        end
+
+        minifier_plugin_name = pkg.bpm_minifier
+        if minifier_plugin_name.nil?
+          raise MinifierNotFoundError.new(minifier_name)
+        end
+
+        plugin_ctx = environment.plugin_context_for minifier_plugin_name
+
+        # slice out the header at the top - we don't want the minifier to 
+        # touch it.
+        header   = data.match /^(\/\* ====.+====\*\/)$/m
+        if header
+          header = header[0] + "\n"
+          data   = data[header.size..-1]
+        end
+
+        V8::C::Locker() do
+          plugin_ctx["CTX"]  = BPM::PluginContext.new(pkg)
+          plugin_ctx["DATA"] = data
+          data = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, CTX)")
+        end
+
+        data = header+data if header
+      end
+      data
+    end
 
   protected
 
@@ -18,53 +74,20 @@ module BPM
   private
 
     def build_source
-      minify super
+      self.class.push_generating_asset self
+      ret = minify super
+      self.class.pop_generating_asset
+      ret
     end
 
     def minify(hash)
       return hash if environment.mode == :debug
       
       hash = environment.cache_hash("#{pathname}:minify", id) do
-        project = environment.project
-        minifier_name = project.minifier_name asset_name
-        minifier_name = minifier_name.keys.first if minifier_name
-
-        if minifier_name && content_type == 'application/javascript'
-          pkg = project.package_from_name minifier_name
-          if pkg.nil?
-            raise MinifierNotFoundError.new(minifier_name)
-          end
-
-          minifier_plugin_name = pkg.bpm_minifier
-          if minifier_plugin_name.nil?
-            raise MinifierNotFoundError.new(minifier_name)
-          end
-
-          plugin_ctx = environment.plugin_context_for minifier_plugin_name
-
-          # slice out the header at the top - we don't want the minifier to 
-          # touch it.
-          data     = hash['source']
-          header   = data.match /^(\/\* ====.+====\*\/)$/m
-          if header
-            header = header[0] + "\n"
-            data   = data[header.size..-1]
-          end
-
-          V8::C::Locker() do
-            plugin_ctx["PACKAGE_INFO"] = pkg.as_json
-            plugin_ctx["DATA"]         = data
-            data = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, PACKAGE_INFO)")
-          end
-
-          data = header+data if header
-          
-          { 'length' => Rack::Utils.bytesize(data),
-            'digest' => environment.digest.update(data).hexdigest,
-            'source' => data }
-        else
-          hash
-        end
+        data = minify_body hash['source']
+        { 'length' => Rack::Utils.bytesize(data),
+          'digest' => environment.digest.update(data).hexdigest,
+          'source' => data }
       end
 
       hash['length'] = Integer(hash['length']) if hash['length'].is_a?(String)

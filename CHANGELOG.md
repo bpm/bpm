@@ -1,4 +1,9 @@
 
+  * bpm now passes a context object with build settings and a minify option
+    to plugins - this will allow spade to support string loading.
+  
+# 1.0.0.beta.5
+
   * bpm list now shows local dependencies by default.  Use bpm list --remote
     to get remote.
   * better compatibility with npm - "summary" field is optional and "url" is

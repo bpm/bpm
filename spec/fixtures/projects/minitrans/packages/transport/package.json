@@ -1,0 +1,21 @@
+{
+  "name":         "transport",
+  "version":      "0.5.0",
+  "bpm":          "0.1.0",
+
+  "description":  "DESCRIPTION HERE",
+  "author":       "YOUR NAME HERE",
+  "homepage":     "URL",
+
+  "directories": {
+    "lib":        "./lib",
+    "test":       "./tests"
+  },
+
+  "dependencies": {
+    
+  },
+  
+  "bpm:transport": "transport/transports/wrapper"
+  
+}

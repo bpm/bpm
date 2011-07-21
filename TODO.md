@@ -5,7 +5,6 @@
   * Multiple format support.  Format processors supplied by dependencies 
     should
     be used to resolve formats.
-  * minify then transport -> this will allow for string loading.
   * HTML manifest support [in general we need a way for packages to generate 
     new assets]
   * cache-friendly URLs

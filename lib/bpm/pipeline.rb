@@ -20,6 +20,7 @@ module BPM
 
     # Pass in the project you want the pipeline to manage.
     def initialize(project, mode = :debug, include_preview = false)
+      
       @project = project
       @mode    = mode
       @plugin_contexts = {}

@@ -745,6 +745,9 @@ module BPM
         end
       end
       
+      bpm_settings = ret[target_name]['bpm:settings'] ||= {}
+      ret[target_name]['bpm:settings'] = soft_merge(bpm_settings, opts)
+      
     end
 
     def project_settings_excludes(dep_name, target_name)

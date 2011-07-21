@@ -29,7 +29,7 @@ describe BPM::Pipeline, 'minifier' do
    This file is generated automatically by the bpm (http://www.bpmjs.org)    
    =========================================================================*/
 //MINIFIED START
-UGLY DUCK IS UGLY
+UGLY DUCK IS UGLYboston
 
 
 //MINIFIED END
@@ -48,7 +48,7 @@ EOF
    This file is generated automatically by the bpm (http://www.bpmjs.org)    
    =========================================================================*/
 //MINIFIED START
-UGLY DUCK IS UGLY
+UGLY DUCK IS UGLYsanfran
 
 #{File.read(file_path)}
 //MINIFIED END

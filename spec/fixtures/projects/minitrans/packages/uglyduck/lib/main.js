@@ -1,0 +1,3 @@
+//UGLY DUCK
+UGLYDUCK = "IS UGLY";
+

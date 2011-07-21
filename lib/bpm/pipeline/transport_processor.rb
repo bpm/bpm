@@ -26,9 +26,9 @@ module BPM
       out = ''
 
       V8::C::Locker() do
-        plugin_ctx["PACKAGE_INFO"] = pkg.as_json
-        plugin_ctx["DATA"]         = data
-        out = plugin_ctx.eval("BPM_PLUGIN.compileTransport(DATA, PACKAGE_INFO, '#{module_id}', '#{filepath}');")
+        plugin_ctx["DATA"]  = data
+        plugin_ctx["CTX"]   = BPM::PluginContext.new(pkg, module_id)
+        out = plugin_ctx.eval("BPM_PLUGIN.compileTransport(DATA, CTX, '#{filepath}');")
       end
 
       out + "\n\n"

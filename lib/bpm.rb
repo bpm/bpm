@@ -19,6 +19,7 @@ module BPM
   autoload :TransportProcessor,   'bpm/pipeline/transport_processor'
   autoload :SourceURLProcessor,   'bpm/pipeline/source_url_processor'
   autoload :PluginAsset,          'bpm/pipeline/plugin_asset'
+  autoload :PluginContext,        'bpm/pipeline/plugin_context'
 end
 
 # The BPM constants need to be defined first
