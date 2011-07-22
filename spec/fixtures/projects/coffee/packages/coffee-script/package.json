@@ -1,0 +1,15 @@
+{
+  "name":        "coffee-script",
+  "version":     "1.0.0",
+  "description": "DESC",
+  "summary":     "SUMMARY",
+  "author":      "AUTHOR",
+  "homepage":    "HOMEPAGE",
+
+  "bpm:provides": {
+    "format:coffee": {
+      "mime:default": "application/javascript",
+      "plugin":       "coffee-script/compiler"
+    }
+  }
+}

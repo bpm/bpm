@@ -1,0 +1,14 @@
+{
+  "name":        "spade",
+  "version":     "1.0.0",
+  "description": "DESC",
+  "summary":     "SUMMARY",
+  "author":      "AUTHOR",
+  "homepage":    "HOMEPAGE",
+
+  "bpm:provides": {
+    "transport": {
+      "plugin": "spade/transport"
+    }
+  }
+}
