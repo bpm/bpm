@@ -1,4 +1,5 @@
 require 'json'
+require 'set'
 require 'bpm/version'
 
 module BPM
@@ -612,7 +613,7 @@ module BPM
 
 
     # Get list of dependencies, searching only the project and fetched 
-    # packages.  Does not query remote server.  Raises if not found or 
+    # packages.  Raises if not found or 
     # conflicting.
     def find_dependencies(deps=nil, verbose=false)
        
@@ -621,7 +622,11 @@ module BPM
       search_list = Array(deps)
       found = []
       ret = []
-
+      
+      # if we discover a new local package via indirect dependencies then
+      # it's dependencies will be fetchable one time.
+      fetchable = Set.new
+      
       until search_list.empty?
         name, version = search_list.shift
 
@@ -632,17 +637,24 @@ module BPM
         end
 
         pkg = locate_package(name, version, verbose)
+        if pkg.nil? && fetchable.include?(name)
+          fetchable.reject! { |x| x == name }
+          core_fetch_dependency(name, version, :runtime, true) 
+          pkg = locate_package name, version, verbose
+        end
+          
         raise PackageNotFoundError.new(name, version) unless pkg
 
         found << pkg
 
         # Look up dependencies of dependencies
-        search_list += Array(pkg.dependencies)
-        search_list += Array(pkg.dependencies_build)
-
+        new_deps = Array(pkg.dependencies) + Array(pkg.dependencies_build)
         if has_local_package? pkg.name
-          search_list += Array(pkg.dependencies_development)
+          new_deps += Array(pkg.dependencies_development)
+          new_deps.each { |dep| fetchable.add dep.first }
         end
+        
+        search_list += new_deps
 
         ret << pkg
       end
