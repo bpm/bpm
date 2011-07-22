@@ -638,8 +638,11 @@ module BPM
 
         # Look up dependencies of dependencies
         search_list += Array(pkg.dependencies)
-        search_list += Array(pkg.dependencies_development)
         search_list += Array(pkg.dependencies_build)
+
+        if has_local_package? pkg.name
+          search_list += Array(pkg.dependencies_development)
+        end
 
         ret << pkg
       end
