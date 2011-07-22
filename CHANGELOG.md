@@ -1,4 +1,13 @@
 
+# 1.0.0.beta.7
+
+  * fixed bug where local packages that are indirect dependencies of other 
+    remote packages could cause bpm to error out unable to find dependencies.
+    
+  * improved logging slightly
+  
+# 1.0.0.beta.6 (yanked)
+
   * bpm now passes a context object with build settings and a minify option
     to plugins - this will allow spade to support string loading.
   
