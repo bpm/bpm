@@ -174,7 +174,7 @@ module BPM
       all_hard_deps = all_dependencies.merge(new_deps)
       exp_deps = find_non_local_dependencies(all_hard_deps, true)
       
-      puts "Fetching packages from remote..." if verbose
+      say "Fetching packages from remote..." if verbose
       core_fetch_dependencies(exp_deps, verbose)
       
       if development
@@ -187,7 +187,7 @@ module BPM
 
       local_deps.each do |dep|
         next if old_deps.find { |pkg| (pkg.name == dep.name) && (pkg.version == dep.version) }
-        puts "Added #{development ? "development " : ""}package '#{dep.name}' (#{dep.version})"
+        say "Added #{development ? "development " : ""}package '#{dep.name}' (#{dep.version})"
       end
 
       save!
@@ -213,7 +213,7 @@ module BPM
 
       old_deps.each do |dep|
         next if local_deps.find { |pkg| (pkg.name == dep.name) && (pkg.version == dep.version) }
-        puts "Removed package '#{dep.name}' (#{dep.version})"
+        say "Removed package '#{dep.name}' (#{dep.version})"
       end
 
       save!
@@ -234,7 +234,7 @@ module BPM
     # Get dependencies from server if not installed
 
     def fetch_dependencies(verbose=false)
-      puts "Fetching packages from remote..." if verbose
+      say "Fetching packages from remote..." if verbose
       exp_deps = find_non_local_dependencies(all_dependencies, true)
       core_fetch_dependencies(exp_deps, verbose)
     end
@@ -246,7 +246,7 @@ module BPM
       
       verify_and_repair mode, verbose
 
-      puts "Building static assets..." if verbose
+      say "Building static assets..." if verbose
 
       report_package_locations if verbose
       
@@ -264,7 +264,7 @@ module BPM
         FileUtils.mkdir_p File.dirname(dst_path)
 
         if asset.kind_of? Sprockets::StaticAsset
-          puts "~ Copying #{asset.logical_path}" if verbose
+          say "~ Copying #{asset.logical_path}" if verbose
           FileUtils.rm dst_path if File.exists? dst_path
           FileUtils.cp asset.pathname, dst_path
         else
@@ -278,7 +278,7 @@ module BPM
         end
       end
 
-      puts "\n" if verbose
+      say "\n" if verbose
     end
 
 
@@ -286,7 +286,7 @@ module BPM
     # package is removed from the project to cleanup any assets
 
     def unbuild(verbose=false)
-      puts "Removing stale assets..." if verbose
+      say "Removing stale assets..." if verbose
 
       pipeline = BPM::Pipeline.new self
       asset_root = File.join root_path, 'assets'
@@ -294,7 +294,7 @@ module BPM
         next if asset.logical_path =~ /^bpm_/
         asset_path = File.join asset_root, asset.logical_path
         next unless File.exists? asset_path
-        puts "~ Removing #{asset.logical_path}" if verbose
+        say "~ Removing #{asset.logical_path}" if verbose
         FileUtils.rm asset_path
 
         # cleanup empty directories
@@ -302,12 +302,12 @@ module BPM
           asset_path = File.dirname asset_path
           FileUtils.rmdir(asset_path) if File.directory?(asset_path)
           if verbose && !File.exists?(asset_path)
-            puts "~ Removed empty directory #{File.basename asset_path}"
+            say "~ Removed empty directory #{File.basename asset_path}"
           end
         end
       end
 
-      puts "\n" if verbose
+      say "\n" if verbose
     end
 
 
@@ -570,7 +570,7 @@ module BPM
       end
 
       installed.each do |i|
-        puts "~ Fetched #{i.name} (#{i.version}) from remote" if verbose
+        say "~ Fetched #{i.name} (#{i.version}) from remote"
       end
 
     end
@@ -685,7 +685,7 @@ module BPM
       deps ||= local_deps
       deps.each do |dep|
         is_local = has_local_package?(dep.name) ? 'local' : 'fetched'
-        puts "~ Using #{is_local} package '#{dep.name}' (#{dep.version})"
+        say "~ Using #{is_local} package '#{dep.name}' (#{dep.version})"
       end
     end
       

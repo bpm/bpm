@@ -45,6 +45,14 @@ module BPM
       [@template_path, self.class.source_root].compact
     end
 
+    def shell
+      @shell ||= Thor::Base.shell.new
+    end
+    
+    def say(*args)
+      shell.say *args
+    end
+
   private
 
     def app_const

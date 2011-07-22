@@ -124,6 +124,14 @@ module BPM
       as_json.to_json
     end
 
+    def shell
+      @shell ||= Thor::Base.shell.new
+    end
+    
+    def say(*args)
+      shell.say *args
+    end
+    
     def full_name
       "#{name}-#{version}"
     end

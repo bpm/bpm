@@ -5,8 +5,15 @@ module BPM
 
   class Console
     def log(str)
-      puts str
+      shell.say str
     end
+    
+    private
+    
+    def shell
+      @shell ||= Thor::Base.shell.new
+    end
+    
   end
   
   # A BPM package-aware asset pipeline.  Asset lookup respects package.json
@@ -67,7 +74,7 @@ module BPM
           
           dep = project.local_deps.find { |dep| dep.name == target_name }
           dep = project if project.name == target_name
-          
+
           dir_paths = File.join(dep.root_path, dir_name)
           if File.directory? dir_paths
             dir_paths = Dir[File.join(dir_paths, '**', '*')]
