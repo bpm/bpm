@@ -2,9 +2,6 @@
 
 ## Important Features
 
-  * Multiple format support.  Format processors supplied by dependencies 
-    should
-    be used to resolve formats.
   * HTML manifest support [in general we need a way for packages to generate 
     new assets]
   * cache-friendly URLs

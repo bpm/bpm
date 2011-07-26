@@ -1,4 +1,21 @@
 
+  * First cut at support for formats.
+  * Also introduces new requirement for defining transport and format plugins 
+    in the package.json.  Now you must use the "bpm:provides" keyword:
+
+New format for defining a format or transport plugin:
+
+      "bpm:provides": {
+        "transport": {
+          "main": "path/to/transport/plugin"
+        },
+        
+        "format:EXT": {
+          "default:mime": "application/javascript",
+          "main": "path/to/format/plugin"
+        }
+      }
+
 # 1.0.0.beta.7
 
   * fixed bug where local packages that are indirect dependencies of other 

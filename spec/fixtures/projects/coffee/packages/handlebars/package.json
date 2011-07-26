@@ -9,8 +9,8 @@
   "bpm:provides": {
     "format:handlebars": {
       "mime:default": "application/javascript",
-      "dependencies": { "handlebars-runtime": "~> 1.0.0" },
-      "plugin":       "handlebars/format"
+      "main":         "handlebars/format"
     }
   }
+  
 }

@@ -8,7 +8,7 @@
 
   "bpm:provides": {
     "transport": {
-      "plugin": "spade/transport"
-    }
+      "main": "spade/transport"
+    }    
   }
 }

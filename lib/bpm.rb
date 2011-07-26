@@ -16,10 +16,12 @@ module BPM
   autoload :Pipeline,             'bpm/pipeline'
   autoload :DirectiveProcessor,   'bpm/pipeline/directive_processor'
   autoload :GeneratedAsset,       'bpm/pipeline/generated_asset'
-  autoload :TransportProcessor,   'bpm/pipeline/transport_processor'
   autoload :SourceURLProcessor,   'bpm/pipeline/source_url_processor'
   autoload :PluginAsset,          'bpm/pipeline/plugin_asset'
   autoload :PluginContext,        'bpm/pipeline/plugin_context'
+  autoload :PackagePipeline,      'bpm/pipeline/package_pipeline'
+  autoload :FormatProcessor,      'bpm/pipeline/format_processor'
+  autoload :PluginProcessor,        'bpm/pipeline/plugin_processor'
 end
 
 # The BPM constants need to be defined first

@@ -9,7 +9,7 @@
   "bpm:provides": {
     "format:coffee": {
       "mime:default": "application/javascript",
-      "plugin":       "coffee-script/compiler"
+      "main":         "coffee-script/compiler"
     }
   }
 }

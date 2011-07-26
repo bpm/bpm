@@ -48,4 +48,12 @@ module BPM
     end
   end
   
+  class TooManyTransportsError < BPM::Error
+    def format_message(pkg)
+      err = <<EOF
+#{pkg.name} depends on #{pkg.provided_transports.size} packages that define transport plugins. Select a plugin by adding a `bpm:use:transport` property to the package.json
+EOF
+    end
+  end
+  
 end

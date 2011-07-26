@@ -89,8 +89,12 @@ module BPM
       File.join([@root_path, BPM_DIR, 'packages', package_name].compact)
     end
 
+    def assets_path
+      'assets'
+    end
+    
     def assets_root(*paths)
-      File.join @root_path, 'assets', *paths
+      File.join @root_path, assets_path, *paths
     end
     
     def preview_root(*paths)
@@ -401,6 +405,12 @@ module BPM
       @local_deps ||= build_local_dependency_list
     end
 
+    def map_to_packages(deps)
+      Array(deps).map do |dep_name, vers| 
+        local_deps.find { |x| x.name==dep_name }
+      end
+    end
+    
     # List of local dependency names in order of dependency
 
     def sorted_deps

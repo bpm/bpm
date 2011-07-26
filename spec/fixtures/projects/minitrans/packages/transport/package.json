@@ -16,6 +16,10 @@
     
   },
   
-  "bpm:transport": "transport/transports/wrapper"
+  "bpm:provides": {
+    "transport": {
+      "main": "transport/transports/wrapper"
+    }
+  }
   
 }

@@ -26,7 +26,8 @@ module BPM
       "bpm:formats"       => :hash,
       "bpm:transport"     => :string,
       "bpm:use:transport" => :string,
-      "bpm:minifier"      => :string
+      "bpm:minifier"      => :string,
+      "bpm:provides"      => :hash
     }
 
     PLUGIN_FIELDS = %w[bpm:formats bpm:minifier bpm:transport bpm:use:transport]
@@ -215,6 +216,12 @@ module BPM
           ret.merge! minifier
         end
       end
+      
+      bpm_provides.each do |_,opts|
+        next unless opts.is_a?(Hash) && opts['dependencies']
+        ret.merge! opts['dependencies']
+      end
+
       ret
     end
     
@@ -319,6 +326,61 @@ module BPM
       ret
     end
 
+    def merged_dependencies(*kinds)
+      kinds.inject({}) do |ret, kind|
+        deps = case kind
+        when :runtime
+          dependencies
+        when :development
+          dependencies_development
+        when :build
+          dependencies_build
+        end
+        ret.merge! deps
+      end
+    end
+    
+    def provided_formats
+      ret = {}
+      bpm_provides.each do | key, opts |
+        ret[key[7..-1]] = opts if key =~ /^format:/
+      end
+      ret
+    end
+
+    def used_formats(project)
+      pkgs=project.map_to_packages merged_dependencies(:runtime, :development)
+      pkgs.inject({}) { |ret, pkg| ret.merge!(pkg.provided_formats) }
+    end
+
+    def provided_preprocessors
+      bpm_provides['preprocessors'] || []
+    end
+
+    def used_preprocessors(project)
+      pkgs=project.map_to_packages merged_dependencies(:runtime, :development)
+      pkgs.map { |pkg| pkg.provided_postprocessors }.flatten
+    end
+    
+    def provided_postprocessors
+      bpm_provides['postprocessors'] || []
+    end
+
+    def used_postprocessors(project)
+      pkgs=project.map_to_packages merged_dependencies(:runtime, :development)
+      pkgs.map { |pkg| pkg.provided_postprocessors }.flatten
+    end
+    
+    def provided_transport
+      bpm_provides['transport']
+    end
+
+    def used_transports(project)
+      pkgs=project.map_to_packages merged_dependencies(:runtime, :development)
+      pkgs.map { |pkg| pkg.provided_transport }.compact.flatten
+    end      
+      
+          
     # TODO: Make better errors
     # TODO: This might not work well with conflicting versions
     def local_deps(search_path=nil)

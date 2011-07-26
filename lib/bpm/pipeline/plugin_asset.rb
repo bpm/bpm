@@ -26,7 +26,7 @@ module BPM
 
   private
 
-    # Note: logical path must be hte module
+    # Note: logical path must be the module
     def plugin_module
       project      = environment.project
       parts        = logical_path.split('/')

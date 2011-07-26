@@ -24,6 +24,7 @@ module BPM
     
     attr_reader :project
     attr_reader :mode
+    attr_reader :package_pipelines
 
     # Pass in the project you want the pipeline to manage.
     def initialize(project, mode = :debug, include_preview = false)
@@ -31,34 +32,84 @@ module BPM
       @project = project
       @mode    = mode
       @plugin_contexts = {}
+
+      # Create a pipeline for each package.  Will be used for searching.
+      @package_pipelines = project.local_deps.map do |pkg|
+        BPM::PackagePipeline.new self, pkg
+      end
+      @package_pipelines << BPM::PackagePipeline.new(self, project)
       
       project_path = project.root_path
 
       super project_path
 
-      # use custom directive processor
+      # Unregister built-in processors.  We want most things served by the 
+      # pipeline directly to just pass through.  (package pipelines do the
+      # processing)
       %w(text/css application/javascript).each do |kind|
         unregister_processor kind, Sprockets::DirectiveProcessor
-        register_processor   kind, BPM::DirectiveProcessor
       end
-
-      register_postprocessor 'application/javascript', BPM::TransportProcessor
-      #register_postprocessor 'application/javascript', BPM::SourceURLProcessor
-
-      # This gunks things up. I'm not a fan - PDW
       unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
 
       # configure search paths
-      append_path File.join project_path, '.bpm', 'packages'
-      append_path File.dirname project_path
       append_path project.assets_root
       append_path project.preview_root if include_preview
     end    
-      
-    def plugin_context_for(module_id)
-      @plugin_contexts[module_id] ||= build_plugin_context(module_id)
+    
+    # determines the proper pipeline for the path  
+    def pipeline_for(path)
+      return nil if magic_paths.include?(path)
+      package_pipelines.find do |cur_pipeline|
+        path.to_s[cur_pipeline.package.root_path.to_s]
+      end
     end
     
+    def attributes_for(path)
+      if path.to_s[File.join(project.root_path, '.bpm')] ||  !Pathname.new(path).absolute?
+        return super(path) 
+      end
+
+      pipeline = pipeline_for path
+      pipeline ? pipeline.attributes_for(path) : super(path)
+    end
+
+    def resolve(logical_path, options={}, &block)
+      
+      magic_path = magic_paths.find do |path|
+        path =~ /#{Regexp.escape logical_path.to_s}(\..+)?$/
+      end
+      
+      package_name = logical_path.to_s.sub(/#{Regexp.escape File::SEPARATOR}.+/,'')
+      pipeline = package_pipelines.find do |cur_pipeline| 
+        cur_pipeline.package_name == package_name
+      end
+      
+      if pipeline && magic_path.nil?
+        logical_path = logical_path.to_s[package_name.size+1..-1]
+        pipeline.resolve Pathname.new(logical_path), options, &block
+      else
+        super logical_path, options, &block
+      end
+      
+    end
+
+    # Detect whenever we are asked to build some of the magic files and swap
+    # in a custom asset type that can generate the contents.
+    def build_asset(logical_path, pathname, options)
+      if magic_paths.include? pathname.to_s
+        BPM::GeneratedAsset.new(self, logical_path, pathname, options)
+      elsif pipeline = pipeline_for(pathname)
+        pipeline.build_asset logical_path, pathname, options
+      else
+        super logical_path, pathname, options
+      end
+    end
+
+    # Paths to files that should be built.
+    def magic_paths
+      @magic_paths ||= build_magic_paths
+    end
+
     # Returns an array of all the buildable assets in the current directory.
     # These are the assets that will be built when you compile the project.
     def buildable_assets
@@ -92,29 +143,34 @@ module BPM
 
       ret.sort.map { |x| find_asset x }.compact
     end
+
+    def plugin_context_for(logical_path)
+      @plugin_contexts[logical_path] ||= build_plugin_context(logical_path)
+    end
     
-    # Detect whenever we are asked to build some of the magic files and swap
-    # in a custom asset type that can generate the contents.
-    def build_asset(logical_path, pathname, options)
+  protected
+
+    def build_magic_paths
       magic_paths = project.buildable_asset_filenames(mode).map do |filename|
         project.assets_root filename
       end
-
+      
       magic_paths += project.buildable_asset_filenames(mode).map do |filename|
         project.preview_root filename
       end
-
-      if magic_paths.include? pathname.to_s
-        BPM::GeneratedAsset.new(self, logical_path, pathname, options)
-      else
-        super logical_path, pathname, options
-      end
     end
-    
+      
+    # Pass along to package pipelines
+    def expire_index!
+      super
+      @magic_paths = nil
+      package_pipelines.each { |pipeline| pipeline.expire_index! }
+    end
+      
   private
   
-    def build_plugin_context(module_id)
-      asset = BPM::PluginAsset.new(self, module_id)
+    def build_plugin_context(logical_path)
+      asset = BPM::PluginAsset.new(self, logical_path)
       plugin_text = asset.to_s
       
       ctx = nil
