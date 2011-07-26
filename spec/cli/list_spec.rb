@@ -11,6 +11,7 @@ describe "bpm list" do
     before do
       FileUtils.cp_r project_fixture('hello_world'), home
       cd home('hello_world')
+      bpm 'fetch' and wait # make sure rebuild step doesn't run
     end
     
     it "lists non-development dependencies by default" do

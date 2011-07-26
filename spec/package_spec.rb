@@ -14,10 +14,10 @@ describe BPM::Package, "#to_spec" do
   let(:email) { "user@example.com" }
 
   before do
-    cd(home)
-    FileUtils.mkdir_p(home("lib"))
-    FileUtils.mkdir_p(home("resources"))
-    FileUtils.mkdir_p(home("tests"))
+    FileUtils.mkdir_p(home("core-test", "lib"))
+    FileUtils.mkdir_p(home("core-test", "resources"))
+    FileUtils.mkdir_p(home("core-test", "tests"))
+    cd home('core-test')
   end
 
   subject do
@@ -103,8 +103,7 @@ describe BPM::Package, "#to_s" do
   let(:email) { "user@example.com" }
 
   subject do
-    package = BPM::Package.new
-    package.json_path = package_fixture("core-test","package.json")
+    package = BPM::Package.new package_fixture('core-test')
     package.valid?
     package
   end
@@ -135,14 +134,17 @@ end
 
 describe BPM::Package, "validating" do
   before do
-    cd(home)
+    FileUtils.mkdir_p home('core-test')
+    cd home('core-test')
   end
 
   subject { BPM::Package.new }
 
   shared_examples_for "a good parser" do
     it "had a problem parsing package.json" do
-      subject.should have_error("There was a problem parsing package.json")
+      lambda {
+        subject.load_json
+      }.should raise_error
     end
   end
 
@@ -186,9 +188,9 @@ describe BPM::Package, "validation errors" do
   let(:email) { "user@example.com" }
 
   before do
-    cd(home)
-    FileUtils.mkdir_p(home("lib"))
-    FileUtils.mkdir_p(home("tests"))
+    FileUtils.mkdir_p home("core-test", "lib")
+    FileUtils.mkdir_p home("core-test", "tests")
+    cd home("core-test")
   end
 
   subject do
@@ -196,7 +198,7 @@ describe BPM::Package, "validation errors" do
   end
 
   def write_package
-    path    = home("package.json")
+    path    = home("core-test", "package.json")
     package = JSON.parse(File.read(package_fixture("core-test","package.json")))
     yield package
     File.open(path, "w") do |file|
@@ -205,10 +207,15 @@ describe BPM::Package, "validation errors" do
     subject.json_path = path
   end
 
-  %w[name description summary homepage author version directories].each do |field|
+  %w[name description summary homepage author version].each do |field|
     it "is invalid without a #{field} field" do
       write_package do |package|
-        package.delete(field)
+        if %w(description summary).include?(field)
+          package.delete 'description'
+          package.delete 'summary'
+        else
+          package.delete(field)
+        end
       end
 
       subject.should have_error("Package requires a '#{field}' field")
@@ -216,7 +223,11 @@ describe BPM::Package, "validation errors" do
 
     it "is invalid with a blank #{field} field" do
       write_package do |package|
-        package[field] = ""
+        if %w(description summary).include?(field)
+          package['description'] = package['summary'] = ''
+        else
+          package[field] = ''
+        end
       end
 
       subject.should have_error("Package requires a '#{field}' field")
@@ -251,7 +262,7 @@ describe BPM::Package, "validation errors" do
 
   %w(lib tests).each do |dir|
     it "is invalid if #{dir} points to a file" do
-      FileUtils.touch(home("somefile"))
+      FileUtils.touch(home("core-test", "somefile"))
       write_package do |package|
         package["directories"][dir] = "./somefile"
       end
@@ -268,7 +279,7 @@ describe BPM::Package, "validation errors" do
     end
 
     it "is valid with a #{dir} directory that exists" do
-      FileUtils.mkdir_p(home("somewhere", "else"))
+      FileUtils.mkdir_p(home("core-test", "somewhere", "else"))
       write_package do |package|
         package["directories"][dir] = "./somewhere/else"
       end
@@ -278,11 +289,12 @@ describe BPM::Package, "validation errors" do
   end
 
   it "is valid with a lib directory array" do
-    FileUtils.mkdir_p(home("vendor/lib"))
+    FileUtils.mkdir_p(home("core-test", "vendor", "lib"))
     write_package do |package|
       package["directories"]["lib"] = ["./lib", "./vendor/lib"]
     end
 
+    subject.valid?
     subject.should be_valid
   end
 

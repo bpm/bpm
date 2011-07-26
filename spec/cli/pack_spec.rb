@@ -87,8 +87,9 @@ end
 
 describe "bpm pack npm-compatible package" do
   before do
+    goto_home
     FileUtils.cp_r package_fixture("backbone"), "."
-    cd "backbone"
+    cd home("backbone")
     bpm "pack", :track_stderr => true and wait
   end
 

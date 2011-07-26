@@ -76,9 +76,9 @@ module BPM
         spec.licenses     = licenses.map{|l| l["type"]}
         spec.executables  = bin_files.map{|p| File.basename(p) } if bin_path
 
-        spec.homepage     = homepage || url
-        spec.description  = description || summary
-        spec.summary      = summary || description
+        spec.homepage     = self.homepage || self.url
+        spec.description  = self.description || self.summary
+        spec.summary      = self.summary || self.description
 
         metadata = Hash[METADATA_FIELDS.map{|f| [f, send(c2u(f)) ] }]
         spec.requirements = [metadata.to_json]
@@ -248,12 +248,12 @@ module BPM
     end
 
     def has_json?
-      File.exist?(json_path)
+      !!json_path && File.exist?(json_path)
     end
 
     def validate_name_and_path
       filename = File.basename(root_path)
-      unless filename==name || filename=="#{name}-#{version}"
+      unless name.nil? || name.empty? || filename==name || filename=="#{name}-#{version}"
         raise BPM::InvalidPackageNameError.new self
       end
     end
@@ -290,6 +290,10 @@ module BPM
 
       self.author = spec.authors.first
       self.version = spec.version.to_s
+
+      self.description = spec.description
+      self.summary     = spec.summary
+      self.homepage    = spec.homepage
 
       metadata = spec.requirements.first
       if metadata
@@ -465,15 +469,26 @@ module BPM
       end
 
       def validate_summary
-        summary || description
+        if (summary.nil? || summary.empty?) && (description.nil? || description.empty?)
+          add_error "Package requires a 'summary' field"
+          add_error "Package requires a 'description' field"
+          false
+        else
+          true
+        end
       end
       
       def validate_homepage
-        homepage || url
+        if (homepage.nil? || homepage.empty?) && (url.nil? || url.empty?)
+          add_error "Package requires a 'homepage' field"
+          false
+        else
+          true
+        end
       end
       
       def add_error(message)
-        self.errors << message
+        self.errors << message unless self.errors.include?(message)
       end
 
       def glob_files(path)

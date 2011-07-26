@@ -50,7 +50,7 @@ module BPM
       end
 
       @name = name || File.basename(root_path)
-      @json_path = project_file
+      @json_path = project_file || File.join(root_path, "#{File.basename(root_path)}.json")
 
       load_json && validate
     end
@@ -488,7 +488,10 @@ module BPM
 
     def load_json
       return super if has_json?
-      FIELDS.keys.each{|f| send("#{c2u(f)}=", DEFAULT_CONFIG[f]) }
+      (FIELDS.keys + %w(description summary homepage)).each do |f| 
+        send("#{c2u(f)}=", DEFAULT_CONFIG[f])
+      end
+      
       self.name = File.basename(@json_path, '.json')
       self.version = "0.0.1"
       true
@@ -581,7 +584,7 @@ module BPM
       end
 
       installed.each do |i|
-        say "~ Fetched #{i.name} (#{i.version}) from remote"
+        say "~ Fetched #{i.name} (#{i.version}) from remote" if verbose
       end
 
     end
