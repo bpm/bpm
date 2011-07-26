@@ -1,34 +1,34 @@
 require 'sprockets'
 
 module BPM
-  
+
   class GeneratedAsset < Sprockets::BundledAsset
 
     FORMAT_METHODS = {
       'text/css' => ['css', 'pipeline_css'],
       'application/javascript' => ['lib', 'pipeline_libs']
     }
-    
+
     def self.generating_asset
       @generating_asset && @generating_asset.last
     end
-    
+
     def self.push_generating_asset(asset)
       @generating_asset ||= []
       @generating_asset.push asset
     end
-    
+
     def self.pop_generating_asset
       @generating_asset && @generating_asset.pop
     end
 
     def build_settings
-      ret = environment.project.build_settings[asset_name] 
+      ret = environment.project.build_settings[asset_name]
       (ret && ret['bpm:settings']) || {}
     end
-    
+
     def minify_body(data)
-      
+
       project = environment.project
       minifier_name = project.minifier_name asset_name
       minifier_name = minifier_name.keys.first if minifier_name
@@ -46,7 +46,7 @@ module BPM
 
         plugin_ctx = environment.plugin_context_for minifier_plugin_name
 
-        # slice out the header at the top - we don't want the minifier to 
+        # slice out the header at the top - we don't want the minifier to
         # touch it.
         header   = data.match /^(\/\* ====.+====\*\/)$/m
         if header
@@ -80,7 +80,7 @@ module BPM
 
     def minify(hash)
       return hash if environment.mode == :debug
-      
+
       hash = environment.cache_hash("#{pathname}:minify", id) do
         data = minify_body hash['source']
         { 'length' => Rack::Utils.bytesize(data),
@@ -96,7 +96,7 @@ module BPM
 
       hash
     end
-    
+
     def asset_name
       project = environment.project
       if pathname.to_s.include?(project.assets_root)
@@ -105,23 +105,23 @@ module BPM
         pathname.relative_path_from(Pathname.new(project.preview_root)).to_s
       end
     end
-    
+
     def build_dependency_context_and_body
 
       project       = environment.project
       settings = project.build_settings(environment.mode)[asset_name]
-      pkgs     = settings.keys.map do |pkg_name| 
+      pkgs     = settings.keys.map do |pkg_name|
         next if pkg_name == 'bpm:minifier'
         if pkg_name == project.name
           project
         else
-          project.local_deps.find { |dep| dep.name == pkg_name } 
+          project.local_deps.find { |dep| dep.name == pkg_name }
         end
       end.compact
 
       if pkgs.size > 0
-        manifest = pkgs.sort { |a,b| a.name <=> b.name } 
-        manifest = manifest.map do |x| 
+        manifest = pkgs.sort { |a,b| a.name <=> b.name }
+        manifest = manifest.map do |x|
           "#{x.name} (#{x.version})"
         end.join " "
       else
@@ -133,7 +133,7 @@ module BPM
 /* ===========================================================================
    BPM Combined Asset File
    MANIFEST: #{manifest}
-   This file is generated automatically by the bpm (http://www.bpmjs.org)    
+   This file is generated automatically by the bpm (http://www.bpmjs.org)
    =========================================================================*/
 
 EOF
