@@ -1,6 +1,3 @@
-# Included vendored sprockets
-$:.unshift File.expand_path('../../vendor/sprockets/lib', __FILE__)
-
 module BPM
   BPM_DIR = ".bpm"
   TEMPLATES_DIR = File.expand_path("../../templates", __FILE__)
