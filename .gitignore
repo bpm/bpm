@@ -3,3 +3,4 @@ devbin
 .bundle
 Gemfile.lock
 *.gem
+*.swp
