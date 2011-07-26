@@ -74,9 +74,9 @@ module BPM
   private
 
     def build_source
-      self.class.push_generating_asset self
+      BPM::GeneratedAsset.push_generating_asset self
       ret = minify super
-      self.class.pop_generating_asset
+      BPM::GeneratedAsset.pop_generating_asset
       ret
     end
 

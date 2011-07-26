@@ -5,7 +5,7 @@ module BPM
   # Defines an asset that represents a build plugin (such as a transport or
   # a minifier.)  The generated asset will include dependencies of the plugin
   # module as well as the module itself.
-  class PluginAsset < Sprockets::BundledAsset
+  class PluginAsset < BPM::GeneratedAsset
 
     def initialize(environment, module_name)
       pathname = Pathname.new(File.join(environment.project.root_path, '.bpm', 'plugins', module_name+'.js'))
@@ -18,14 +18,13 @@ module BPM
       super(environment, module_name, pathname, {})
     end
     
-  protected
-
-    def dependency_context_and_body
-      @dependency_context_and_body ||= build_dependency_context_and_body
-    end
-
   private
 
+    # do not minify plugin assets
+    def minify(hash)
+      hash
+    end
+    
     # Note: logical path must be the module
     def plugin_module
       project      = environment.project
