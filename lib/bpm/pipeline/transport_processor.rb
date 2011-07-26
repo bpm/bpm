@@ -23,15 +23,10 @@ module BPM
       
       plugin_ctx = environment.plugin_context_for transport_plugins.first
       filepath   = file.to_s
-      out = ''
 
-      V8::C::Locker() do
-        plugin_ctx["DATA"]  = data
-        plugin_ctx["CTX"]   = BPM::PluginContext.new(pkg, module_id)
-        out = plugin_ctx.eval("BPM_PLUGIN.compileTransport(DATA, CTX, '#{filepath}');")
-      end
-
-      out + "\n\n"
+      plugin_ctx["DATA"]  = data
+      plugin_ctx["CTX"]   = BPM::PluginContext.new(pkg, module_id)
+      plugin_ctx.eval("BPM_PLUGIN.compileTransport(DATA, CTX, '#{filepath}');") + "\n\n"
     end
     
   end

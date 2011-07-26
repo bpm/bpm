@@ -33,15 +33,10 @@ module BPM
       pkg, module_id = project.package_and_module_from_path file
       
       filepath   = file.to_s
-      out = ''
 
-      V8::C::Locker() do
-        ctx["DATA"]  = data
-        ctx["CTX"]   = BPM::PluginContext.new(pkg, module_id)
-        out = ctx.eval("BPM_PLUGIN.#{self.class.method_name}(DATA, CTX, '#{filepath}');")
-      end
-
-      out
+      ctx["DATA"]  = data
+      ctx["CTX"]   = BPM::PluginContext.new(pkg, module_id)
+      ctx.eval("BPM_PLUGIN.#{self.class.method_name}(DATA, CTX, '#{filepath}');")
     end
     
   end

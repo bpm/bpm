@@ -173,18 +173,13 @@ module BPM
       asset = BPM::PluginAsset.new(self, logical_path)
       plugin_text = asset.to_s
       
-      ctx = nil
-      V8::C::Locker() do
-        ctx = V8::Context.new do |ctx|
-          ctx['window'] = ctx # make browser-like environment
-          ctx['console'] = BPM::Console.new
-          
-          ctx['BPM_PLUGIN'] = {}
-          ctx.eval plugin_text
-        end
+      V8::Context.new do |ctx|
+        ctx['window'] = ctx # make browser-like environment
+        ctx['console'] = BPM::Console.new
+        
+        ctx['BPM_PLUGIN'] = {}
+        ctx.eval plugin_text
       end
-      
-      ctx
     end
         
   end

@@ -54,11 +54,9 @@ module BPM
           data   = data[header.size..-1]
         end
 
-        V8::C::Locker() do
-          plugin_ctx["CTX"]  = BPM::PluginContext.new(pkg)
-          plugin_ctx["DATA"] = data
-          data = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, CTX)")
-        end
+        plugin_ctx["CTX"]  = BPM::PluginContext.new(pkg)
+        plugin_ctx["DATA"] = data
+        data = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, CTX)")
 
         data = header+data if header
       end
