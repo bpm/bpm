@@ -4,7 +4,7 @@
   "description": "DESC",
   "summary":     "SUMMARY",
   "author":      "AUTHOR",
-  "homepage":    "HOMEPAGE",
+  "homepage":    "http://example.com",
 
   "bpm:provides": {
     "transport": {

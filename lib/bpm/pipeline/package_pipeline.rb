@@ -67,6 +67,13 @@ module BPM
     def plugin_context_for(logical_path)
       pipeline.plugin_context_for logical_path
     end
+    
+    def resolve(*args)
+      super *args
+    rescue Sprockets::FileNotFound => e
+      raise Sprockets::FileNotFound, "#{e.message} in package '#{package_name}'"
+    end
+      
 
   end
 end
