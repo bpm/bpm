@@ -64,8 +64,8 @@ module BPM
       pipeline.mode
     end
     
-    def plugin_context_for(logical_path)
-      pipeline.plugin_context_for logical_path
+    def plugin_js_for(logical_path)
+      pipeline.plugin_js_for logical_path
     end
     
     def resolve(*args)

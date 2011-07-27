@@ -21,7 +21,7 @@ module BPM
                 "Select a plugin by adding a `bpm:use:transport` property to the package.json"
       end
 
-      plugin_ctx = environment.plugin_context_for transport_plugins.first
+      plugin_ctx = environment.plugin_js_for transport_plugins.first
       filepath   = file.to_s
 
       plugin_ctx["DATA"]  = data
