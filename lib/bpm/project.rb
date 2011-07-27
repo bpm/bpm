@@ -497,6 +497,14 @@ module BPM
       true
     end
 
+    # Tell if package is vendored
+
+    def has_local_package?(package_name)
+      !!locate_local_package(package_name)
+    end
+
+
+
 
   private
 
@@ -608,13 +616,6 @@ module BPM
         pkg
       end
     end
-
-    # Tell if package is vendored
-
-    def has_local_package?(package_name)
-      !!locate_local_package(package_name)
-    end
-
 
     # Tell if given version is satisfied by the passed version
 

@@ -353,6 +353,14 @@ module BPM
       end
     end
     
+    def used_dependencies(project)
+      if project.has_local_package?(self.name) 
+        merged_dependencies(:runtime, :development)
+      else
+        merged_dependencies(:runtime)
+      end
+    end
+      
     def provided_formats
       ret = {}
       bpm_provides.each do | key, opts |
@@ -362,7 +370,7 @@ module BPM
     end
 
     def used_formats(project)
-      pkgs=project.map_to_packages merged_dependencies(:runtime, :development)
+      pkgs=project.map_to_packages used_dependencies(project)
       pkgs.inject({}) { |ret, pkg| ret.merge!(pkg.provided_formats) }
     end
 
@@ -371,7 +379,7 @@ module BPM
     end
 
     def used_preprocessors(project)
-      pkgs=project.map_to_packages merged_dependencies(:runtime, :development)
+      pkgs=project.map_to_packages used_dependencies(project)
       pkgs.map { |pkg| pkg.provided_postprocessors }.flatten
     end
     
@@ -380,7 +388,7 @@ module BPM
     end
 
     def used_postprocessors(project)
-      pkgs=project.map_to_packages merged_dependencies(:runtime, :development)
+      pkgs=project.map_to_packages used_dependencies(project)
       pkgs.map { |pkg| pkg.provided_postprocessors }.flatten
     end
     
@@ -389,7 +397,7 @@ module BPM
     end
 
     def used_transports(project)
-      pkgs=project.map_to_packages merged_dependencies(:runtime, :development)
+      pkgs=project.map_to_packages used_dependencies(project)
       pkgs.map { |pkg| pkg.provided_transport }.compact.flatten
     end      
       
