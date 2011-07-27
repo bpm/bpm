@@ -7,7 +7,7 @@ module BPM
       return false if directory_exists?
 
       empty_directory '.', :verbose => false
-      empty_directory 'app'
+      empty_directory 'lib'
 
       create_files
 
@@ -25,7 +25,7 @@ module BPM
         template "README.md"
         template "index.html"
         
-        inside 'app' do
+        inside 'lib' do
           template 'main.js'
         end
         
