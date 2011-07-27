@@ -1,5 +1,4 @@
 require 'sprockets'
-require 'v8'
 
 module BPM
 
@@ -31,7 +30,7 @@ module BPM
 
       @project = project
       @mode    = mode
-      @plugin_contexts = {}
+      @plugin_js = {}
 
       # Create a pipeline for each package.  Will be used for searching.
       @package_pipelines = project.local_deps.map do |pkg|
@@ -144,8 +143,8 @@ module BPM
       ret.sort.map { |x| find_asset x }.compact
     end
 
-    def plugin_context_for(logical_path)
-      @plugin_contexts[logical_path] ||= build_plugin_context(logical_path)
+    def plugin_js_for(logical_path)
+      @plugin_js[logical_path] ||= build_plugin_js(logical_path)
     end
 
   protected
@@ -178,11 +177,12 @@ module BPM
       expire_index!
       super exception
     end
-    
-    def build_plugin_context(logical_path)
+
+    def build_plugin_js(logical_path)
       asset = BPM::PluginAsset.new(self, logical_path)
       plugin_text = asset.to_s
 
+=begin
       V8::Context.new do |ctx|
         ctx['window'] = ctx # make browser-like environment
         ctx['console'] = BPM::Console.new
@@ -190,6 +190,14 @@ module BPM
         ctx['BPM_PLUGIN'] = {}
         ctx.eval plugin_text
       end
+=end
+
+      # TODO: Add Console if supported
+
+      return <<-end_eval
+BPM_PLUGIN = {};
+#{plugin_text}
+      end_eval
     end
 
   end

@@ -1,4 +1,5 @@
 require 'sprockets'
+require 'execjs'
 
 module BPM
 
@@ -44,7 +45,7 @@ module BPM
           raise MinifierNotFoundError.new(minifier_name)
         end
 
-        plugin_ctx = environment.plugin_context_for minifier_plugin_name
+        plugin_ctx = environment.plugin_js_for minifier_plugin_name
 
         # slice out the header at the top - we don't want the minifier to
         # touch it.
@@ -54,9 +55,17 @@ module BPM
           data   = data[header.size..-1]
         end
 
-        plugin_ctx["CTX"]  = BPM::PluginContext.new(pkg)
-        plugin_ctx["DATA"] = data
-        data = plugin_ctx.eval("BPM_PLUGIN.minify(DATA, CTX)")
+        #plugin_ctx["CTX"]  = BPM::PluginContext.new(pkg)
+        #plugin_ctx["DATA"] = data
+        plugin_ctx += <<-end_eval
+          ; // Safety
+          CTX = #{BPM::PluginContext.new(pkg).to_json};
+          CTX.minify = function(body){ return body; };
+          DATA = #{data.to_json};
+        end_eval
+
+        ctx = ExecJS.compile(plugin_ctx);
+        data = ctx.eval("BPM_PLUGIN.minify(DATA, CTX)")
 
         data = header+data if header
       end

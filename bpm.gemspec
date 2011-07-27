@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency "highline",     "~> 1.6.1"
   s.add_dependency "json_pure",    "~> 1.4.6"
   s.add_dependency "thor",         "~> 0.14.3"
-  s.add_dependency "therubyracer", "~> 0.9.3"
+  s.add_dependency "execjs",       "~> 1.2.0"
   s.add_dependency "sprockets",    "~> 2.0.0.beta.14"
 
   s.add_development_dependency "rspec"

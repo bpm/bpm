@@ -19,6 +19,16 @@ module BPM
       @generating_asset ? @generating_asset.build_settings : {}
     end
 
+    def as_json
+      { :package => @package,
+        :moduleId => @moduleId,
+        :settings => settings }
+    end
+
+    def to_json
+      as_json.to_json
+    end
+
   end
 
 end
