@@ -21,7 +21,7 @@ of lessons learned to jump start bpm.
 
 Once you have bpm installed (see below), create a demo app like so:
 
-    bpm new my_app
+    bpm init my_app
     cd my_app
     
 Then add jquery as a dependency:
@@ -37,19 +37,13 @@ thing there.
 
 # Installing
 
-When we release, bpm will be available via PKG and MSI installers as well as via rubygems.  For now the best way to try bpm is to clone it from github and then:
+Install via RubyGems:
 
-  `bundle install`
-  
-From the directory.  (If you don't have bundler, you will need ruby 1.9.2 installed and type `gem install bundler` to get it.)
+  `gem install bpm --pre`
+
+When we release, bpm will be also be available via PKG and EXE installers as well.
 
 # Current Development Status
 
-Alpha.  You should be able to work the basic system, but some features are 
-still incomplete including:
-
-  * SASS and other CSS plugins
-  * Format plugins (i.e. CoffeeScript)
-  * Minification plugins
-  * lots of other stuff I am forgetting
-  * node support - you will eventually be able to run JS that doesn't require the DOM in node.  We've prototyped this but it needs to be polished still.
+Beta.  You should be able to work the basic system, but some features are 
+still incomplete.
