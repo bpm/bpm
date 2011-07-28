@@ -169,6 +169,16 @@ module BPM
 
   private
 
+    def javascript_exception_response(exception)
+      expire_index!
+      super exception
+    end
+    
+    def css_exception_response(exception)
+      expire_index!
+      super exception
+    end
+    
     def build_plugin_context(logical_path)
       asset = BPM::PluginAsset.new(self, logical_path)
       plugin_text = asset.to_s
