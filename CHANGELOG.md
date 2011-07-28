@@ -1,4 +1,13 @@
 
+# 1.0.0.beta.9
+
+  * Fixed bug with init where it would generate broken apps at first.
+  * Fixed bug when exceptions are thrown in preview mode that would force you
+    to restart the server. Should recover more smoothly now.
+  * Other minor bug fixes.
+  
+# 1.0.0.beta.8
+
   * First cut at support for formats.
   * Also introduces new requirement for defining transport and format plugins 
     in the package.json.  Now you must use the "bpm:provides" keyword:
