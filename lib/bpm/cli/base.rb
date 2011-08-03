@@ -206,12 +206,15 @@ module BPM
         end
       end
 
-      desc "list", "View available packages for download"
-      method_option :remote,     :type => :boolean, :default => false, :aliases => ['-r'], :desc => 'List packages on remote server'
-      method_option :all,        :type => :boolean, :default => false, :aliases => ['-a'],    :desc => 'List all versions available (remote only)'
-      method_option :prerelease, :type => :boolean, :default => false, :aliases => ['--pre'], :desc => 'List prerelease versions available (remote only)'
-      method_option :development, :type => :boolean, :default => false,
-:aliases => ['--dev'], :desc => 'List development dependencies instead of runtime (local only)'
+      desc "list", "List BPM Packages"
+      method_option :remote,     :type => :boolean, :default => false, :aliases => ['-r'],
+                                    :desc => 'List packages on remote server'
+      method_option :all,        :type => :boolean, :default => false, :aliases => ['-a'],
+                                    :desc => 'List all versions available (remote only)'
+      method_option :prerelease, :type => :boolean, :default => false, :aliases => ['--pre'],
+                                    :desc => 'List prerelease versions available (remote only)'
+      method_option :development, :type => :boolean, :default => false, :aliases => ['--dev'],
+                                    :desc => 'List development dependencies instead of runtime (local only)'
       def list(*packages)
         if options[:remote]
           remote = BPM::Remote.new
