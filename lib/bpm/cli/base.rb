@@ -186,7 +186,7 @@ module BPM
         end
       end
 
-      desc "yank", "Remove a specific package version release from SproutCutter"
+      desc "yank", "Remove a specific package version release from GetBPM.org"
       method_option :version, :type => :string,  :default => nil,   :aliases => ['-v'],    :desc => 'Specify a version to yank'
       method_option :undo,    :type => :boolean, :default => false,                        :desc => 'Unyank package'
       def yank(package)

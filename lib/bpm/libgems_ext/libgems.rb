@@ -2,11 +2,11 @@ require 'libgems'
 
 module LibGems
   def self.default_sources
-    %w[https://sproutcutter.heroku.com/]
+    %w[https://getbpm.org/]
   end
 
   def self.host
-    @host ||= "https://sproutcutter.heroku.com"
+    @host ||= "https://getbpm.org"
   end
 
   def self.default_dir
