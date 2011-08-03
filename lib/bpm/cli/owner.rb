@@ -32,7 +32,7 @@ module BPM::CLI
       end
     end
 
-    desc "remove [PACKAGE] [EMAIL]", "Allow another user to push new versions of your bpm package"
+    desc "remove [PACKAGE] [EMAIL]", "Remove user's permission to push new versions of your bpm package"
     def remove(package, email)
       remote = BPM::Remote.new
       if remote.logged_in?

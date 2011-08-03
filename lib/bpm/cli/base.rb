@@ -176,7 +176,7 @@ module BPM
         end
       end
 
-      desc "push", "Distribute your bpm package"
+      desc "push PACKAGE", "Distribute your bpm package"
       def push(package)
         remote = BPM::Remote.new
         if remote.logged_in?
@@ -236,8 +236,8 @@ module BPM
       desc "init [PATHS]", "Configure a project to use bpm for management"
       method_option :name, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
       method_option :skip, :type => :boolean, :default => false, :desc => 'Skip any conflicting files'
-      method_option :app, :type => :boolean, :default => false, :desc => 'Manage app as well as packages'
-      method_option :package, :type => :string, :default => nil, :desc => 'Specify a package template to build from'
+      method_option :app, :type => :boolean, :default => false, :desc => 'Manage app files as well as packages. (Always true for new directories.)'
+      #method_option :package, :type => :string, :default => nil, :desc => 'Specify a package template to build from'
       def init(*paths)
         paths = [Dir.pwd] if paths.empty?
         paths.map!{|p| File.expand_path(p) }
@@ -259,7 +259,8 @@ module BPM
           if File.directory?(path)
             run_init(name, options[:app], path)
           else
-            package = install_package(options[:package])
+            #package = install_package(options[:package])
+            package = nil
             template_path = package ? package.template_path(:project) : nil
             generator = get_generator(:project, package)
             success = generator.new(self, name, path, template_path, package).run
