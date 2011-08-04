@@ -66,7 +66,7 @@ module BPM
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
       method_option :development, :type => :boolean, :default => false, :aliases => ['--dev'], :desc => "Add as a development dependency"
-      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile (default production)"
+      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
       def add(*package_names)
         # map to dependencies
         if package_names.empty?
@@ -100,7 +100,7 @@ module BPM
 
       desc "remove [PACKAGE]", "Remove one or more packages from a bpm project"
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile (default production)"
+      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
       def remove(*package_names)
 
         # map to dependencies
@@ -129,7 +129,7 @@ module BPM
       end
       
       desc "rebuild", "Rebuilds bpm assets, does not update versions"
-      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile (default production)'
+      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :update, :type => :boolean, :default => false, :aliases => ['-u'], :desc => 'Updates dependencies to latest compatible version'
       def rebuild
