@@ -119,7 +119,7 @@ module BPM
       end
 
       desc "preview", "Preview server that will autocompile assets as you request them.  Useful for hacking"
-      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode for compile (default debug)'
+      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode for compile'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :port,       :type => :string,  :default => '4020', :desc => "Port to host server on"
       def preview
@@ -309,9 +309,9 @@ module BPM
         end
       end
 
-      desc "debug [OPTION]", "Display various options for debugging"
+      desc "debug [OPTION]", "Display various options for debugging.\n  :build - Shows all project build settings\n  :repair - Verify and repair project"
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode (default debug)'
+      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode'
       def debug(option)
         case option
         when 'build'
