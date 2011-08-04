@@ -23,7 +23,6 @@ module BPM
       "dependencies"             => :hash,
       "dependencies:development" => :hash,
       "bpm:build"         => :hash,
-      "bpm:formats"       => :hash,
       "bpm:use:transport" => :string,
       "bpm:provides"      => :hash
     }
@@ -34,7 +33,7 @@ module BPM
     SPEC_FIELDS = %w[name email]
 
     # Fields that should be bundled up into JSON in the gemspec
-    METADATA_FIELDS = %w[keywords licenses engines main bin directories pipeline bpm:build bpm:formats]
+    METADATA_FIELDS = %w[keywords licenses engines main bin directories pipeline bpm:build]
 
     REQUIRED_FIELDS = %w[name author version]
 
