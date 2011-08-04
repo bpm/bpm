@@ -47,3 +47,7 @@ When we release, bpm will be also be available via PKG and EXE installers as wel
 
 Beta.  You should be able to work the basic system, but some features are 
 still incomplete.
+
+# Additional Documentation
+
+https://github.com/getbpm/bpm/wiki
