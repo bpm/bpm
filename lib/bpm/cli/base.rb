@@ -309,8 +309,8 @@ module BPM
         end
       end
 
-      desc "debug [OPTION]", "Display various options for debugging.\n  :build - Shows all project build settings\n  :repair - Verify and repair project"
-      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      desc "debug [OPTION]", "Display various options for debugging.\n  build - Shows all project build settings\n  repair - Verify and repair project"
+      method_option :project, :type => :string,  :default => nil, :aliases => ['-p'], :desc => 'Specify project location other than working directory'
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode'
       def debug(option)
         case option
