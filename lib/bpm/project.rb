@@ -483,7 +483,9 @@ module BPM
     # Name of minifier
 
     def minifier_name(asset_name)
-      build_settings[asset_name] && build_settings[asset_name]['bpm:minifier']
+      build_settings[asset_name] &&
+        build_settings[asset_name]['bpm:provides'] &&
+        build_settings[asset_name]['bpm:provides']['minifier']
     end
 
     def load_json
@@ -754,11 +756,12 @@ module BPM
       end
       
       if opts['minifier']
+        ret[target_name]['bpm:provides'] ||= {}
         if opts['minifier'].is_a? String
-          ret[target_name]['bpm:minifier'] = {}
-          ret[target_name]['bpm:minifier'][opts['minifier']] = '>= 0'
+          ret[target_name]['bpm:provides']['minifier'] = {}
+          ret[target_name]['bpm:provides']['minifier'][opts['minifier']] = '>= 0'
         else
-          ret[target_name]['bpm:minifier'] = opts['minifier']
+          ret[target_name]['bpm:provides']['minifier'] = opts['minifier']
         end
       end
 

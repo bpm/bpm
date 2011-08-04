@@ -24,19 +24,17 @@ module BPM
       "dependencies:development" => :hash,
       "bpm:build"         => :hash,
       "bpm:formats"       => :hash,
-      "bpm:transport"     => :string,
       "bpm:use:transport" => :string,
-      "bpm:minifier"      => :string,
       "bpm:provides"      => :hash
     }
 
-    PLUGIN_FIELDS = %w[bpm:minifier]
-    
+    PLUGIN_TYPES = %w[minifier]
+
     # Fields that can be loaded straight into the gemspec
     SPEC_FIELDS = %w[name email]
 
     # Fields that should be bundled up into JSON in the gemspec
-    METADATA_FIELDS = %w[keywords licenses engines main bin directories pipeline bpm:build bpm:formats bpm:transport]
+    METADATA_FIELDS = %w[keywords licenses engines main bin directories pipeline bpm:build bpm:formats]
 
     REQUIRED_FIELDS = %w[name author version]
 
@@ -150,8 +148,8 @@ module BPM
         hash['directories'] || hash['assets']
       end
 
-      build_names += PLUGIN_FIELDS.map do |field_name|
-        val = self.send(c2u(field_name))
+      build_names += PLUGIN_TYPES.map do |type|
+        val = bpm_provides[type]
         val = val && val =~ /^#{name}\// ? val[name.size+1..-1]+'.js' : nil
         val
       end
@@ -190,7 +188,7 @@ module BPM
           pkg.name == pkg_name
         end
         raise "Could not find dependency: #{pkg_name}" unless dep
-        dep.bpm_transport
+        dep.provided_transport
       end.compact
     end
 
@@ -399,9 +397,12 @@ module BPM
     def used_transports(project)
       pkgs=project.map_to_packages used_dependencies(project)
       pkgs.map { |pkg| pkg.provided_transport }.compact.flatten
-    end      
-      
-          
+    end
+
+    def provided_minifier
+      bpm_provides['minifier']
+    end
+
     # TODO: Make better errors
     # TODO: This might not work well with conflicting versions
     def local_deps(search_path=nil)

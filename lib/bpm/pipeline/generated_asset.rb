@@ -39,7 +39,7 @@ module BPM
           raise MinifierNotFoundError.new(minifier_name)
         end
 
-        minifier_plugin_name = pkg.bpm_minifier
+        minifier_plugin_name = pkg.provided_minifier
         if minifier_plugin_name.nil?
           raise MinifierNotFoundError.new(minifier_name)
         end
@@ -111,7 +111,6 @@ module BPM
       project       = environment.project
       settings = project.build_settings(environment.mode)[asset_name]
       pkgs     = settings.keys.map do |pkg_name|
-        next if pkg_name == 'bpm:minifier'
         if pkg_name == project.name
           project
         else
