@@ -4,7 +4,7 @@ class FakeGemcutter
   end
 
   def respond(code, text)
-    [code, {"Content-Type" => "text/plain"}, text]
+    [code, {"Content-Type" => "text/plain"}, [text]]
   end
 
   def call(env)

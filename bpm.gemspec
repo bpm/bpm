@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency "sprockets",    "~> 2.0.0.beta.12"
 
   s.add_development_dependency "rspec"
-  s.add_development_dependency "rack", "~> 1.2.1"
+  s.add_development_dependency "rack", "~> 1.3.2"
 
   paths = `git submodule`.split("\n").map do |line|
     path = line.gsub(/^.\w+\s+(\S+).*/,'\1')
