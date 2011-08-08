@@ -7,18 +7,120 @@ bpm(1) -- browser package manager
 
 ## DESCRIPTION
 
-## WORKFLOW
+bpm is a package manager for browser-based applications.  It is based 
+loosely on npm (node package manager), but designed to handle all the 
+different types of assets and optimizations you will need for the web 
+including packaging and minifying JavaScript as well as handling CSS and 
+image assets.
 
-bpm init | bpm new - create the new project
-bpm add spade - adds the dependency, fetches, compiles.
-bpm remove spade - removes the dependency, compiles
+You can use bpm both to manage the dependencies of an application you are
+building and to publish libraries of code for others to use.  This manual
+page will explain to you how to use bpm both different ways.
 
-bpm fetch - fetches any dependencies locally
-bpm compile - rebuilds the project; uses any current dependencies 
-bpm preview - allows you to preview the files. creates any needed files
+## GETTING STARTED (WITH AN EXISTING PROJECT)
 
+The most common way to use bpm is to manage the dependencies of your 
+application.  To configure bpm for an existing project, just cd into the project directory
+and type:
 
-## DISCUSSION
+    bpm init
+  
+This will setup a new project JSON file as well as create an empty set of 
+asset files in the `assets` directory of your project.  Inside of that 
+directory you will find two key files: `bpm_libs.js` and `bpm_styles.css`.
+
+These files will contain the JavaScript and CSS styles for all of your 
+dependencies, respectively.  Make sure you modify any HTML files to reference
+these two files so they load.  Typically you will want both files to load 
+before other JavaScript or CSS files in your page.
+
+As you add dependencies, additional assets may appear in this directory,
+including images.
+
+Now that you have setup your project, you can start adding dependencies.  See
+(ADDING DEPENDENCIES) below.
+
+## GETTING STARTED (WITH A NEW APP)
+
+If you are starting a new project, you can also use bpm to create your new
+project with:
+
+    bpm init [PROJECT_NAME]
+
+This will create a new project with the name that you gave it based on the
+HTML5 Boilerplate template.
+
+Your new project will also contain an assets directory that contains 
+`bpm_libs.js` and `bpm_styles.css` files.  These must be loaded in your HTML
+file for your dependencies to load.  The default index.html created by bpm
+will already do this for you.
+
+## ADDING AND REMOVING DEPENDENCIES
+
+Once you have configured your application, you can add and remove dependencies using the `bpm add` and `bpm remove` commands.  For example, to add jquery to
+your project just type:
+
+    bpm add jquery
+    
+This will fetch the jquery package and any dependencies (if they exist) and
+then rebuild the files in the `assets` directory.  Once the add is complete 
+bpm should display the new total file sizes of the files it built.  This 
+size represents the size after minification (if there is any) and gzipped.
+
+For more information on adding dependencies see the `bpm-add` manual.
+
+You can also remove dependencies by using the `bpm remove` command.  Just name
+the package you want to remove and all the assets will be rebuilt for you.
+For example:
+
+    bpm remove jquery
+    
+Would remove jquery from your project (if it was already added).  Calling
+bpm remove with the same package multiple times has no effect.
+
+For more information on remove dependencies see the `bpm-remove` manual.
+
+## MANAGING YOUR APP ITSELF
+
+In addition to handling dependencies, bpm can also be used to build your 
+actual app JavaScript and CSS.  To do this, you just need to run:
+
+    bpm init --app
+    
+Note that when you create new projects with bpm, the app will already be 
+built.
+
+The default configuration for this setup will build any JavaScript found in
+a `lib` directory in the root of your project and any CSS found in a `css`
+directory in the root of your project. You can change these settings by 
+modifying the project JSON.
+
+## PREVIEWING
+
+Sometimes while hacking on your app - especially if you are using BPM to
+build the app itself, you will want to see your changes in the browser 
+without having to constantly rebuild your app.  To do this you can use the
+`bpm preview` command.  
+
+Run this command from the root of your project and it will start a server on
+port 4020 that will simply load the files found in your project.  Any of the
+files found in the assets folder, however, will be automatically rebuilt from
+your installed packages on demand.  They will also be built in debug mode
+which means you will be able to see code uniminified, making things 
+far easier to debug.
+
+As an example, if you created a new app using bpm and then used bpm preview,
+you could just visit:
+
+    http://localhost:4020/index.html
+    
+To actually load the app in your browser.
+
+## REBUILDING
+
+If you have modified your app and you are ready to release it, you may want
+to do a new build in bpm to get the latest code.  You can use the
+`bpm rebuild` command for this.
 
 ## COPYRIGHT
 
@@ -26,6 +128,7 @@ bpm preview - allows you to preview the files. creates any needed files
 
 ## SEE ALSO
 
-bpm-add(1)  bpm-remove(1)
+bpm-add(1)  bpm-remove(1) bpm-rebuild(1) bpm-preview(1)
+
 
 
