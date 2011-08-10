@@ -249,11 +249,11 @@ module BPM
         paths.each do |path|
           name = options[:name] || File.basename(path)
 
-          # if someone specified both a name and path assume they meant 
-          # exactly what they said and don't normalize it.
+          # if someone specified both a name and path assume they meant
+          # exactly what they said
           if name == File.basename(path)
-            underscored = File.join(File.dirname(path), underscore(File.basename(path)))
-            path = underscored if !File.directory?(path)
+            new_path = File.join(File.dirname(path), File.basename(path))
+            path = new_path if !File.directory?(path)
           end
 
           if File.directory?(path)
@@ -412,14 +412,6 @@ module BPM
           spec = installed.find{|p| p.name == pkg_name }
           abort "Unable to find package: #{pkg_name}" unless spec
           BPM::Package.from_spec(spec)
-        end
-
-        def underscore(str)
-          str.gsub(/::/, '/').
-            gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-            gsub(/([a-z\d])([A-Z])/,'\1_\2').
-            tr("-", "_").
-            downcase
         end
 
     end

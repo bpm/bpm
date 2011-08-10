@@ -126,11 +126,11 @@ describe "bpm init on a non-existant directory" do
 
       files.each do |file|
         output.should =~ /create\s+#{file}$/
-        home("bpm_test", *file.split('/')).should exist
+        home("BpmTest", *file.split('/')).should exist
       end
 
       generated_files.each do |file|
-        home('bpm_test', *file.split('/')).should exist
+        home('BpmTest', *file.split('/')).should exist
       end
     end
 
@@ -140,7 +140,7 @@ describe "bpm init on a non-existant directory" do
       home("DifferentLocation").should exist
       home("DifferentLocation", "BpmTest.json").should exist
       home("DifferentLocation", "DifferentLocation.json").should_not exist
-      home("bpm_test").should_not exist
+      home("BpmTest").should_not exist
     end
 
   end
@@ -166,20 +166,20 @@ describe "bpm init on a non-existant directory" do
 
         files.each do |file|
           output.should =~ /create\s+#{file}$/
-          home("bpm_test", file).should exist
+          home("BpmTest", file).should exist
         end
       end
 
       it "should create custom app.js with explicit generator" do
         bpm 'init', 'BpmTest', '--package=custom_generator' and wait
 
-        File.read(home("bpm_test", "app.js")).should == "require('BpmTest/main.js')\n"
+        File.read(home("BpmTest", "app.js")).should == "require('BpmTest/main.js')\n"
       end
 
       it "should create custom project.json without explicit generator" do
         bpm 'init', 'BpmTest', '--package=core-test' and wait
 
-        File.read(home("bpm_test", "BpmTest.json")).should =~ /"core-test": "0.4.9"/
+        File.read(home("BpmTest", "BpmTest.json")).should =~ /"core-test": "0.4.9"/
       end
 
     end
@@ -196,7 +196,7 @@ describe "bpm init on a non-existant directory" do
       it "should add package as a dependency even if it doesn't have custom generator" do
         bpm 'init', 'BpmTest', '--package=jquery' and wait
 
-        File.read(home("bpm_test", "BpmTest.json")).should =~ /"dependencies": {\n\s+"jquery": "1.4.3"\n\s+}/
+        File.read(home("BpmTest", "BpmTest.json")).should =~ /"dependencies": {\n\s+"jquery": "1.4.3"\n\s+}/
       end
 
     end
