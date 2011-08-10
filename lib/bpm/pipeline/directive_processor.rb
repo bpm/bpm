@@ -45,3 +45,12 @@ module BPM
   end
   
 end
+
+
+# Fix bad regexp
+class Sprockets::DirectiveProcessor::Parser
+  remove_const :DIRECTIVE_PATTERN
+  DIRECTIVE_PATTERN = /
+    ^ [^\w=]* = \s* (\w+.*?) (\*\/)? $
+  /x
+end
