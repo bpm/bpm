@@ -32,7 +32,7 @@ module BPM
 
   class MinifierNotFoundError < PackageNotFoundError
     def format_message(minifier_name)
-      "Minifier package #{minifier_name} was not found.  Try running bpm update to refresh."
+      "Minifier package #{minifier_name} was not found.  Try running `bpm rebuild -u` to refresh."
     end
   end
   
