@@ -82,7 +82,7 @@ module BPM
     end
 
     def vendor_root(*paths)
-      File.join @root_path, 'vendor', *paths
+      File.join @root_path, 'packages', *paths
     end
     
     def internal_package_root(package_name=nil)
@@ -681,8 +681,8 @@ module BPM
 
     def locate_local_package(package_name)
       src_path = local_package_root package_name
-      unless File.directory?(src_path)
-        src_path = Dir[vendor_root('*','packages','*')].find do |path|
+      unless File.exists?(File.join(src_path, "package.json")) && File.directory?(src_path)
+        src_path = Dir[vendor_root('**','packages','*')].find do |path|
           File.basename(path)==package_name && File.directory?(path)
         end
       end

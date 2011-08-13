@@ -36,6 +36,40 @@ EOF
       file.should == expected
     end
   end
+  
+  
+  describe 'packages and projects in the packages directory' do
+    before do
+      goto_home
+      set_host
+      start_fake(FakeGemServer.new)
+      FileUtils.cp_r(fixtures('projects', 'with_packages_and_projects'), '.')
+      cd home('with_packages_and_projects')
+    end
+
+    it "should order the packages property with dependencies" do
+      bpm 'rebuild', '--mode=debug' # avoid minification.
+      wait
+
+      file = File.read home('with_packages_and_projects', 'assets', 'bpm_libs.js')
+      expected = <<EOF
+/* ===========================================================================
+   BPM Combined Asset File
+   MANIFEST: a (1.0.0) b (1.0.0) c (1.0.0)
+   This file is generated automatically by the bpm (http://www.bpmjs.org)
+   =========================================================================*/
+
+// HELLO C
+
+// HELLO B
+
+// HELLO A
+
+EOF
+
+      file.should == expected
+    end
+  end
 
   describe 'development dependencies' do
 

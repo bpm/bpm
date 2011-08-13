@@ -1,0 +1,17 @@
+{
+  "name":         "b",
+  "version":      "1.0.0",
+
+  "description":  "DESCRIPTION HERE",
+  "author":       "YOUR NAME HERE",
+  "homepage":     "URL",
+
+  "directories": {
+    "lib":        "lib",
+    "tests":      "tests"
+  },
+
+  "dependencies": {
+    "c": "1.0.0"
+  }
+}

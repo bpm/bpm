@@ -185,15 +185,13 @@ describe "bpm add using a vendor directory" do
     start_fake(FakeGemServer.new)
     FileUtils.cp_r project_fixture('hello_dev'), '.'
     FileUtils.mkdir_p home('hello_dev', 'vendor')
-    FileUtils.cp_r project_fixture('hello_world'), home('hello_dev', 'vendor', 'hello_world')
+    FileUtils.cp_r project_fixture('hello_world'), home('hello_dev', 'packages', 'hello_world')
     cd home('hello_dev')
   end
   
-  it "should include custom_package defined in a project found vendor" do
+  it "should include custom_package defined in a project found packages" do
     bpm 'add', 'custom_package' and wait
     
     File.read(home('hello_dev', 'assets', 'bpm_libs.js')).should include("custom_package (2.0.0)")
   end
-    
 end
-
