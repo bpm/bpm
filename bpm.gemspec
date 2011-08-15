@@ -16,13 +16,13 @@ Gem::Specification.new do |s|
   mswin = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
   mri = !mswin && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby")
 
-  s.add_dependency "libgems",      "~> 0.1.0"
+  s.add_dependency "libgems",      "~> 0.1.2"
   s.add_dependency "gemcutter",    "~> 0.6.1"
   s.add_dependency "highline",     "~> 1.6.1"
   s.add_dependency "json_pure",    "~> 1.4.6"
   s.add_dependency "thor",         "~> 0.14.3"
-  s.add_dependency "therubyracer", "~> 0.9.3beta1"
-  s.add_dependency "sprockets",    "~> 2.0.0.beta.12"
+  s.add_dependency "therubyracer", "~> 0.9.3"
+  s.add_dependency "sprockets",    "~> 2.0.0.beta.13"
 
   s.add_development_dependency "rspec"
   s.add_development_dependency "rack", "~> 1.3.2"
