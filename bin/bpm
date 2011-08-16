@@ -17,7 +17,7 @@ rescue Interrupt => e
 rescue Exception => e
   warn "Unfortunately, a fatal error has occurred. " +
     "Please report this error to the BPM issue tracker at " +
-    "https://gbpm/bpmm/issues so that we can fix it. Thanks!"
+    "https://github.com/bpm/bpm/issues so that we can fix it. Thanks!"
   puts e.inspect
   puts e.backtrace.join("\n")
   raise e
