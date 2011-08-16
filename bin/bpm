@@ -4,5 +4,22 @@ $:.unshift(lib) if File.exists?(lib)
 
 require 'bpm'
 
-BPM::CLI::Base.start
+begin
+  BPM::CLI::Base.start
+rescue BPM::Error => e
+  warn e.message
+  puts e.backtrace.join("\n") if ENV['DEBUG']
+  exit false
+rescue Interrupt => e
+  puts "\nQuitting..."
+  puts e.backtrace.join("\n") if ENV['DEBUG']
+  exit false
+rescue Exception => e
+  warn "Unfortunately, a fatal error has occurred. " +
+    "Please report this error to the BPM issue tracker at " +
+    "https://gbpm/bpmm/issues so that we can fix it. Thanks!"
+  puts e.inspect
+  puts e.backtrace.join("\n")
+  raise e
+end
 

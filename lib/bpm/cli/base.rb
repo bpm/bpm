@@ -44,11 +44,11 @@ module BPM
               end
             end
           rescue LibGems::InstallError => e
-            abort "Fetch error: #{e}"
+            raise BPM::Error.new("Fetch error: #{e}")
           rescue LibGems::GemNotFoundException => e
             abort "Can't find package #{e.name} #{e.version} available for fetch"
           rescue Errno::EACCES, LibGems::FilePermissionError => e
-            abort e.message
+            raise BPM::Error.new(e.message)
           end
         end
       end
@@ -90,12 +90,8 @@ module BPM
         # find project
         project = find_project
 
-        begin
-          project.add_dependencies deps, options[:development], true
-          project.build options[:mode], true
-        rescue BPM::Error => e
-          abort e.message
-        end
+        project.add_dependencies deps, options[:development], true
+        project.build options[:mode], true
       end
 
       desc "remove [PACKAGE]", "Remove one or more packages from a bpm project"
@@ -108,14 +104,10 @@ module BPM
           abort "You must specify at least one package"
         end
 
-        begin
-          project = find_project
-          project.unbuild options[:verbose]
-          project.remove_dependencies package_names, true
-          project.build options[:mode], true
-        rescue BPM::Error => e
-          abort e.message
-        end
+        project = find_project
+        project.unbuild options[:verbose]
+        project.remove_dependencies package_names, true
+        project.build options[:mode], true
       end
 
       desc "preview", "Preview server that will autocompile assets as you request them.  Useful for hacking"
@@ -135,8 +127,6 @@ module BPM
       def rebuild
         find_project.fetch_dependencies(true) if options[:update]
         find_project.build options[:mode].to_sym, true
-      rescue BPM::Error => e
-        abort e.message
       end
       
       desc "login", "Log in with your BPM credentials"
@@ -266,11 +256,7 @@ module BPM
             success = generator.new(self, name, path, template_path, package).run
             run_init(name, true, path, package) if success
           end
-          
         end
-      
-      rescue BPM::Error => e
-        abort e.message
       end
 
       desc "pack [PACKAGE]", "Build a bpm package from a package.json"
@@ -289,8 +275,6 @@ module BPM
           end
           abort failure_message
         end
-      rescue BPM::Error => e
-        abort e.message
       end
 
       desc "unpack [PACKAGE]", "Extract files from a bpm package"

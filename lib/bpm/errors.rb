@@ -14,7 +14,12 @@ module BPM
   class InvalidPackageError < BPM::Error
     def format_message(package, msg=nil)
       msg = msg.nil? ? '' : ": #{msg}"
-      "There was a problem parsing #{File.basename(package.json_path)}#{msg}"
+      path = begin
+        Pathname.new(package.json_path).relative_path_from(Pathname.new(Dir.pwd))
+      rescue
+        package.json_path
+      end
+      "There was a problem parsing #{path}#{msg}"
     end
   end
   
