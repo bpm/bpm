@@ -50,7 +50,7 @@ describe 'bpm add' do
     output.should include("Added package 'coffee' (1.0.1.pre)")
     output.should include("Added package 'jquery' (1.4.3)")
 
-    has_dependency 'coffee', '1.0.1.pre', '>= 0-pre'
+    has_dependency 'coffee', '1.0.1.pre', '>= 0.pre'
     has_soft_dependency 'jquery', '1.4.3'
   end
 
@@ -111,13 +111,13 @@ describe 'bpm add' do
     wait
     output = stdout.read
     output.should include("Added package 'bundler' (1.1.pre)")
-    has_dependency 'bundler', '1.1.pre', '>= 0-pre'
+    has_dependency 'bundler', '1.1.pre', '>= 0.pre'
   end
 
   it "does not add the normal package when asking for a prerelease" do
     bpm "add", "rake", "--pre", :track_stderr => true
     wait
-    stderr.read.should == "Could not find eligible package for 'rake' (>= 0-pre)\n"
+    stderr.read.should == "Could not find eligible package for 'rake' (>= 0.pre)\n"
     no_dependency 'rake'
   end
 
@@ -152,6 +152,16 @@ describe 'bpm add' do
     output = stderr.read
     output.should include("'custom_package' (2.0.0) is not compatible")
     no_dependency 'custom_package'
+  end
+
+  it "should add local prerelease package" do
+    no_dependency 'prerelease_package'
+
+    bpm "add", "prerelease_package", "--pre"
+    output = stdout.read
+
+    output.should include("Using local package 'prerelease_package'")
+    has_dependency 'prerelease_package', '1.0.0.pre', '>= 0.pre'
   end
 
   it "should work with .bpkg file" do

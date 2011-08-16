@@ -535,6 +535,7 @@ module BPM
 
       until search_list.empty?
         name, version = search_list.shift
+        version = check_version(version)
         next if seen.include?(name)
         seen << name
 
@@ -571,8 +572,9 @@ module BPM
     # Fetch a single dependency into local cache
 
     def core_fetch_dependency(package_name, vers, type, verbose)
+      vers = check_version(vers)
       prerelease = false
-      if vers == '>= 0-pre'
+      if vers == '>= 0.pre'
         prerelease = true
         vers = '>= 0'
       else
@@ -697,7 +699,8 @@ module BPM
       # It's true that we don't have a prerelase check here, but the
       # previous one we had didn't do anything, so it's better to have
       # none than one that doesn't work
-      vers = ">= 0" if vers == ">= 0-pre"
+      vers = check_version(vers)
+      vers = ">= 0" if vers == ">= 0.pre"
       src_path = local ? locate_local_package(package_name) :  
                          BPM::Local.new.source_root(package_name, vers)
 
@@ -843,6 +846,14 @@ module BPM
         next if !ignore_excludes && project_settings_excludes(dep.name, target_name)
         merge_build_opts ret, dep.name, target_name, opts, mode
       end
+    end
+
+    def check_version(vers)
+      if vers == '>= 0-pre'
+        warn "[DEPRECATION] Use '>= 0.pre' in your JSON config instead of '>= 0-pre'."
+        vers = '>= 0.pre'
+      end
+      vers
     end
 
   end

@@ -78,7 +78,7 @@ module BPM
 
           deps = {}
           package_names.each do |name|
-            vers = options[:version] || (options[:prerelease] ? '>= 0-pre' : '>= 0')
+            vers = options[:version] || (options[:prerelease] ? '>= 0.pre' : '>= 0')
             if name =~ /^(.+?)(-(\d[\w\.]*))?\.bpkg$/
               name = $1
               vers = $3 if $3
