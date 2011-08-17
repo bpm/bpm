@@ -12,15 +12,17 @@ module SpecHelpers
     @pid = Process.fork do
       Dir.chdir opts[:chdir] if opts[:chdir]
 
-      @stdout.close
-      STDOUT.reopen @stdout_child
+      unless ENV['DEBUG_CLI']
+        @stdout.close
+        STDOUT.reopen @stdout_child
 
-      @stdin.close
-      STDIN.reopen @stdin_child
+        @stdin.close
+        STDIN.reopen @stdin_child
 
-      if opts[:track_stderr]
-        @stderr.close
-        STDERR.reopen @stderr_child
+        if opts[:track_stderr]
+          @stderr.close
+          STDERR.reopen @stderr_child
+        end
       end
 
       env.each do |key, val|
