@@ -451,6 +451,14 @@ module BPM
         end
       end
 
+      # Tell if given version is satisfied by the passed version
+
+      def satisfied_by?(req_vers, new_vers)
+        req = LibGems::Requirement.new(req_vers)
+        req_vers.sub(/^= /,'') == new_vers.sub(/^= /,'') ||
+        req.satisfied_by?(LibGems::Version.new(new_vers))
+      end
+
       def validate_paths
         success = true
 
