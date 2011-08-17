@@ -77,14 +77,42 @@ module BPM
       deps.merge(dependencies_build)
     end
 
-    def local_package_root(package_name=nil)
-      File.join([@root_path, 'packages', package_name].compact)
+    def vendor_root
+      File.join @root_path, 'vendor'
     end
 
-    def vendor_root(*paths)
-      File.join @root_path, 'vendor', *paths
+    def vendored_projects
+      @vendored_projects ||= begin
+        Dir.glob(File.join(vendor_root, '*')).
+          select{|p| Project.is_project_root?(p) }.
+          map{|p| Project.new(p) }
+      end
     end
-    
+
+    def vendored_packages
+      @vendored_packages ||= begin
+        # Packages path is deprecated
+        packages_path = File.join(@root_path, 'packages')
+        search_paths = [vendor_root, packages_path]
+        paths = search_paths.map{|p| Dir.glob(File.join(p, '*')) }.flatten
+        pkgs = paths.select{|p| Package.is_package_root?(p) }.map{|p| Package.new(p) }
+        if pkgs.any?{|p| p.root_path =~ /^#{Regexp.escape(packages_path)}\// }
+          warn "[DEPRECATION] Use the vendor directory instead of the packages directory for #{root_path}"
+        end
+        pkgs += vendored_projects.map{|p| p.vendored_packages }.flatten
+        pkgs.each{|p| p.load_json }
+        pkgs
+      end
+    end
+
+    def find_vendored_project(name)
+      vendored_projects.find{|p| p.name == name }
+    end
+
+    def find_vendored_package(name)
+      vendored_packages.find{|p| p.name == name }
+    end
+
     def internal_package_root(package_name=nil)
       File.join([@root_path, BPM_DIR, 'packages', package_name].compact)
     end
@@ -502,7 +530,7 @@ module BPM
     # Tell if package is vendored
 
     def has_local_package?(package_name)
-      !!locate_local_package(package_name)
+      !!find_vendored_package(package_name)
     end
 
 
@@ -539,9 +567,8 @@ module BPM
         next if seen.include?(name)
         seen << name
 
-        package_root = locate_local_package(name)
-        if package_root
-          pkg = BPM::Package.new(package_root)
+        pkg = find_vendored_package(name)
+        if pkg
           pkg.load_json
 
           unless satisfied_by?(version, pkg.version)
@@ -672,33 +699,26 @@ module BPM
     end
 
 
-    def locate_local_package(package_name)
-      src_path = local_package_root package_name
-      unless File.directory?(src_path)
-        src_path = Dir[vendor_root('*','packages','*')].find do |path|
-          File.basename(path)==package_name && File.directory?(path)
-        end
-      end
-      src_path
-    end
-
     # Find package locally or in global cache
 
     def locate_package(package_name, vers, verbose)
-      local = has_local_package?(package_name)
-      
-      # It's true that we don't have a prerelase check here, but the
-      # previous one we had didn't do anything, so it's better to have
-      # none than one that doesn't work
-      vers = check_version(vers)
-      vers = ">= 0" if vers == ">= 0.pre"
-      src_path = local ? locate_local_package(package_name) :  
-                         BPM::Local.new.source_root(package_name, vers)
+      pkg = find_vendored_package(package_name)
+      # FIXME: Make sure that local packages match specified version as well
 
-      return nil unless src_path
+      unless pkg
+        # It's true that we don't have a prerelase check here, but the
+        # previous one we had didn't do anything, so it's better to have
+        # none than one that doesn't work
+        vers = check_version(vers)
+        vers = ">= 0" if vers == ">= 0.pre"
 
-      pkg = BPM::Package.new(src_path)
-      pkg.load_json # throws exception if json invalid
+        src_path = BPM::Local.new.source_root(package_name, vers)
+        pkg = BPM::Package.new(src_path) if src_path # Do we need this check?
+        pkg.load_json if pkg
+      end
+
+      return nil unless pkg
+
       pkg
     end
 

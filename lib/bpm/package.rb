@@ -415,21 +415,27 @@ module BPM
 
     # TODO: Make better errors
     # TODO: This might not work well with conflicting versions
-    def local_deps(search_path=nil)
-      search_path ||= File.join(root_path, "packages")
+    def local_deps(search_paths=nil)
+      # Using the packages directory is deprecated
+      packages_path = File.join(root_path, "packages")
+      search_paths ||= [File.join(root_path, "vendor"), packages_path]
 
       dependencies.inject([]) do |list, (name, version)|
-        package = Package.new(File.join(search_path, name))
-        requirement = LibGems::Requirement.new(version)
-        if package.has_json?
-          package.load_json
-        else
-          raise "Can't find package #{name} required in #{self.name}"
+        packages = search_paths.map{|p| Package.new(File.join(p, name)) }.select{|p| p.has_json? }
+
+        raise "Can't find package #{name} required in #{self.name}" if packages.empty?
+
+        if packages.any?{|p| p.root_path =~ /^#{Regexp.escape(packages_path)}\// }
+          warn "[DEPRECATION] Use the vendor directory instead of the packages directory for #{root_path}"
         end
-        unless requirement.satisfied_by?(LibGems::Version.new(package.version))
+
+        packages.each{|p| p.load_json }
+
+        unless satisfied_by?(version, package.version)
           raise "#{name} (#{package.version}) doesn't match #{version} required in #{self.name}"
         end
-        (package.local_deps(search_path) << package).each do |dep|
+
+        (package.local_deps(search_paths) << package).each do |dep|
           list << dep unless list.any?{|d| d.name == dep.name }
         end
         list
