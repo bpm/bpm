@@ -615,7 +615,7 @@ module BPM
       end
 
       Dir[File.join(install_root, '*')].map do |package_name|
-        pkg = BPM::Package.new package_name
+        pkg = BPM::Package.new(package_name)
         pkg.load_json
         pkg
       end

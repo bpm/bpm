@@ -14,7 +14,7 @@ module BPM
       cur_pwd = Dir.pwd
 
       FileUtils.cd package_path if package_path != cur_pwd
-      package = BPM::Package.new(nil, email || creds.email)
+      package = BPM::Package.new(nil, :email => (email || creds.email), :standalone => true)
       package.json_path = File.basename path
       
       

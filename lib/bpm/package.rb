@@ -48,14 +48,15 @@ module BPM
       pkg
     end
 
-    def initialize(root_path=nil, email = "")
+    def initialize(root_path=nil, config={})
       @root_path   = root_path || Dir.pwd
       @json_path   = File.join @root_path, 'bpm_package.json'
       unless File.exists? @json_path
         @json_path   = File.join @root_path, 'package.json'
       end
       
-      @email       = email
+      @email       = config[:email]
+      @standalone  = config[:standalone]
       @errors      = []
       # Set defaults
       FIELDS.keys.each{|f| send("#{c2u(f)}=", fd(f))}
@@ -245,6 +246,10 @@ module BPM
       generator
     end
 
+    def standalone?
+      !!@standalone
+    end
+
     def validate
       validate_fields && validate_version && validate_paths && validate_summary && validate_homepage
     end
@@ -258,12 +263,15 @@ module BPM
     end
 
     def validate_name_and_path
-      filename = File.basename(root_path)
-      unless name.nil? || name.empty? || filename==name || filename=="#{name}-#{version}"
-        raise BPM::InvalidPackageNameError.new self
+      # Currently we're only validating this for vendored packages
+      return if standalone?
+
+      dirname = File.basename(root_path)
+      unless name.nil? || name.empty? || dirname == name || (version && dirname == "#{name}-#{version}")
+        raise BPM::InvalidPackagePathError.new(self)
       end
     end
-    
+
     def load_json
       begin
         json = JSON.parse(File.read(@json_path))

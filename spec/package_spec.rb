@@ -21,7 +21,7 @@ describe BPM::Package, "#to_spec" do
   end
 
   subject do
-    package = BPM::Package.new(nil, email)
+    package = BPM::Package.new(nil, :email => email)
     package.json_path = package_fixture("core-test", "package.json")
     if spec = package.to_spec
       spec
@@ -194,7 +194,7 @@ describe BPM::Package, "validation errors" do
   end
 
   subject do
-    BPM::Package.new(nil, email)
+    BPM::Package.new(nil, :email => email)
   end
 
   def write_package
@@ -316,7 +316,7 @@ describe BPM::Package, "validation errors" do
 
 end
 
-describe BPM::Package, 'InvalidPackageError' do
+describe BPM::Package, 'InvalidPackagePathError' do
   
   it "should raise exception when loading invalid JSON" do
     package = BPM::Package.new(package_fixture('invalid_json'))
@@ -339,9 +339,19 @@ describe BPM::Package, 'InvalidPackageError' do
     package = BPM::Package.new home('jquery2')
     lambda {
       package.load_json
-    }.should raise_error(BPM::InvalidPackageNameError)
+    }.should raise_error(BPM::InvalidPackagePathError)
   end
-  
+
+  it "should not raise exception for standalone packages" do
+    goto_home
+    FileUtils.cp_r package_fixture('jquery'), 'jquery2'
+    package = BPM::Package.new home('jquery2'), :standalone => true
+    lambda {
+      package.load_json
+    }.should_not raise_error
+  end
+
+
 end
 
 describe BPM::Package, "templates" do

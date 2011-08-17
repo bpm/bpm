@@ -23,7 +23,7 @@ module BPM
     end
   end
   
-  class InvalidPackageNameError < BPM::InvalidPackageError
+  class InvalidPackagePathError < BPM::InvalidPackageError
     def format_message(package)
       "Package at #{package.root_path} name and directory do not match. (name: #{package.name}).  Change the directory or package.json name to match."
     end

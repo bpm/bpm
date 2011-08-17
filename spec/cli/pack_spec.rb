@@ -25,6 +25,16 @@ describe "bpm pack" do
       package.spec.version.should == LibGems::Version.new("0.4.9")
       package.spec.email.should == email
     end
+
+    it "should not complain about different directories" do
+      FileUtils.cp_r package_fixture("core-test"), "custom-path"
+      cd "custom-path"
+      bpm "pack"
+
+      exit_status.should be_success
+      stdout.read.should include("Successfully built package: core-test-0.4.9.bpkg")
+    end
+
   end
   
   describe "without logging in" do
