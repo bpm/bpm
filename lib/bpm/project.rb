@@ -100,8 +100,13 @@ module BPM
           warn "[DEPRECATION] Use the vendor directory instead of the packages directory for #{root_path}"
         end
         pkgs += vendored_projects.map{|p| p.vendored_packages }.flatten
-        pkgs.each{|p| p.load_json }
-        pkgs
+        pkgs.select do |p|
+          begin
+            p.load_json
+          rescue BPM::InvalidPackageError
+            false
+          end
+        end
       end
     end
 
