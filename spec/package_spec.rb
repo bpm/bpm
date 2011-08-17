@@ -1,5 +1,15 @@
 require "spec_helper"
 
+describe "BPM::Package class" do
+  it "should create from_spec"
+
+  it "should tell if package root" do
+    BPM::Package.is_package_root?(fixtures('packages', 'backbone')).should be_true
+    BPM::Package.is_package_root?(fixtures('projects', 'hello_world')).should be_false
+    BPM::Package.is_package_root?(fixtures('packages', 'non_existent')).should be_false
+  end
+end
+
 describe BPM::Package do
   it "should have 'lib' as default lib_path'" do
     subject.send(:lib_path).should == 'lib'

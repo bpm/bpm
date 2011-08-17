@@ -47,6 +47,10 @@ module BPM
       pkg
     end
 
+    def self.is_package_root?(path)
+      File.exists?(File.join(path, 'bpm_package.json')) || File.exists?(File.join(path, 'package.json'))
+    end
+
     def initialize(root_path=nil, config={})
       @root_path   = root_path || Dir.pwd
       @json_path   = File.join @root_path, 'bpm_package.json'
