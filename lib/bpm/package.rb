@@ -19,7 +19,6 @@ module BPM
       "author"      => :string,
       "homepage"    => :string,
       "summary"     => :string,
-      "url"         => :string,
       "dependencies"             => :hash,
       "dependencies:development" => :hash,
       "bpm:build"         => :hash,
@@ -35,7 +34,7 @@ module BPM
     # Fields that should be bundled up into JSON in the gemspec
     METADATA_FIELDS = %w[keywords licenses engines main bin directories pipeline bpm:build]
 
-    REQUIRED_FIELDS = %w[name author version]
+    REQUIRED_FIELDS = %w[name version summary]
 
     attr_accessor *FIELDS.keys.map{|f| f.gsub(':', '_') }
 
@@ -67,16 +66,16 @@ module BPM
       LibGems::Specification.new do |spec|
         SPEC_FIELDS.each{|f| spec.send("#{f}=", send(f)) }
         spec.version      = version
-        spec.authors      = [author]
+        spec.authors      = [author] if author
         spec.files        = directory_files + ["package.json"]
         spec.test_files   = glob_files(tests_path)
         spec.bindir       = bin_path
         spec.licenses     = licenses.map{|l| l["type"]}
         spec.executables  = bin_files.map{|p| File.basename(p) } if bin_path
 
-        spec.homepage     = self.homepage || self.url
-        spec.description  = self.description || self.summary
-        spec.summary      = self.summary || self.description
+        spec.homepage     = self.homepage
+        spec.summary      = self.summary
+        spec.description  = self.description if self.description
 
         metadata = Hash[METADATA_FIELDS.map{|f| [f, send(c2u(f)) ] }]
         spec.requirements = [metadata.to_json]
@@ -251,7 +250,7 @@ module BPM
     end
 
     def validate
-      validate_fields && validate_version && validate_paths && validate_summary && validate_homepage
+      validate_fields && validate_version && validate_paths
     end
 
     def valid?
@@ -493,25 +492,6 @@ module BPM
         end
       end
 
-      def validate_summary
-        if (summary.nil? || summary.empty?) && (description.nil? || description.empty?)
-          add_error "Package requires a 'summary' field"
-          add_error "Package requires a 'description' field"
-          false
-        else
-          true
-        end
-      end
-      
-      def validate_homepage
-        if (homepage.nil? || homepage.empty?) && (url.nil? || url.empty?)
-          add_error "Package requires a 'homepage' field"
-          false
-        else
-          true
-        end
-      end
-      
       def add_error(message)
         self.errors << message unless self.errors.include?(message)
       end

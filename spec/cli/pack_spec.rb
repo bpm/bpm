@@ -109,11 +109,6 @@ describe "bpm pack" do
       exit_status.should be_success
     end
   
-    it "implies the summary field" do
-      package = LibGems::Format.from_file_by_path("backbone-0.5.1.bpkg")
-      package.spec.summary.should == package.spec.description
-    end
-  
     it "gets name and version" do
       package = LibGems::Format.from_file_by_path("backbone-0.5.1.bpkg")
       package.spec.name.should == "backbone"

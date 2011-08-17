@@ -207,27 +207,10 @@ describe BPM::Package, "validation errors" do
     subject.json_path = path
   end
 
-  %w[name description summary homepage author version].each do |field|
+  %w[name summary version].each do |field|
     it "is invalid without a #{field} field" do
       write_package do |package|
-        if %w(description summary).include?(field)
-          package.delete 'description'
-          package.delete 'summary'
-        else
-          package.delete(field)
-        end
-      end
-
-      subject.should have_error("Package requires a '#{field}' field")
-    end
-
-    it "is invalid with a blank #{field} field" do
-      write_package do |package|
-        if %w(description summary).include?(field)
-          package['description'] = package['summary'] = ''
-        else
-          package[field] = ''
-        end
+        package.delete(field)
       end
 
       subject.should have_error("Package requires a '#{field}' field")
