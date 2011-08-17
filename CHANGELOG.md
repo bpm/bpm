@@ -1,3 +1,24 @@
+# 1.0.0.beta.13
+
+  * Updated to latest LibGems with bug fixes
+  * Improved error messages
+
+# 1.0.0.beta.12
+
+  * Updated to Rack 1.3.2
+  * Removed old references to bpm:formats
+  * Added wiki link
+
+# 1.0.0.beta.11
+
+  * Moved JSON transport and minifiers into bpm:provides
+  * Documentation updates and fixes - Fixes #3
+  * Updated options and fixed tests
+
+# 1.0.0.beta.10
+
+  * Updated documentation
+  * Switched to GetBPM.org
 
 # 1.0.0.beta.9
 
