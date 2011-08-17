@@ -75,7 +75,7 @@ describe 'bpm remove' do
     output = stdout.read
     
     no_dependency 'custom_package'
-    File.exists?(home('hello_world', 'packages', 'custom_package', 'package.json')).should be_true
+    File.exists?(home('hello_world', 'vendor', 'custom_package', 'package.json')).should be_true
   end
   
   it "should remove development dependencies"

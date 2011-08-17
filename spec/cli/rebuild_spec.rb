@@ -79,7 +79,7 @@ EOF
 
       css_dev = [
         # css of a locally installed development dependency
-        %w(packages style_package css some_style.css)
+        %w(vendor style_package css some_style.css)
       ]
 
       if should_include

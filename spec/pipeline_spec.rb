@@ -70,11 +70,11 @@ describe BPM::Pipeline, "asset_path" do
       end
     
       it "should include any required modules in the bpm_package.js" do
-        subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'lib', 'main.js')))
+        subject.to_s.should include(File.read(home('hello_world', 'vendor', 'custom_package', 'lib', 'main.js')))
       end
     
       it "should reference package.json directories when resolving modules" do
-        subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'custom_dir', 'basic-module.js')))
+        subject.to_s.should include(File.read(home('hello_world', 'vendor', 'custom_package', 'custom_dir', 'basic-module.js')))
       end
     
     end
@@ -90,7 +90,7 @@ describe BPM::Pipeline, "asset_path" do
       end
     
       it "should include any required modules in the bpm_styles.css" do
-        subject.to_s.should include(File.read(home('hello_world', 'packages', 'custom_package', 'css', 'sample_styles.css')))
+        subject.to_s.should include(File.read(home('hello_world', 'vendor', 'custom_package', 'css', 'sample_styles.css')))
       end
       
       it "should reference installed package styles as well" do

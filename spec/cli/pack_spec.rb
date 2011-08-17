@@ -125,11 +125,11 @@ describe "bpm pack" do
   describe "package with plugins" do
     before do
       goto_home
-      FileUtils.cp_r project_fixture('coffee', 'packages'), '.'
+      FileUtils.cp_r project_fixture('coffee', 'vendor'), '.'
     end
     
     it "should pack transports" do
-      cd home('packages', 'spade')
+      cd home('vendor', 'spade')
       bpm "pack" and wait
       puts stdout.read
       exit_status.should be_success
