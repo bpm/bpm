@@ -1,0 +1,16 @@
+{
+  "directories": {
+    "lib": "lib",
+    "tests": "tests"
+  },
+  "name": "with_packages_and_projects",
+  "version": "0.0.1",
+  "description": "DESCRIPTION HERE",
+  "author": "YOUR NAME HERE",
+  "homepage": "URL",
+  "summary": null,
+  "dependencies": {
+    "a": ">= 0"
+  },
+  "bpm": "1.0.0.beta.1.pre"
+}
