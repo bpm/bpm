@@ -48,7 +48,7 @@ end
 
 
 # Fix bad regexp
-class Sprockets::DirectiveProcessor::Parser
+class Sprockets::DirectiveProcessor
   remove_const :DIRECTIVE_PATTERN
   DIRECTIVE_PATTERN = /
     ^ [^\w=]* = \s* (\w+.*?) (\*\/)? $
