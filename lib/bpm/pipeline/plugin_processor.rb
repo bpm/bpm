@@ -35,11 +35,9 @@ module BPM
 
       filepath   = file.to_s
 
-      #ctx["DATA"]  = data
-      #ctx["CTX"]   = BPM::PluginContext.new(pkg, module_id)
       plugin_context = BPM::PluginContext.new(pkg, module_id);
       minifier_js = plugin_context.minify_as_js;
-      
+
       # CTX.additionalContext is the minifier's execution environment
       plugin_ctx += <<-end_eval
           ; // Safety

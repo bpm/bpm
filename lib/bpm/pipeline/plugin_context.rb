@@ -11,10 +11,6 @@ module BPM
       @moduleId = module_id
     end
 
-    def minify(body)
-      @generating_asset ? @generating_asset.minify_body(body) : body
-    end
-
     def minify_as_js
       @generating_asset ? @generating_asset.minify_as_js : "function(body) { return body;}"
     end

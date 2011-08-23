@@ -182,16 +182,6 @@ module BPM
       asset = BPM::PluginAsset.new(self, logical_path)
       plugin_text = asset.to_s
 
-=begin
-      V8::Context.new do |ctx|
-        ctx['window'] = ctx # make browser-like environment
-        ctx['console'] = BPM::Console.new
-
-        ctx['BPM_PLUGIN'] = {}
-        ctx.eval plugin_text
-      end
-=end
-
       # TODO: Add Console if supported
       # pretty much need the window={} definition otherwise the minifier hash is borked
 

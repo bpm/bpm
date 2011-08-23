@@ -43,7 +43,7 @@ module BPM
           raise MinifierNotFoundError.new(minifier_name)
         end
         plugin_ctx = environment.plugin_js_for minifier_plugin_name
-        
+
         plugin_ctx += <<-end_eval
           ; // Safety
           CTX.minify = function(body) { return BPM_PLUGIN.minify(body); };
@@ -56,7 +56,6 @@ module BPM
     end
 
     def minify_body(data)
-
       project = environment.project
       minifier_name = project.minifier_name asset_name
       minifier_name = minifier_name.keys.first if minifier_name
@@ -82,8 +81,6 @@ module BPM
           data   = data[header.size..-1]
         end
 
-        #plugin_ctx["CTX"]  = BPM::PluginContext.new(pkg)
-        #plugin_ctx["DATA"] = data
         plugin_ctx += <<-end_eval
           ; // Safety
           CTX = #{BPM::PluginContext.new(pkg).to_json};
