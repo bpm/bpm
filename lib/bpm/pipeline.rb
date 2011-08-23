@@ -193,10 +193,12 @@ module BPM
 =end
 
       # TODO: Add Console if supported
+      # pretty much need the window={} definition otherwise the minifier hash is borked
 
       return <<-end_eval
-BPM_PLUGIN = {};
-#{plugin_text}
+        window={};
+        if (typeof BPM_PLUGIN === 'undefined') BPM_PLUGIN={};
+        #{plugin_text}
       end_eval
     end
 

@@ -28,6 +28,33 @@ module BPM
       (ret && ret['bpm:settings']) || {}
     end
 
+    def minify_as_js
+      project = environment.project
+      minifier_name = project.minifier_name asset_name
+      minifier_name = minifier_name.keys.first if minifier_name
+
+      if minifier_name && content_type == 'application/javascript'
+        pkg = project.package_from_name minifier_name
+        if pkg.nil?
+          raise MinifierNotFoundError.new(minifier_name)
+        end
+        minifier_plugin_name = pkg.provided_minifier
+        if minifier_plugin_name.nil?
+          raise MinifierNotFoundError.new(minifier_name)
+        end
+        plugin_ctx = environment.plugin_js_for minifier_plugin_name
+        
+        plugin_ctx += <<-end_eval
+          ; // Safety
+          CTX.minify = function(body) { return BPM_PLUGIN.minify(body); };
+        end_eval
+
+      end
+      #Return a default (noop) minifier if none if defined      
+      plugin_ctx = "CTX.minify=function(body) { return body; }" unless plugin_ctx;
+      plugin_ctx
+    end
+
     def minify_body(data)
 
       project = environment.project
