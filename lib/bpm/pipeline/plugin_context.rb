@@ -15,6 +15,10 @@ module BPM
       @generating_asset ? @generating_asset.minify_body(body) : body
     end
 
+    def minify_as_js
+      @generating_asset ? @generating_asset.minify_as_js : "function(body) { return body;}"
+    end
+
     def settings
       @generating_asset ? @generating_asset.build_settings : {}
     end

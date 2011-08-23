@@ -37,15 +37,19 @@ module BPM
 
       #ctx["DATA"]  = data
       #ctx["CTX"]   = BPM::PluginContext.new(pkg, module_id)
+      plugin_context = BPM::PluginContext.new(pkg, module_id);
+      minifier_js = plugin_context.minify_as_js;
+      
+      # CTX.additionalContext is the minifier's execution environment
       plugin_ctx += <<-end_eval
-        ; // Safety
-        CTX = #{BPM::PluginContext.new(pkg, module_id).to_json};
-        CTX.minify = function(body){ return body; };
-        DATA = #{data.to_json};
+          ; // Safety
+          CTX = #{plugin_context.to_json};
+          DATA = #{data.to_json};
+          CTX.additionalContext=#{minifier_js};
       end_eval
-
       ctx = ExecJS.compile(plugin_ctx)
       ctx.eval("BPM_PLUGIN.#{self.class.method_name}(DATA, CTX, '#{filepath}')")
+
     end
 
   end
