@@ -1,3 +1,16 @@
+# 1.0.0.beta.14
+
+  * Switched from therubyracer to execjs, should provide Windows support
+  * Don't blow up when encountering invalid vendored packages
+  * Better error handling for CLI
+  * Added flag for easier debugging
+  * Allow packages to be put in vendor directory - Fixes #14
+  * Cleanup Package fields
+  * Allow packages to be developed in directories without matching names
+  * Fix prerelease flag for local packages - Fixes #16
+  * Bpm Init no longer changes folder name - Fixes #13
+  * Patched Sprockets directive bug
+
 # 1.0.0.beta.13
 
   * Updated to latest LibGems with bug fixes
