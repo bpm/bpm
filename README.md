@@ -50,4 +50,4 @@ still incomplete.
 
 # Additional Documentation
 
-https://github.com/getbpm/bpm/wiki
+https://github.com/bpm/bpm/wiki
