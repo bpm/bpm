@@ -14,14 +14,12 @@ rescue Interrupt => e
   puts "\nQuitting..."
   puts e.backtrace.join("\n") if ENV['DEBUG']
   exit false
-rescue SystemExit
-  # Let it run its course, we just don't want it to get caught by the catch all
+rescue SystemExit => e
+  exit e.status
 rescue Exception => e
   warn "Unfortunately, a fatal error has occurred. " +
     "Please report this error to the BPM issue tracker at " +
     "https://github.com/bpm/bpm/issues so that we can fix it. Thanks!"
-  puts e.inspect
-  puts e.backtrace.join("\n")
   raise e
 end
 
