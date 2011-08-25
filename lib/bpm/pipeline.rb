@@ -192,6 +192,14 @@ module BPM
       end_eval
     end
 
+    # MEGAHAX!!!!
+    def find_asset(*)
+      asset = super
+      # The way BPM is set up we need to call build_source
+      asset.send(:build_source) if asset
+      asset
+    end
+
   end
 
 end
