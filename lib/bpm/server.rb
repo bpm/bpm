@@ -5,14 +5,21 @@ module BPM
 
   class Server < Rack::Server
 
-    def initialize(project, options=nil)
+    def initialize(project, options={})
+      options = default_options.merge(options)
       @project = project
-      @mode    = (options && options[:mode]) || :debug
+      @mode    = options[:mode] || :debug
       super options
     end
 
     def self.start(project, options=nil)
       new(project, options).start
+    end
+
+    def start
+      super
+    rescue Errno::EADDRINUSE
+      raise BPM::Error, "Port #{options[:Port]} is already in use. Please use --port to specify a different port."
     end
 
     attr_reader :project
