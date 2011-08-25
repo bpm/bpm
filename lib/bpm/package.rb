@@ -469,15 +469,10 @@ module BPM
         success = true
 
         paths = [*lib_path]
-        if paths.empty?
-          add_error "A lib directory is required"
+        non_dirs = paths.reject{|p| File.directory?(File.join(root_path, p))}
+        unless non_dirs.empty?
+          add_error "#{non_dirs.map{|p| "'#{p}'" }.join(", ")}, specified for lib directory, is not a directory"
           success = false
-        else
-          non_dirs = paths.reject{|p| File.directory?(File.join(root_path, p))}
-          unless non_dirs.empty?
-            add_error "#{non_dirs.map{|p| "'#{p}'" }.join(", ")}, specified for lib directory, is not a directory"
-            success = false
-          end
         end
 
         # look for actual 'tests' in directories hash since simply having no
