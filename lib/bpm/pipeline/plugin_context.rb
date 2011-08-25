@@ -12,7 +12,7 @@ module BPM
     end
 
     def minify_as_js
-      @generating_asset ? @generating_asset.minify_as_js : "function(body) { return body;}"
+      @generating_asset ? @generating_asset.minify_as_js : "CTX.minify=function(body) { return body; }"
     end
 
     def settings
