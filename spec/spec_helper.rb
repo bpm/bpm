@@ -69,14 +69,15 @@ RSpec.configure do |config|
 
   config.include SpecHelpers
 
-  config.around do |blk|
+  config.before do
     reset!
+  end
 
-    blk.call
-
+  config.after do
     kill!
     stop_fake
     reset_host
+    reset_env
     Dir.chdir working_dir if Dir.pwd != working_dir
   end
 end

@@ -64,7 +64,7 @@ module BPM
     end
 
     def attributes_for(path)
-      if path.to_s[File.join(project.root_path, '.bpm')] ||  !Pathname.new(path).absolute?
+      if path.to_s[File.join(project.root_path, BPM_DIR)] ||  !Pathname.new(path).absolute?
         return super(path)
       end
 

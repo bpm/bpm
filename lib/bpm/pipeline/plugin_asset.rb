@@ -8,7 +8,7 @@ module BPM
   class PluginAsset < BPM::GeneratedAsset
 
     def initialize(environment, module_name)
-      pathname = Pathname.new(File.join(environment.project.root_path, '.bpm', 'plugins', module_name+'.js'))
+      pathname = Pathname.new(File.join(environment.project.root_path, BPM_DIR, 'plugins', module_name+'.js'))
       
       unless File.exists? pathname
         FileUtils.mkdir_p File.dirname(pathname)

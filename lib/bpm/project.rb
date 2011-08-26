@@ -488,18 +488,7 @@ module BPM
 
     # Verifies that packages are available to meet all the dependencies
     def rebuild_dependency_list(deps=nil, verbose=false)
-
-      found = find_dependencies(deps, verbose)
-
-      install_root = self.internal_package_root
-      FileUtils.rm_r install_root if File.exists? install_root
-      FileUtils.mkdir_p install_root
-
-      found.each do |pkg|
-        dst_path = File.join(install_root, pkg.name)
-        FileUtils.ln_s pkg.root_path, dst_path
-      end
-
+      @dependency_list = find_dependencies(deps, verbose)
       @local_deps = nil
     end
 
@@ -639,15 +628,12 @@ module BPM
     # Pass +false+ to prevent the list from being rebuilt
 
     def build_local_dependency_list(force=true)
-      install_root = self.internal_package_root
-
-      unless File.exists?(install_root)
+      unless @dependency_list
         return nil unless force
         rebuild_dependency_list
       end
 
-      Dir[File.join(install_root, '*')].map do |package_name|
-        pkg = BPM::Package.new(package_name)
+      @dependency_list.each do |pkg|
         pkg.load_json
         pkg
       end

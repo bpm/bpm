@@ -63,6 +63,7 @@ module SpecHelpers
     env["HOME"] = home.to_s
     env["BPM_HOME"] = bpm_dir.to_s
     env["BPM_PATH"] = bpm_dir.to_s
+    load_env
     LibGems.clear_paths
   end
 

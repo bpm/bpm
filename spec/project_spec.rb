@@ -181,7 +181,7 @@ describe BPM::Project, "package_and_module_from_path" do
 
   subject do
     proj = BPM::Project.nearest_project('.')
-    with_env{ proj.fetch_dependencies }
+    proj.fetch_dependencies
     proj
   end
 
@@ -198,7 +198,7 @@ describe BPM::Project, "package_and_module_from_path" do
   end
 
   it "should find path in dependencies" do
-    check_package_and_module(subject, home("hello_world", ".bpm", "packages", "core-test", "resources", "runner.css"),
+    check_package_and_module(subject, home(".bpm", "gems", "core-test", "resources", "runner.css"),
                               "core-test", "~resources/runner")
   end
 
