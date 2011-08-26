@@ -174,14 +174,6 @@ module BPM
       package_pipelines.each { |pipeline| pipeline.expire_index! }
     end
 
-    # MEGAHAX!!!!
-    def find_asset(*)
-      asset = super
-      # The way BPM is set up we need to call build_source
-      asset.send(:build_source) if asset.respond_to?(:build_source)
-      asset
-    end
-
   private
 
     def javascript_exception_response(exception)
