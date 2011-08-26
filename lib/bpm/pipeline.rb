@@ -196,7 +196,7 @@ module BPM
     def find_asset(*)
       asset = super
       # The way BPM is set up we need to call build_source
-      asset.send(:build_source) if asset
+      asset.send(:build_source) if asset.respond_to?(:build_source)
       asset
     end
 
