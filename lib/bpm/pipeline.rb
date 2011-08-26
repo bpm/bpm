@@ -147,6 +147,14 @@ module BPM
       @plugin_js[logical_path] ||= build_plugin_js(logical_path)
     end
 
+    # MEGAHAX!!!!
+    def find_asset(*)
+      asset = super
+      # The way BPM is set up we need to call build_source
+      asset.send(:build_source) if asset.respond_to?(:build_source)
+      asset
+    end
+
   protected
 
     def build_magic_paths
@@ -164,6 +172,14 @@ module BPM
       super
       @magic_paths = nil
       package_pipelines.each { |pipeline| pipeline.expire_index! }
+    end
+
+    # MEGAHAX!!!!
+    def find_asset(*)
+      asset = super
+      # The way BPM is set up we need to call build_source
+      asset.send(:build_source) if asset.respond_to?(:build_source)
+      asset
     end
 
   private
@@ -190,14 +206,6 @@ module BPM
         if (typeof BPM_PLUGIN === 'undefined') BPM_PLUGIN={};
         #{plugin_text}
       end_eval
-    end
-
-    # MEGAHAX!!!!
-    def find_asset(*)
-      asset = super
-      # The way BPM is set up we need to call build_source
-      asset.send(:build_source) if asset.respond_to?(:build_source)
-      asset
     end
 
   end
