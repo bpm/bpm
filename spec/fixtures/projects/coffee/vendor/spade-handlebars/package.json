@@ -1,9 +1,9 @@
 {
-  "name": "handlebars",
+  "name": "spade-handlebars",
   "version": "1.0.0",
   "dependencies": {
     "spade": ">= 0",
-    "handlebars-format": ">= 0"
+    "handlebars": ">= 0"
   },
 
   "bpm:provides": {
