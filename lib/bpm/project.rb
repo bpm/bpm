@@ -118,8 +118,8 @@ module BPM
       vendored_packages.find{|p| p.name == name }
     end
 
-    def internal_package_root(package_name=nil)
-      File.join([@root_path, BPM_DIR, 'packages', package_name].compact)
+    def package_manifest_path
+      File.join(@root_path, BPM_DIR, 'package_manifest.json')
     end
 
     def assets_path
@@ -488,7 +488,18 @@ module BPM
 
     # Verifies that packages are available to meet all the dependencies
     def rebuild_dependency_list(deps=nil, verbose=false)
-      @dependency_list = find_dependencies(deps, verbose)
+      found = find_dependencies(deps, verbose)
+
+      json = {}
+      found.each do |f|
+        json[f.name] = { :version => f.version.to_s, :path => f.root_path }
+      end
+
+      FileUtils.mkdir_p(File.dirname(package_manifest_path))
+      File.open(package_manifest_path, 'w') do |f|
+        f.puts JSON.pretty_generate(json)
+      end
+
       @local_deps = nil
     end
 
@@ -628,12 +639,14 @@ module BPM
     # Pass +false+ to prevent the list from being rebuilt
 
     def build_local_dependency_list(force=true)
-      unless @dependency_list
+      unless File.exist?(package_manifest_path)
         return nil unless force
         rebuild_dependency_list
       end
 
-      @dependency_list.each do |pkg|
+      manifest = JSON.parse(File.read(package_manifest_path))
+      manifest.map do |name, data|
+        pkg = BPM::Package.new(data['path'])
         pkg.load_json
         pkg
       end

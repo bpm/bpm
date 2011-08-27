@@ -198,7 +198,7 @@ describe BPM::Project, "package_and_module_from_path" do
   end
 
   it "should find path in dependencies" do
-    check_package_and_module(subject, home(".bpm", "gems", "core-test", "resources", "runner.css"),
+    check_package_and_module(subject, home(".bpm", "gems", "core-test-0.4.9", "resources", "runner.css"),
                               "core-test", "~resources/runner")
   end
 
@@ -210,8 +210,9 @@ describe BPM::Project, "package_and_module_from_path" do
   it "should not match partial directories" do
     # We're verifying that core-testing doesn't match core-test
     # Since there is no core-testing package it will fall back to the base package, hello_world
-    check_package_and_module(subject, home("hello_world", ".bpm", "packages", "core-testing", "resources", "runner.css"),
-                              "hello_world", "~.bpm/packages/core-testing/resources/runner")
+    path = home(".bpm", "gems", "core-testing", "resources", "runner.css")
+    l = lambda{ subject.package_and_module_from_path(path) }
+    l.should raise_error("#{path} is not within a known package")
   end
 
   it "should handle directory reference in package directories array" do
