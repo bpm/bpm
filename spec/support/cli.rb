@@ -1,4 +1,5 @@
 require 'bpm/cli/base'
+require 'open3'
 
 module SpecHelpers
   attr_reader :stdin, :stdout, :stderr
@@ -9,33 +10,18 @@ module SpecHelpers
     kill!
     create_pipes
 
-    @pid = Process.fork do
-      Dir.chdir opts[:chdir] if opts[:chdir]
-
-      unless ENV['DEBUG_CLI']
-        @stdout.close
-        STDOUT.reopen @stdout_child
-
-        @stdin.close
-        STDIN.reopen @stdin_child
-
-        if opts[:track_stderr]
-          @stderr.close
-          STDERR.reopen @stderr_child
-        end
-      end
-
-      env.each do |key, val|
-        ENV[key] = val
-      end
-
-      BPM::CLI::Base.start(argv)
+    Open3.popen3(env, ["./bin/bpm", *argv]) do |stdin, stdout, stderr, thread|
+      @stdin_child = stdin
+      @stdout_child = stdout
+      @stderr_child = stderr
     end
 
-    @stdout_child.close
-    @stdin_child.close
-    @stderr_child.close
-    @pid
+    if ENV['DEBUG_CLI']
+      puts @stdout_child.read
+      puts @stderr_child.read
+      @stdout_child.rewind
+      @stderr_child.rewind
+    end
   end
 
   def out_until_block(io = stdout)
