@@ -125,38 +125,38 @@ module BPM
     def assets_path
       'assets'
     end
-    
+
     def assets_root(*paths)
       File.join @root_path, assets_path, *paths
     end
-    
+
     def preview_root(*paths)
       File.join @root_path, '.bpm', 'preview', *paths
     end
-    
+
     def build_app?
       !!(bpm_build && bpm_build["bpm_libs.js"] && 
                       bpm_build["bpm_libs.js"]["directories"] && 
                       bpm_build["bpm_libs.js"]["directories"].size>0)
     end
-    
+
     def build_app=(value)
-      
+
       bpm_libs = "bpm_libs.js"
       bpm_styles = "bpm_styles.css"
-      
+
       if value
         bpm_build[bpm_libs] ||= {}
         hash = bpm_build[bpm_libs]
         hash['directories'] ||= []
         hash['directories'] << 'lib' if hash['directories'].size==0
         hash['minifier']    ||= 'uglify-js'
-        
+
         bpm_build[bpm_styles] ||= {}
         hash = bpm_build[bpm_styles]
         hash['directories'] ||= []
         hash['directories'] << 'css' if hash['directories'].size==0
-        
+
         directories ||= {}
         directories['lib'] ||= ['app']
       else
@@ -165,12 +165,12 @@ module BPM
       end
       value
     end
-    
+
     # returns array of all assets that should be generated for this project
     def buildable_asset_filenames(mode)
       build_settings(mode).keys.reject { |x| !(x =~ /\..+$/) }
     end
-    
+
     # Validates that all required files are present in the project needed
     # for compile to run.  This will not fetch new dependencies from remote.
     def verify_and_repair(mode=:debug, verbose=false)
@@ -179,18 +179,18 @@ module BPM
       rebuild_dependency_list nil, verbose
       rebuild_preview verbose
     end
-    
+
     def rebuild_preview(verbose=false)
-      
+
       needs_rebuild = true
-      
+
       if File.directory?(preview_root)
         cur_previews  = Dir[preview_root('**', '*')].sort.reject { |x| File.directory?(x) }
         exp_filenames = buildable_asset_filenames(:debug)
         exp_previews  = exp_filenames.map { |x| preview_root(x) }.sort
         needs_rebuild = cur_previews != exp_previews
       end
-      
+
       if needs_rebuild
         FileUtils.rm_r preview_root if File.exists? preview_root
         buildable_asset_filenames(:debug).each do |filename|
@@ -199,28 +199,28 @@ module BPM
           FileUtils.touch preview_root(filename)
         end
       end
-      
+
     end
-    
+
     # Add a new dependency
     #
     # Adds to the project json and installs dependency
-    
+
     def add_dependencies(new_deps, development=false, verbose=false)
       old_deps  = build_local_dependency_list(false) || []
       hard_deps = (development ? dependencies_development : dependencies).merge(new_deps)
       all_hard_deps = all_dependencies.merge(new_deps)
       exp_deps = find_non_local_dependencies(all_hard_deps, true)
-      
+
       say "Fetching packages from remote..." if verbose
       core_fetch_dependencies(exp_deps, verbose)
-      
+
       if development
         self.dependencies_development = hard_deps
       else
         self.dependencies = hard_deps
       end
-      
+
       rebuild_dependency_list(all_hard_deps, verbose)
 
       local_deps.each do |dep|
@@ -281,13 +281,13 @@ module BPM
     # Builds assets directory for dependent packages
 
     def build(mode=:debug, verbose=false)
-      
+
       verify_and_repair mode, verbose
 
       say "Building static assets..." if verbose
 
       report_package_locations if verbose
-      
+
       # Seed the project with any required files to ensure they are built
       buildable_asset_filenames(mode).each do |filename|
         dst_path = assets_root filename
@@ -295,7 +295,7 @@ module BPM
         FileUtils.mkdir_p File.dirname(dst_path)
         FileUtils.touch dst_path
       end
-      
+
       pipeline = BPM::Pipeline.new self, mode
       pipeline.buildable_assets.each do |asset|
         dst_path = assets_root asset.logical_path
@@ -439,11 +439,11 @@ module BPM
     end
 
     def map_to_packages(deps)
-      Array(deps).map do |dep_name, vers| 
+      Array(deps).map do |dep_name, vers|
         local_deps.find { |x| x.name==dep_name }
       end
     end
-    
+
     # List of local dependency names in order of dependency
 
     def sorted_deps
@@ -458,26 +458,26 @@ module BPM
     end
 
     def sorted_runtime_deps
-      
+
       dep_names = dependencies.map { |name, vers| name }
       deps = local_deps.reject { |dep| !dep_names.include?(dep.name) }
-      
-      deps.inject([]) do |ret, dep| 
+
+      deps.inject([]) do |ret, dep|
         add_sorted_dep(dep, local_deps, :runtime, ret)
         ret
       end
-      
+
     end
 
     def sorted_development_deps
       dep_names = dependencies_development.map { |name, vers| name }
       deps = local_deps.reject { |dep| !dep_names.include?(dep.name) }
-      
-      deps = deps.inject([]) do |ret, dep| 
+
+      deps = deps.inject([]) do |ret, dep|
         add_sorted_dep(dep, local_deps, :both, ret)
         ret
       end
-      
+
       # development deps should include all dependencies of dev deps excluding
       # those that are bonafide runtime deps
       runtime_deps = sorted_runtime_deps
@@ -523,10 +523,10 @@ module BPM
 
     def load_json
       return super if has_json?
-      (FIELDS.keys + %w(description summary homepage)).each do |f| 
+      (FIELDS.keys + %w(description summary homepage)).each do |f|
         send("#{c2u(f)}=", DEFAULT_CONFIG[f])
       end
-      
+
       self.name = File.basename(@json_path, '.json')
       self.version = "0.0.1"
       true
@@ -652,21 +652,21 @@ module BPM
       end
     end
 
-    # Get list of dependencies, searching only the project and fetched 
-    # packages.  Raises if not found or 
+    # Get list of dependencies, searching only the project and fetched
+    # packages.  Raises if not found or
     # conflicting.
     def find_dependencies(deps=nil, verbose=false)
-       
+
       deps ||= all_dependencies
 
       search_list = Array(deps)
       found = []
       ret = []
-      
+
       # if we discover a new local package via indirect dependencies then
       # it's dependencies will be fetchable one time.
       fetchable = Set.new
-      
+
       until search_list.empty?
         name, version = search_list.shift
 
@@ -679,10 +679,10 @@ module BPM
         pkg = locate_package(name, version, verbose)
         if pkg.nil? && fetchable.include?(name)
           fetchable.reject! { |x| x == name }
-          core_fetch_dependency(name, version, :runtime, true) 
+          core_fetch_dependency(name, version, :runtime, true)
           pkg = locate_package name, version, verbose
         end
-          
+
         raise PackageNotFoundError.new(name, version) unless pkg
 
         found << pkg
@@ -693,7 +693,7 @@ module BPM
           new_deps += Array(pkg.dependencies_development)
           new_deps.each { |dep| fetchable.add dep.first }
         end
-        
+
         search_list += new_deps
 
         ret << pkg
@@ -734,13 +734,13 @@ module BPM
         say "~ Using #{is_local} package '#{dep.name}' (#{dep.version})"
       end
     end
-      
+
     # Method for help in sorting dependencies
 
     def add_sorted_dep(dep, deps, type, sorted, seen=[])
       return if seen.include? dep
       seen << dep # we want to do this first to avoid cylical refs
-      
+
       list = {}
       list.merge!(dep.dependencies) if [:both, :runtime].include?(type)
       list.merge!(dep.dependencies_development) if [:both, :development].include?(type)
@@ -750,29 +750,29 @@ module BPM
       end
       sorted << dep unless sorted.include? dep
     end
-    
+
     def has_mode(opts, mode)
       return false if opts.nil?
       modes = Array(opts['modes'])
       modes.size==0 || modes.include?('*') || modes.include?(mode.to_s)
     end
-    
-    
+
+
     ## BUILD OPTIONS
-    
+
     def merge_build_opts(ret, dep_name, target_name, opts, mode)
-      
+
       ret[target_name] ||= {}
-      
+
       if opts['assets']
         ret[target_name] = opts['assets']
         return
       end
-      
+
       if opts['directories'] && opts['directories'].size>0
         ret[target_name][dep_name] = opts['directories']
       end
-      
+
       if opts['minifier']
         ret[target_name]['bpm:provides'] ||= {}
         if opts['minifier'].is_a? String
@@ -794,29 +794,29 @@ module BPM
           ret[target_name].merge! tmp_settings['bpm_libs.js']
         end
       end
-      
+
       bpm_settings = ret[target_name]['bpm:settings'] ||= {}
       ret[target_name]['bpm:settings'] = soft_merge(bpm_settings, opts)
-      
+
     end
 
     def project_settings_excludes(dep_name, target_name)
       exclusions = bpm_build[target_name] && bpm_build[target_name]['exclude']
       exclusions && exclusions.include?(dep_name)
     end
-     
+
     DEFAULT_BUILD_OPTS = {
       'bpm_libs.js' => {
         'directories' =>  ['lib'],
         'modes'       =>  ['*']
       },
-      
+
       'bpm_styles.css' => {
         'directories' =>  ['css'],
         'modes'       =>  ['*']
       }
     }
-    
+
     def soft_merge(base, ext)
       ret = base.dup
       ext.each do |key, value|
@@ -828,22 +828,22 @@ module BPM
       end
       ret
     end
-    
+
     def default_build_opts(dep_name)
       @default_build_opts ||= {}
       ret = @default_build_opts[dep_name]
       if ret.nil?
         ret = DEFAULT_BUILD_OPTS.dup
-        ret[dep_name] = { 
-          "assets" => %w(resources assets), 
-          "modes"  => ["*"] 
+        ret[dep_name] = {
+          "assets" => %w(resources assets),
+          "modes"  => ["*"]
         }
-        
+
         ret["#{dep_name}/bpm_tests.js"] = {
           'directories' => ['tests'],
           'modes'       => ['debug']
         }
-        
+
         @default_build_opts[dep_name] = ret
       end
       ret
@@ -855,7 +855,7 @@ module BPM
       if include_defaults
         bpm_opts = soft_merge default_build_opts(dep.name), bpm_opts
       end
-      
+
       bpm_opts.each do |target_name, opts|
         next if !has_mode(opts, mode)
         next if !ignore_excludes && project_settings_excludes(dep.name, target_name)
