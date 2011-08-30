@@ -109,6 +109,9 @@ module BPM
       ret = minify super
       BPM::GeneratedAsset.pop_generating_asset
       ret
+    # This may not catch all, but it will hopefully catch many
+    rescue Sprockets::CircularDependencyError => e
+      raise BPM::CircularDependencyError.new(e)
     end
 
     def minify(hash)
