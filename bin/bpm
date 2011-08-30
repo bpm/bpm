@@ -7,12 +7,12 @@ require 'bpm'
 begin
   BPM::CLI::Base.start
 rescue BPM::Error => e
+  raise e if ENV['DEBUG']
   warn e.message
-  puts e.backtrace.join("\n") if ENV['DEBUG']
   exit false
 rescue Interrupt => e
+  raise e if ENV['DEBUG']
   puts "\nQuitting..."
-  puts e.backtrace.join("\n") if ENV['DEBUG']
   exit false
 rescue SystemExit => e
   exit e.status
