@@ -76,7 +76,7 @@ describe BPM::Pipeline, "asset_path" do
       it "should reference package.json directories when resolving modules" do
         subject.to_s.should include(File.read(home('hello_world', 'vendor', 'custom_package', 'custom_dir', 'basic-module.js')))
       end
-    
+
     end
       
     describe "bpm_styles.css" do
@@ -124,6 +124,15 @@ describe BPM::Pipeline, "asset_path" do
       it "should include any required modules in the bpm_libs" do
         subject.to_s.should include(File.read(home('hello_world', 'lib', 'main.js')))
       end
+
+      it "should load from secondary lib" do
+        subject.to_s.should include(File.read(home('hello_world', 'lib2', 'something.js')))
+      end
+
+      it "should use singly loaded files" do
+        subject.to_s.should include(File.read(home('hello_world', 'another', 'one.js')))
+      end
+
     end
 
     describe "hello_world/bpm_styles.css" do

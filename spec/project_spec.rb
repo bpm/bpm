@@ -218,7 +218,7 @@ describe BPM::Project, "package_and_module_from_path" do
   it "should handle directory reference in package directories array" do
     check_package_and_module(subject, home("hello_world", "lib", "main.js"),
                               "hello_world", "main")
-    check_package_and_module(subject, home("hello_world", "vendor", "lib", "something.js"),
+    check_package_and_module(subject, home("hello_world", "lib2", "something.js"),
                               "hello_world", "something")
   end
 
