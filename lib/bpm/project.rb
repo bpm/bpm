@@ -310,7 +310,7 @@ module BPM
           $stdout << "~ Building #{asset.logical_path}..." if verbose
           File.open(dst_path, 'w+') { |fd| fd << asset.to_s }
           if verbose
-            gzip_size = `gzip -c #{dst_path}`.bytesize
+            gzip_size = LibGems.gzip(asset.to_s).bytesize
             gzip_size = gzip_size < 1024 ? "#{gzip_size} bytes" : "#{gzip_size / 1024} Kb"
             $stdout << " (gzipped size: #{gzip_size})\n"
           end
