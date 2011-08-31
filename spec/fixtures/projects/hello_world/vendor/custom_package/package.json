@@ -18,7 +18,7 @@
   
   "bpm:build": {
     "bpm_libs.js": {
-      "directories": ["lib", "not-normal"],
+      "files": ["lib", "not-normal"],
       "minifier": "uglify-js"
     }
   }

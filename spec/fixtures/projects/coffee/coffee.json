@@ -10,7 +10,7 @@
   
   "bpm:build": {
     "bpm_libs.js": {
-      "directories": ["lib", "templates"]
+      "files": ["lib", "templates"]
     }
   }
 }

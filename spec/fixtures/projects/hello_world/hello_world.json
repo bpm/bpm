@@ -26,15 +26,15 @@
   "bpm:build": {
     
     "hello_world/bpm_libs.js": {
-      "directories": ["lib", "custom"]
+      "files": ["lib", "custom"]
     },
     
     "hello_world/bpm_styles.css": {
-      "directories": ["css"]
+      "files": ["css"]
     },
     
     "hello_world/bpm_tests.js": {
-      "directories": ["test"]
+      "files": ["test"]
     }
   }
 

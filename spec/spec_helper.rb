@@ -25,7 +25,7 @@ module SpecHelpers
   # Use to avoid throwing errors just because an extra newline shows up
   # somewhere
   def normalize_whitespace(string)
-    string.gsub(/ +/, ' ').gsub(/\n+/,"\n")
+    string.gsub(/ +/, ' ').gsub(/\n+/,"\n").strip
   end
   
   def compare_file_contents(actual_path, expected_path)

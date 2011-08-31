@@ -148,7 +148,8 @@ module BPM
       dir_names.reject! { |t| t == tests_path }
       
       build_names = bpm_build.values.map do |hash|
-        hash['directories'] || hash['assets']
+        # Directories is deprecated
+        hash['files'] || hash['directories'] || hash['assets']
       end
 
       build_names += PLUGIN_TYPES.map do |type|

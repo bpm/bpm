@@ -112,7 +112,6 @@ module BPM
     # Returns an array of all the buildable assets in the current directory.
     # These are the assets that will be built when you compile the project.
     def buildable_assets
-
       # make sure the logical_path can be used to simply build into the
       # assets directory when we are done
       ret = project.buildable_asset_filenames mode

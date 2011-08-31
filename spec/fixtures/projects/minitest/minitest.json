@@ -19,7 +19,7 @@
     },
     
     "minitest/bpm_libs.js": {
-      "directories": ["lib"],
+      "files": ["lib"],
       "minifier": { "uglyduck": ">= 0" },
       "uglyduck:where": "sanfran"
     }

@@ -135,33 +135,34 @@ module BPM
     end
 
     def build_app?
-      !!(bpm_build && bpm_build["bpm_libs.js"] && 
-                      bpm_build["bpm_libs.js"]["directories"] && 
-                      bpm_build["bpm_libs.js"]["directories"].size>0)
+      # Make sure we have some lib files
+      !!(bpm_build &&
+          bpm_build["bpm_libs.js"] &&
+          ((bpm_build["bpm_libs.js"]["files"] && bpm_build["bpm_libs.js"]["files"].size>0) ||
+            (bpm_build["bpm_libs.js"]["directories"] && bpm_build["bpm_libs.js"]["directories"].size>0)))
     end
 
     def build_app=(value)
-
       bpm_libs = "bpm_libs.js"
       bpm_styles = "bpm_styles.css"
 
       if value
         bpm_build[bpm_libs] ||= {}
         hash = bpm_build[bpm_libs]
-        hash['directories'] ||= []
-        hash['directories'] << 'lib' if hash['directories'].size==0
+        hash['files'] ||= hash['directories'] || []
+        hash['files'] << 'lib' if hash['files'].size==0
         hash['minifier']    ||= 'uglify-js'
 
         bpm_build[bpm_styles] ||= {}
         hash = bpm_build[bpm_styles]
-        hash['directories'] ||= []
-        hash['directories'] << 'css' if hash['directories'].size==0
+        hash['files'] ||= hash['directories'] || []
+        hash['files'] << 'css' if hash['files'].size==0
 
         directories ||= {}
-        directories['lib'] ||= ['app']
+        directories['lib'] ||= ['lib']
       else
-        bpm_build[bpm_libs]['directories'] = []
-        bpm_build[bpm_styles]['directories'] = []
+        bpm_build[bpm_libs]['files'] = []
+        bpm_build[bpm_styles]['files'] = []
       end
       value
     end
@@ -761,7 +762,6 @@ module BPM
     ## BUILD OPTIONS
 
     def merge_build_opts(ret, dep_name, target_name, opts, mode)
-
       ret[target_name] ||= {}
 
       if opts['assets']
@@ -769,8 +769,14 @@ module BPM
         return
       end
 
-      if opts['directories'] && opts['directories'].size>0
-        ret[target_name][dep_name] = opts['directories']
+      if opts['directories']
+        warn "[DEPRECATION] Use 'files' array instead of 'directories' array in #{dep_name} config"
+        opts['files'] ||= []
+        opts['files'] += opts.delete('directories')
+      end
+
+      if opts['files'] && opts['files'].size>0
+        ret[target_name][dep_name] = opts['files']
       end
 
       if opts['minifier']
@@ -807,13 +813,13 @@ module BPM
 
     DEFAULT_BUILD_OPTS = {
       'bpm_libs.js' => {
-        'directories' =>  ['lib'],
-        'modes'       =>  ['*']
+        'files' =>  ['lib'],
+        'modes' =>  ['*']
       },
 
       'bpm_styles.css' => {
-        'directories' =>  ['css'],
-        'modes'       =>  ['*']
+        'files' =>  ['css'],
+        'modes' =>  ['*']
       }
     }
 
@@ -840,8 +846,8 @@ module BPM
         }
 
         ret["#{dep_name}/bpm_tests.js"] = {
-          'directories' => ['tests'],
-          'modes'       => ['debug']
+          'files' => ['tests'],
+          'modes' => ['debug']
         }
 
         @default_build_opts[dep_name] = ret
