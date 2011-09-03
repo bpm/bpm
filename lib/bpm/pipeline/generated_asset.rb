@@ -1,5 +1,4 @@
 require 'sprockets'
-require 'bpm/execjs_hacks'
 
 module BPM
 
@@ -88,7 +87,7 @@ module BPM
           DATA = #{data.to_json};
         end_eval
 
-        ctx = ExecJS.compile(plugin_ctx);
+        ctx = BPM.compile_js(plugin_ctx);
         data = ctx.eval("BPM_PLUGIN.minify(DATA, CTX)")
 
         data = header+data if header

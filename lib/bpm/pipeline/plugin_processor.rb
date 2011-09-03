@@ -1,5 +1,4 @@
 require 'sprockets'
-require 'bpm/execjs_hacks'
 
 module BPM
 
@@ -58,7 +57,7 @@ module BPM
           CTX.additionalContext=#{minifier_js};
       end_eval
 
-      ctx = ExecJS.compile(plugin_ctx)
+      ctx = BPM.compile_js(plugin_ctx)
       ctx.eval("BPM_PLUGIN.#{self.class.method_name}(DATA, CTX, '#{filepath}')")
 
     end
