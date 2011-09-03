@@ -1,5 +1,5 @@
 require 'sprockets'
-require 'execjs'
+require 'bpm/execjs_hacks'
 
 module BPM
 
