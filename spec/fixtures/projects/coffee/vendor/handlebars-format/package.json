@@ -1,0 +1,16 @@
+{
+  "name":        "handlebars-format",
+  "version":     "1.0.0",
+  "description": "DESC",
+  "summary":     "SUMMARY",
+  "author":      "AUTHOR",
+  "homepage":    "HOMEPAGE",
+
+  "bpm:provides": {
+    "format:handlebars": {
+      "mime:default": "application/javascript",
+      "main":         "handlebars-format/format"
+    }
+  }
+  
+}

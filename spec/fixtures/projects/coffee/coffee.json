@@ -3,14 +3,14 @@
   "bpm":  "1.0.0",
   
   "dependencies": {
-    "spade":         "~> 1.0.0",
-    "coffee-script": "~> 1.0.0",
-    "handlebars":    "~> 1.0.0"
+    "coffee-script":    "~> 1.0.0",
+    "spade-handlebars": "~> 1.0.0",
+    "spade":            "~> 1.0.0"
   },
   
   "bpm:build": {
     "bpm_libs.js": {
-      "directories": ["lib", "templates"]
+      "files": ["lib", "templates"]
     }
   }
 }

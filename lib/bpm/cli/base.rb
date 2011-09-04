@@ -16,7 +16,7 @@ module BPM
         shell.say "\nbpm (v#{BPM::VERSION}) - the browser package manager\n\n"
         super shell, subcommand
       end
-      
+
       desc "owner", "Manage users for a package"
       subcommand "owner", BPM::CLI::Owner
 
@@ -119,7 +119,7 @@ module BPM
         project.verify_and_repair options[:mode], options[:verbose]
         BPM::Server.start project, :Port => options[:port], :mode => options[:mode].to_sym
       end
-      
+
       desc "rebuild", "Rebuilds bpm assets, does not update versions"
       method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
@@ -128,7 +128,7 @@ module BPM
         find_project.fetch_dependencies(true) if options[:update]
         find_project.build options[:mode].to_sym, true
       end
-      
+
       desc "login", "Log in with your BPM credentials"
       method_option :username,  :type => :string,  :default => nil, :aliases => ['-u'], :desc => 'Specify the username to login as'
       method_option :password,  :type => :string,  :default => nil, :aliases => ['-p'], :desc => 'Specify the login password'
@@ -214,7 +214,7 @@ module BPM
           packages = nil if packages.size == 0
           project  = find_project
           project.verify_and_repair
-          
+
           deps = options[:development] ? project.sorted_development_deps : project.sorted_runtime_deps
           deps.each do |dep|
             next if packages && !packages.include?(dep.name)
@@ -318,7 +318,7 @@ module BPM
 
         def run_init(name, include_app, path, package=nil)
 
-          # we only need to create a new project.json if one does not 
+          # we only need to create a new project.json if one does not
           # already exist.
           unless BPM::Project.is_project_root? path
             template_path = package ? package.template_path(:init) : nil
@@ -363,10 +363,10 @@ module BPM
               abort "You do not appear to be inside of a bpm project"
             end
           end
-          
+
           project
         end
-        
+
         def print_specs(names, index)
           packages = {}
 

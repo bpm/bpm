@@ -64,7 +64,7 @@ module BPM
     end
 
     def attributes_for(path)
-      if path.to_s[File.join(project.root_path, '.bpm')] ||  !Pathname.new(path).absolute?
+      if path.to_s[File.join(project.root_path, BPM_DIR)] ||  !Pathname.new(path).absolute?
         return super(path)
       end
 
@@ -112,7 +112,6 @@ module BPM
     # Returns an array of all the buildable assets in the current directory.
     # These are the assets that will be built when you compile the project.
     def buildable_assets
-
       # make sure the logical_path can be used to simply build into the
       # assets directory when we are done
       ret = project.buildable_asset_filenames mode
@@ -145,6 +144,14 @@ module BPM
 
     def plugin_js_for(logical_path)
       @plugin_js[logical_path] ||= build_plugin_js(logical_path)
+    end
+
+    # MEGAHAX!!!!
+    def find_asset(*)
+      asset = super
+      # The way BPM is set up we need to call build_source
+      asset.send(:build_source) if asset.respond_to?(:build_source, true)
+      asset
     end
 
   protected

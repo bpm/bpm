@@ -52,7 +52,7 @@ EOF
 
     def test_include(does_include, build_file, *source_file)
       contents_path = home('hello_dev', 'assets', build_file)
-      expected_path = home('hello_dev', *source_file)
+      expected_path = home(*source_file)
 
       if does_include
         File.read(contents_path).should include(File.read(expected_path))
@@ -66,20 +66,20 @@ EOF
 
       js_reg = [
         # fetch regular dependency
-        %w(.bpm packages spade lib main.js)
+        %w(.bpm gems spade-0.5.0 lib main.js)
       ]
 
       js_dev = [
         # fetched development dependency
-        %w(.bpm packages uglify-js lib parse-js.js),
+        %w(.bpm gems uglify-js-1.0.4 lib parse-js.js),
 
         # required dependency of development dependency
-        %w(.bpm packages optparse lib optparse.js)
+        %w(.bpm gems optparse-1.0.1 lib optparse.js)
       ]
 
       css_dev = [
         # css of a locally installed development dependency
-        %w(vendor style_package css some_style.css)
+        %w(hello_dev vendor style_package css some_style.css)
       ]
 
       if should_include

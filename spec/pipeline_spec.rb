@@ -26,7 +26,7 @@ describe BPM::Pipeline, "asset_path" do
     bpm 'add', 'custom_package' and wait
     
     asset = subject.find_asset 'custom_package/assets/dummy.txt'
-    asset.pathname.should == home('hello_world', '.bpm', 'packages', 'custom_package', 'assets', 'dummy.txt')
+    asset.pathname.should == home('hello_world', 'vendor', 'custom_package', 'assets', 'dummy.txt')
   end
   
   it "should find any asset in installed packages" do
@@ -34,7 +34,7 @@ describe BPM::Pipeline, "asset_path" do
     bpm 'rebuild' and wait
   
     asset = subject.find_asset 'core-test/resources/runner.css'
-    asset.pathname.should == home('hello_world', '.bpm', 'packages', 'core-test', 'resources', 'runner.css')
+    asset.pathname.should == home('.bpm', 'gems', 'core-test-0.4.9', 'resources', 'runner.css')
   end
   
   describe "generated assets" do
@@ -76,7 +76,7 @@ describe BPM::Pipeline, "asset_path" do
       it "should reference package.json directories when resolving modules" do
         subject.to_s.should include(File.read(home('hello_world', 'vendor', 'custom_package', 'custom_dir', 'basic-module.js')))
       end
-    
+
     end
       
     describe "bpm_styles.css" do
@@ -94,7 +94,7 @@ describe BPM::Pipeline, "asset_path" do
       end
       
       it "should reference installed package styles as well" do
-        subject.to_s.should include(File.read(home('hello_world', '.bpm', 'packages', 'core-test', 'resources', 'runner.css')))
+        subject.to_s.should include(File.read(home('.bpm', 'gems', 'core-test-0.4.9', 'resources', 'runner.css')))
       end
     
     end
@@ -124,6 +124,15 @@ describe BPM::Pipeline, "asset_path" do
       it "should include any required modules in the bpm_libs" do
         subject.to_s.should include(File.read(home('hello_world', 'lib', 'main.js')))
       end
+
+      it "should load from secondary lib" do
+        subject.to_s.should include(File.read(home('hello_world', 'lib2', 'something.js')))
+      end
+
+      it "should use singly loaded files" do
+        subject.to_s.should include(File.read(home('hello_world', 'another', 'one.js')))
+      end
+
     end
 
     describe "hello_world/bpm_styles.css" do
@@ -241,13 +250,13 @@ describe BPM::Pipeline, "buildable_assets" do
   it "should include custom_package assets" do
     asset = find_asset 'custom_package/assets/dummy.txt'
     asset.should_not be_nil
-    asset.pathname.should == project('.bpm', 'packages', 'custom_package', 'assets', 'dummy.txt')
+    asset.pathname.should == project('vendor', 'custom_package', 'assets', 'dummy.txt')
   end
   
   it "should include installed package assets" do
     asset = find_asset 'core-test/extras/extra_file.html'
     asset.should_not be_nil
-    asset.pathname.should == project('.bpm', 'packages', 'core-test', 'extras', 'extra_file.html')
+    asset.pathname.should == home('.bpm', 'gems', 'core-test-0.4.9', 'extras', 'extra_file.html')
   end
   
   it "should exclude libs" do

@@ -1,15 +1,15 @@
 {
-  "name": "handlebars",
+  "name": "spade-coffee",
   "version": "1.0.0",
   "dependencies": {
     "spade": ">= 0",
-    "handlebars-format": ">= 0"
+    "coffee-script": ">= 0"
   },
 
   "bpm:provides": {
-    "format:handlebars": {
+    "format:coffee": {
       "mime:default": "application/javascript",
-      "main":         "handlebars-format/format"
+      "main":         "coffee-script/compiler"
     }
   }
 }

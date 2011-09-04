@@ -60,5 +60,12 @@ module BPM
 EOF
     end
   end
-  
+
+  class CircularDependencyError < BPM::Error
+    def initialize(original)
+      set_backtrace(original.backtrace)
+      super(original.message)
+    end
+  end
+
 end

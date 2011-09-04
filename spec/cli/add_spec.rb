@@ -95,7 +95,6 @@ describe 'bpm add' do
     wait
     has_dependency 'rake', '0.8.6', '0.8.6' # precond
 
-    output = stdout.read
     bpm 'add', 'rake'
     wait
 

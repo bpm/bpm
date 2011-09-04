@@ -109,6 +109,9 @@ module BPM
       ret = minify super
       BPM::GeneratedAsset.pop_generating_asset
       ret
+    # This may not catch all, but it will hopefully catch many
+    rescue Sprockets::CircularDependencyError => e
+      raise BPM::CircularDependencyError.new(e)
     end
 
     def minify(hash)
@@ -184,15 +187,26 @@ EOF
       end
 
       pkgs.map do |pkg|
-        settings[pkg.name].each do |dir|
-          dir_names = Array(pkg.directories[dir] || dir)
-          dir_names.each do |dir_name|
-            search_path = File.expand_path File.join(pkg.root_path, dir_name)
-
-            Dir[File.join(search_path, '**', '*')].sort.each do |fn|
-              context.depend_on File.dirname(fn)
-              context.require_asset(fn) if context.asset_requirable? fn
+        settings[pkg.name].each do |file|
+          dir = pkg.directories.find{|name, path| file =~ /^#{Regexp.escape(name)}(\/|$)/ }
+          if dir
+            dir_alias = dir[0]
+            dir_paths = Array(dir[1])
+            require_paths = dir_paths.map do |dir_path|
+              file.gsub(/^#{Regexp.escape(dir_alias)}(\/|$)/, "#{dir_path}\\1")
             end
+          else
+            require_paths = [file]
+          end
+
+          require_files = require_paths.map do |path|
+            path = File.expand_path(File.join(pkg.root_path, path))
+            File.directory?(path) ? Dir[File.join(path, '**', '*')].sort : path
+          end.flatten
+
+          require_files.each do |fn|
+            context.depend_on File.dirname(fn)
+            context.require_asset(fn) if context.asset_requirable? fn
           end
         end
       end

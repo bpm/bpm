@@ -8,9 +8,10 @@
   "homepage":     "URL",
 
   "directories": {
-    "lib":        ["./lib", "./vendor/lib"],
+    "lib":        ["./lib", "./lib2"],
     "test":       "./tests",
-    "custom":     "./custom_dir"
+    "custom":     "./custom_dir",
+    "different":  "./another"
   },
 
   "dependencies": {
@@ -26,15 +27,15 @@
   "bpm:build": {
     
     "hello_world/bpm_libs.js": {
-      "directories": ["lib", "custom"]
+      "files": ["lib", "custom", "different/one.js"]
     },
     
     "hello_world/bpm_styles.css": {
-      "directories": ["css"]
+      "files": ["css"]
     },
     
     "hello_world/bpm_tests.js": {
-      "directories": ["test"]
+      "files": ["test"]
     }
   }
 

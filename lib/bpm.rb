@@ -1,3 +1,5 @@
+Encoding.default_external = 'UTF-8'
+
 module BPM
   BPM_DIR = ".bpm"
   TEMPLATES_DIR = File.expand_path("../../templates", __FILE__)

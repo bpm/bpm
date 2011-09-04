@@ -25,7 +25,7 @@ module SpecHelpers
   # Use to avoid throwing errors just because an extra newline shows up
   # somewhere
   def normalize_whitespace(string)
-    string.gsub(/ +/, ' ').gsub(/\n+/,"\n")
+    string.gsub(/ +/, ' ').gsub(/\n+/,"\n").strip
   end
   
   def compare_file_contents(actual_path, expected_path)
@@ -69,14 +69,15 @@ RSpec.configure do |config|
 
   config.include SpecHelpers
 
-  config.around do |blk|
+  config.before do
     reset!
+  end
 
-    blk.call
-
+  config.after do
     kill!
     stop_fake
     reset_host
+    reset_env
     Dir.chdir working_dir if Dir.pwd != working_dir
   end
 end

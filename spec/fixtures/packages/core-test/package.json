@@ -39,7 +39,7 @@
   
   "bpm:build": {
     "bpm_styles.css": {
-      "directories": ["resources"]
+      "files": ["resources"]
     },
     
     "core-test": {

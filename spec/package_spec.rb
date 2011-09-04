@@ -299,12 +299,14 @@ describe BPM::Package, "validation errors" do
     subject.should have_error "'./fake', specified for lib directory, is not a directory"
   end
 
-  it "is invalid if the lib directory array is empty" do
+  it "is valid if the lib directory array is empty" do
+    # This provides a mean to make a libless package
+    # Since this is rare, you have to explicitly specify an empty array
     write_package do |package|
       package["directories"]["lib"] = []
     end
 
-    subject.should have_error("A lib directory is required")
+    subject.should be_valid
   end
 
 end

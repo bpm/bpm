@@ -4,13 +4,13 @@
 
   "bpm:build": {
     "bpm_libs.js": {
-      "directories": [
+      "files": [
         "lib"
       ],
       "minifier": "uglify-js"
     },
     "bpm_styles.css": {
-      "directories": [
+      "files": [
         "css"
       ]
     }

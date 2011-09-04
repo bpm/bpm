@@ -35,6 +35,18 @@ module BPM
 
       filepath   = file.to_s
 
+      # MEGAHAX!!!
+      # This issue that we specifically target only appears when a format
+      # is re-provided twice and the re-provider has a transport.
+      # This prevents the format from being inappropriately wrapped in
+      # the transport.
+      if self.class.method_name == 'compileTransport'
+        plugin = pkg.find_transport_plugins(project).first
+        if !plugin || plugin['main'] != self.class.plugin_name
+          return data
+        end
+      end
+
       plugin_context = BPM::PluginContext.new(pkg, module_id);
       minifier_js = plugin_context.minify_as_js;
 
@@ -45,6 +57,7 @@ module BPM
           DATA = #{data.to_json};
           CTX.additionalContext=#{minifier_js};
       end_eval
+
       ctx = ExecJS.compile(plugin_ctx)
       ctx.eval("BPM_PLUGIN.#{self.class.method_name}(DATA, CTX, '#{filepath}')")
 
