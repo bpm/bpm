@@ -3,14 +3,28 @@ require 'json'
 require 'bpm/version'
 
 module BPM
+  
+
   module CLI
-    LOGIN_MESSAGE = "Please login first with `bpm login`."
+  LOGIN_MESSAGE = "Please login first with `bpm login`."
 
     class Base < Thor
+      @@suppress_deprecations=false;
+      def self.suppress_deprecations
+        @@suppress_deprecations 
+      end
+
+      def initialize(args=[], options={}, config={})
+        super args,options,config
+        @@suppress_deprecations = !self.options[:deprecations]
+      end
 
       class_option :verbose, :type => :boolean, :default => false,
         :aliases => ['-V'],
         :desc => 'Show additional debug information while running'
+      class_option :deprecations, :type => :boolean, :default => true,
+        :aliases => ['-wd'],
+        :desc => 'Suppress deprecation warnings'
 
       def self.help(shell, subcommand = false)
         shell.say "\nbpm (v#{BPM::VERSION}) - the browser package manager\n\n"
