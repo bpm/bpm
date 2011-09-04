@@ -427,7 +427,7 @@ module BPM
         raise "Can't find package #{name} required in #{self.name}" if packages.empty?
 
         if packages.any?{|p| p.root_path =~ /^#{Regexp.escape(packages_path)}\// }
-          warn "[DEPRECATION] Use the vendor directory instead of the packages directory for #{root_path}"
+          warn "[DEPRECATION] Use the vendor directory instead of the packages directory for #{root_path}" unless BPM::CLI::Base.suppress_deprecations
         end
 
         packages.each{|p| p.load_json }
