@@ -97,7 +97,7 @@ module BPM
         paths = search_paths.map{|p| Dir.glob(File.join(p, '*')) }.flatten
         pkgs = paths.select{|p| Package.is_package_root?(p) }.map{|p| Package.new(p) }
         if pkgs.any?{|p| p.root_path =~ /^#{Regexp.escape(packages_path)}\// }
-          warn "[DEPRECATION] Use the vendor directory instead of the packages directory for #{root_path}"
+          BPM.deprecation_warning "Use the vendor directory instead of the packages directory for #{root_path}"
         end
         pkgs += vendored_projects.map{|p| p.vendored_packages }.flatten
         pkgs.select do |p|
@@ -770,7 +770,7 @@ module BPM
       end
 
       if opts['directories']
-        warn "[DEPRECATION] Use 'files' array instead of 'directories' array in #{dep_name} config"
+        BPM.deprecation_warning "Use 'files' array instead of 'directories' array in #{dep_name} config"
         opts['files'] ||= []
         opts['files'] += opts.delete('directories')
       end
@@ -871,7 +871,7 @@ module BPM
 
     def check_version(vers)
       if vers == '>= 0-pre'
-        warn "[DEPRECATION] Use '>= 0.pre' in your JSON config instead of '>= 0-pre'."
+        BPM.deprecation_warning "Use '>= 0.pre' in your JSON config instead of '>= 0-pre'."
         vers = '>= 0.pre'
       end
       vers
