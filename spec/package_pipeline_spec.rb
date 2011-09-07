@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe BPM::PackagePipeline do
-  
+
   before do
     goto_home
     set_host
@@ -9,7 +9,7 @@ describe BPM::PackagePipeline do
     FileUtils.cp_r(project_fixture('coffee'), '.')
     cd home('coffee')
   end
-  
+
   subject do
     project = BPM::Project.new home('coffee')
     BPM::Pipeline.new project
@@ -22,12 +22,12 @@ describe BPM::PackagePipeline do
     # There is currently a fix for this in BPM::PluginProcessor
     names.sort.should == %w(coffee coffee-script handlebars handlebars-format spade spade-handlebars)
   end
-  
+
   it "should get an asset for the coffee file" do
     asset = subject.find_asset 'coffee/lib/main.js'
     asset.should_not be_nil
     asset.pathname.should == home('coffee', 'lib', 'main.coffee')
   end
-  
+
 end
 
