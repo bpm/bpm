@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   mswin = RbConfig::CONFIG["host_os"] =~ %r!(msdos|mswin|djgpp|mingw)!
   mri = !mswin && (!defined?(RUBY_ENGINE) || RUBY_ENGINE == "ruby")
 
-  s.add_dependency "libgems",      "~> 0.1.2"
+  s.add_dependency "libgems",      "~> 0.1.3"
   s.add_dependency "gemcutter",    "~> 0.6.1"
   s.add_dependency "highline",     "~> 1.6.1"
   s.add_dependency "json_pure",    "~> 1.4.6"

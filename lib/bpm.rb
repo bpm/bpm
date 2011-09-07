@@ -29,6 +29,29 @@ module BPM
     ExecJS.compile(@es5_shim+"\n"+data)
   end
 
+  @@show_deprecations = false
+  @@deprecation_count = 0
+
+  def self.show_deprecations
+    @@show_deprecations
+  end
+
+  def self.show_deprecations=(val)
+    @@show_deprecations = val
+  end
+
+  def self.deprecation_count
+    @@deprecation_count
+  end
+
+  def self.deprecation_warning(message)
+    if show_deprecations
+      warn "[DEPRECATION] #{message}"
+    else
+      @@deprecation_count += 1
+    end
+  end
+
 end
 
 # The BPM constants need to be defined first

@@ -17,6 +17,18 @@ module BPM
         super shell, subcommand
       end
 
+      def self.start(given_args=ARGV, config={})
+        if given_args.include?('--verbose') || given_args.include?('-V')
+          BPM.show_deprecations = true
+        end
+
+        super
+
+        if BPM.deprecation_count > 0
+          puts "[WARN] #{BPM.deprecation_count} deprecation warnings were hidden. Run with --verbose to see them."
+        end
+      end
+
       desc "owner", "Manage users for a package"
       subcommand "owner", BPM::CLI::Owner
 
