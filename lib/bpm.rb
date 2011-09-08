@@ -24,7 +24,7 @@ module BPM
   autoload :PluginProcessor,      'bpm/pipeline/plugin_processor'
 
   def self.compile_js(data)
-    require 'execjs'
+    require 'bpm/execjs_ext'
     @es5_shim ||= File.read(ES5_SHIM_PATH)
     ExecJS.compile(@es5_shim+"\n"+data)
   end
