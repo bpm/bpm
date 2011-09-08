@@ -4,23 +4,6 @@ require 'execjs'
 # Once 1.2.5 is released, we can remove this
 
 module ExecJS
-  module Runtimes
-    remove_const :JavaScriptCore
-    JavaScriptCore = ExternalRuntime.new(
-      :name        => "JavaScriptCore",
-      :command     => ["/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc", "jsc"],
-      :runner_path => ExecJS.root + "/support/jsc_runner.js"
-    )
-
-    remove_const :JScript
-    JScript = ExternalRuntime.new(
-      :name        => "JScript",
-      :command     => "cscript //E:jscript //Nologo //U",
-      :runner_path => ExecJS.root + "/support/jscript_runner.js",
-      :encoding    => 'UTF-16LE' # CScript with //U returns UTF-16LE
-    )
-  end
-
   class ExternalRuntime
     def initialize(options)
       @name        = options[:name]
@@ -62,6 +45,7 @@ module ExecJS
       if "".respond_to?(:force_encoding)
         def sh(command)
           output, options = nil, {}
+          options[:internal_encoding] = 'UTF-8'
           options[:external_encoding] = @encoding if @encoding
           IO.popen(command, options) { |f| output = f.read }
           output
@@ -81,4 +65,35 @@ module ExecJS
         end
       end
   end
+
+  module Runtimes
+    remove_const :JavaScriptCore
+    JavaScriptCore = ExternalRuntime.new(
+      :name        => "JavaScriptCore",
+      :command     => ["/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc", "jsc"],
+      :runner_path => ExecJS.root + "/support/jsc_runner.js"
+    )
+
+    remove_const :JScript
+    JScript = ExternalRuntime.new(
+      :name        => "JScript",
+      :command     => "cscript //E:jscript //Nologo //U",
+      :runner_path => ExecJS.root + "/support/jscript_runner.js",
+      :encoding    => 'UTF-16LE' # CScript with //U returns UTF-16LE
+    )
+    
+    instance_variable_set(:@runtimes, [
+      RubyRacer,
+      RubyRhino,
+      Johnson,
+      Mustang,
+      Node,
+      JavaScriptCore,
+      SpiderMonkey,
+      JScript
+    ])
+  end
+
+  self.runtime = Runtimes.autodetect
+  
 end
