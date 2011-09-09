@@ -74,7 +74,7 @@ module ExecJS
       :runner_path => ExecJS.root + "/support/jscript_runner.js",
       :encoding    => 'UTF-16LE' # CScript with //U returns UTF-16LE
     )
-    
+
     instance_variable_set(:@runtimes, [
       RubyRacer,
       RubyRhino,
@@ -88,5 +88,5 @@ module ExecJS
   end
 
   self.runtime = Runtimes.autodetect
-  
+
 end
