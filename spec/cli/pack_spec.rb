@@ -131,7 +131,6 @@ describe "bpm pack" do
     it "should pack transports" do
       cd home('vendor', 'spade')
       bpm "pack" and wait
-      puts stdout.read
       exit_status.should be_success
       
       package = LibGems::Format.from_file_by_path 'spade-1.0.0.bpkg'
@@ -139,7 +138,20 @@ describe "bpm pack" do
       package.spec.files.should include('transport.js')
     end
   end
-  
+
+  describe "lib-less package" do
+    before do
+      goto_home
+      FileUtils.cp_r package_fixture("sproutcore-handlebars-format"), '.'
+    end
+
+    it "should pack without requiring lib" do
+      cd home('sproutcore-handlebars-format')
+      bpm "pack" and wait
+      exit_status.should be_success
+    end
+  end
+
 end
 
     
