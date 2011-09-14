@@ -5,8 +5,8 @@ module BPM
   class GeneratedAsset < Sprockets::BundledAsset
 
     FORMAT_METHODS = {
-      'text/css' => ['css', 'pipeline_css'],
-      'application/javascript' => ['lib', 'pipeline_libs']
+      'text/css' => ['css'],
+      'application/javascript' => ['lib']
     }
 
     def self.generating_asset
@@ -142,8 +142,7 @@ module BPM
     end
 
     def build_dependency_context_and_body
-
-      project       = environment.project
+      project  = environment.project
       settings = project.build_settings(environment.mode)[asset_name]
       pkgs     = settings.keys.map do |pkg_name|
         if pkg_name == project.name
@@ -180,9 +179,9 @@ EOF
       context.require_asset(pathname) # start with self
 
       if pathname.to_s =~ /_tests\.js$/
-        dir_name, dir_method = ['tests', 'pipeline_tests']
+        dir_name, dir_method = ['tests']
       else
-        dir_name, dir_method = FORMAT_METHODS[content_type] || ['lib', 'pipeline_libs']
+        dir_name, dir_method = FORMAT_METHODS[content_type] || ['lib']
       end
 
       require_assets(pkgs, settings, context)

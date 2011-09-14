@@ -196,22 +196,6 @@ module BPM
       end.compact
     end
 
-    def pipeline_libs
-      (pipeline && pipeline['libs']) || ['lib']
-    end
-
-    def pipeline_css
-      (pipeline && pipeline['css']) || ['css']
-    end
-
-    def pipeline_assets
-      (pipeline && pipeline['assets']) || ['assets', 'resources']
-    end
-
-    def pipeline_tests
-      (pipeline && pipeline['tests']) || ['tests']
-    end
-    
     # Returns a hash of dependencies inferred from the build settings.
     def dependencies_build
       ret = {}
