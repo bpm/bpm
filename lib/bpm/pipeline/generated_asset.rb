@@ -185,8 +185,15 @@ EOF
         dir_name, dir_method = FORMAT_METHODS[content_type] || ['lib', 'pipeline_libs']
       end
 
-      pkgs.map do |pkg|
-        settings[pkg.name].each do |file|
+      require_assets(pkgs, settings, context)
+
+      return context, body
+    end
+
+    def require_assets(packages, settings, context)
+      packages.map do |pkg|
+        files = settings[pkg.name] || ['lib']
+        files.each do |file|
           dir = pkg.directories.find{|name, path| file =~ /^#{Regexp.escape(name)}(\/|$)/ }
           if dir
             dir_alias = dir[0]
@@ -209,8 +216,6 @@ EOF
           end
         end
       end
-
-      return context, body
     end
 
   end

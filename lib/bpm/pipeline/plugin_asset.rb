@@ -35,6 +35,8 @@ module BPM
     def build_dependency_context_and_body
 
       project = environment.project
+      # We hardcode this to bpm_libs.js since that's what the plugin should be depending on
+      settings = project.build_settings(environment.mode)["bpm_libs.js"]
       pkg_name, module_id = plugin_module
       pkg  = project.package_from_name pkg_name
 
@@ -51,18 +53,7 @@ module BPM
       # add requires for each depedency to context
       context = blank_context
 
-      deps.map do |pkg|
-        pkg.load_json
-        pkg.pipeline_libs.each do |dir|
-          dir_name = pkg.directories[dir] || dir 
-          search_path = File.expand_path File.join(pkg.root_path, dir_name)
-      
-          Dir[File.join(search_path, '**', '*')].sort.each do |fn|
-            context.depend_on File.dirname(fn)
-            context.require_asset(fn) if context.asset_requirable? fn
-          end
-        end
-      end
+      require_assets(deps, settings, context)
 
       # require asset itself - this should be included directly in the body
       # we don't want to use any processors
