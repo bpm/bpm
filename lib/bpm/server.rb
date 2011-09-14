@@ -1,5 +1,6 @@
 require 'rack'
 require 'sprockets'
+require 'thin'
 
 module BPM
 
@@ -7,6 +8,7 @@ module BPM
 
     def initialize(project, options={})
       options = default_options.merge(options)
+      options[:server] ||= 'thin'
       @project = project
       @mode    = options[:mode] || :debug
       super options

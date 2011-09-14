@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency "thor",         "~> 0.14.3"
   s.add_dependency "execjs",       "~> 1.2.4"
   s.add_dependency "sprockets",    "~> 2.0.0"
+  s.add_dependency "thin",      "~> 1.2"
 
   s.add_development_dependency "rspec"
   s.add_development_dependency "rack", "~> 1.3.2"
