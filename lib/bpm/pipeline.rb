@@ -154,6 +154,12 @@ module BPM
       asset
     end
 
+    # Index is for caching, but it causes us problem,
+    # we don't need the caching
+    def index
+      self
+    end
+
   protected
 
     def build_magic_paths

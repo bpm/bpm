@@ -73,7 +73,12 @@ module BPM
     rescue Sprockets::FileNotFound => e
       raise Sprockets::FileNotFound, "#{e.message} in package '#{package_name}'"
     end
-      
+
+    # Index is for caching, but it causes us problem,
+    # we don't need the caching
+    def index
+      self
+    end
 
   end
 end
