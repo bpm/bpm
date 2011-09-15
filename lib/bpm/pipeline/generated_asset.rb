@@ -118,7 +118,7 @@ module BPM
 
       hash = environment.cache_hash("#{pathname}:minify", id) do
         data = minify_body hash['source']
-        { 'length' => Rack::Utils.bytesize(data),
+        { 'length' => ::Rack::Utils.bytesize(data),
           'digest' => environment.digest.update(data).hexdigest,
           'source' => data }
       end

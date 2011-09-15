@@ -4,7 +4,7 @@ require 'thin'
 
 module BPM
 
-  class Server < Rack::Server
+  class Server < ::Rack::Server
 
     def initialize(project, options={})
       options = default_options.merge(options)
@@ -31,14 +31,9 @@ module BPM
       cur_project = @project
       cur_mode    = @mode
 
-      @app ||= Rack::Builder.new do
-        map '/assets' do
-          run BPM::Pipeline.new cur_project, cur_mode, true
-        end
-
-        map '/' do
-          run Rack::Directory.new cur_project.root_path
-        end
+      @app ||= ::Rack::Builder.new do
+        use BPM::Rack, cur_project, cur_mode
+        run ::Rack::Directory.new cur_project.root_path
       end.to_app
     end
   end
