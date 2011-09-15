@@ -401,18 +401,12 @@ module BPM
     # TODO: Make better errors
     # TODO: This might not work well with conflicting versions
     def local_deps(search_paths=nil)
-      # Using the packages directory is deprecated
-      packages_path = File.join(root_path, "packages")
-      search_paths ||= [File.join(root_path, "vendor"), packages_path]
+      search_paths ||= [File.join(root_path, "vendor"), File.join(root_path, "packages")]
 
       dependencies.inject([]) do |list, (name, version)|
         packages = search_paths.map{|p| Package.new(File.join(p, name)) }.select{|p| p.has_json? }
 
         raise "Can't find package #{name} required in #{self.name}" if packages.empty?
-
-        if packages.any?{|p| p.root_path =~ /^#{Regexp.escape(packages_path)}\// }
-          BPM.deprecation_warning "Use the vendor directory instead of the packages directory for #{root_path}"
-        end
 
         packages.each{|p| p.load_json }
 
