@@ -32,7 +32,7 @@ module BPM
       cur_mode    = @mode
 
       @app ||= ::Rack::Builder.new do
-        use BPM::Rack, cur_project, cur_mode
+        use BPM::Rack, cur_project, :mode => cur_mode
         run ::Rack::Directory.new cur_project.root_path
       end.to_app
     end
