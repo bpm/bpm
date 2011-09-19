@@ -41,6 +41,9 @@ Install via RubyGems:
 
   `gem install bpm --pre`
 
+WARNING: Make sure you have the most recent version of RubyGems and the
+most recent version of RVM if you are using that.
+
 When we release, bpm will be also be available via PKG and EXE installers as well.
 
 # Current Development Status
