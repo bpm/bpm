@@ -12,20 +12,63 @@ module BPM
         :aliases => ['-V'],
         :desc => 'Show additional debug information while running'
 
-      def self.help(shell, subcommand = false)
-        shell.say "\nbpm (v#{BPM::VERSION}) - the browser package manager\n\n"
-        super shell, subcommand
-      end
+      class << self
 
-      def self.start(given_args=ARGV, config={})
-        if given_args.include?('--verbose') || given_args.include?('-V')
-          BPM.show_deprecations = true
+        def help(shell, subcommand = false)
+          shell.say <<LONGDESC
+bpm (v#{BPM::VERSION}) - the browser package manager
+
+BPM is a tool for aiding in development of JavaScript-based web applications.
+It manages dependencies, custom file formats, minification and more.
+
+Sample Usage:
+
+  bpm init my_app
+  cd my_app
+  bpm add my_dependency
+  bpm preview
+
+LONGDESC
+
+          super shell, subcommand
         end
 
-        super
+        # Hacked so long description isn't wrapped
+        def task_help(shell, task_name)
+          meth = normalize_task_name(task_name)
+          task = all_tasks[meth]
+          handle_no_task_error(meth) unless task
 
-        if BPM.deprecation_count > 0
-          puts "[WARN] #{BPM.deprecation_count} deprecation warnings were hidden. Run with --verbose to see them."
+          shell.say "Usage:"
+          shell.say "  #{banner(task)}"
+          shell.say
+          class_options_help(shell, nil => task.options.map { |_, o| o })
+          if task.long_description
+            shell.say "Description:"
+            shell.print_wrapped(task.long_description, :ident => 2)
+          else
+            shell.say task.description
+          end
+        end
+
+        def start(given_args=ARGV, config={})
+          if given_args.include?('--verbose') || given_args.include?('-V')
+            BPM.show_deprecations = true
+          end
+
+          super
+
+          if BPM.deprecation_count > 0
+            puts "[WARN] #{BPM.deprecation_count} deprecation warnings were hidden. Run with --verbose to see them."
+          end
+        end
+      end
+
+      def help(*args)
+        if args.first == "owner"
+          CLI::Owner.start( [ "help" ] + args[1..-1] )
+        else
+          super
         end
       end
 
@@ -33,6 +76,11 @@ module BPM
       subcommand "owner", BPM::CLI::Owner
 
       desc "fetch [PACKAGE]", "Fetch one or many bpm packages to local cache"
+      long_desc <<-LONGDESC
+        Fetch one or many bpm packages to local cache.
+
+        Note: This command is used internally and should not normally need to be called directly.
+      LONGDESC
       method_option :version,    :type => :string,  :default => ">= 0", :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
       def fetch(*packages)
@@ -66,14 +114,29 @@ module BPM
       end
 
 
-      desc "fetched [PACKAGE]", "Display locally fetched bpm packages"
+      desc "fetched [PACKAGE]", "Displays a list of locally cached BPM packages"
       def fetched(*packages)
         local = BPM::Local.new
         index = local.installed(packages)
         print_specs(packages, index)
       end
 
-      desc "add [PACKAGE]", "Add one or more packages to a bpm project"
+      desc "add [PACKAGE]", "Add one or more dependencies to a bpm project"
+      long_desc <<-LONGDESC
+        Adds one or more dependencies to a bpm project.
+
+        It first fetches the dependency from getbpm.org (or uses the locally vendored version)
+        and then adds it to your project's JSON config.
+
+        If multiple package names are passed they will all be added.
+
+        Run with --pre to install a prerelease version of your package.
+
+        Run with --version to specify a specific package version other than
+        the most recent.
+
+        To remove a dependency just run `bpm remove`.
+      LONGDESC
       method_option :version,    :type => :string,  :default => nil, :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
@@ -106,7 +169,13 @@ module BPM
         project.build options[:mode], true
       end
 
-      desc "remove [PACKAGE]", "Remove one or more packages from a bpm project"
+      desc "remove [PACKAGE]", "Remove one or more dependencies from a BPM project"
+      long_desc <<-LONGDESC
+        Remove one or more dependencies from a BPM project.
+
+        This command will remove the dependency declaration from the project JSON.
+        It will then rebuild the project without the depedency.
+      LONGDESC
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
       def remove(*package_names)
@@ -122,7 +191,17 @@ module BPM
         project.build options[:mode], true
       end
 
-      desc "preview", "Preview server that will autocompile assets as you request them.  Useful for hacking"
+      desc "preview", "Preview server that autocompiles assets as they are requested"
+      long_desc <<-LONGDESC
+        Preview server that autocompiles assets as they are requested.
+
+        The primary use of `bpm preview` is that it is faster to use that `bpm rebuild`.
+        When developing with the preview server changes to your code are automatically
+        recognized and will be present when the page is reloaded.
+
+        Once you are satisfied with your project you will still need to run `bpm rebuild`
+        to save your updated assets to disk.
+      LONGDESC
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode for compile'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :port,       :type => :string,  :default => '4020', :desc => "Port to host server on"
@@ -132,7 +211,15 @@ module BPM
         BPM::Server.start project, :Port => options[:port], :mode => options[:mode].to_sym
       end
 
-      desc "rebuild", "Rebuilds bpm assets, does not update versions"
+      desc "rebuild", "Rebuilds BPM assets"
+      long_desc <<-LONGDESC
+        Rebuilds BPM assets
+
+        `bpm rebuild` will rebuild all assets managed by BPM as declared in your project's
+        JSON config. This should always be run before deploying to the server. During active
+        development, consider using `bpm preview`. Though remember that you will have to run
+        `bpm rebuild` before deploying.
+      LONGDESC
       method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile'
       method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :update, :type => :boolean, :default => false, :aliases => ['-u'], :desc => 'Updates dependencies to latest compatible version'
@@ -178,7 +265,14 @@ module BPM
         end
       end
 
-      desc "push PACKAGE", "Distribute your bpm package"
+      desc "push PACKAGE", "Distribute your BPM package on GetBPM.org"
+      long_desc <<-LONGDESC
+        Distribute your BPM package on GetBPM.org
+
+        Pushes your package to GetBPM.org. You will need to run
+        `bpm pack` before you can run this command. You will also need
+        an account on GetBPM.org.
+      LONGDESC
       def push(package)
         remote = BPM::Remote.new
         if remote.logged_in?
@@ -189,6 +283,14 @@ module BPM
       end
 
       desc "yank PACKAGE", "Remove a specific package version release from GetBPM.org"
+      long_desc <<-LONGDESC
+        Remove a specific package version release from GetBPM.org
+
+        This is useful if you have pushed a version in error or have discovered a serious bug.
+        Beware, however, that you cannot repush a version number. When you yank a package that
+        version number still remains active in the event that other pacakges depend on it. If
+        you need a package gone for good, please contact BPM support.
+      LONGDESC
       method_option :version, :type => :string,  :default => nil,   :aliases => ['-v'],    :desc => 'Specify a version to yank'
       method_option :undo,    :type => :boolean, :default => false,                        :desc => 'Unyank package'
       def yank(package)
@@ -209,10 +311,18 @@ module BPM
       end
 
       desc "list", "List BPM Packages"
+      long_desc <<-LONGDESC
+        List BPM Packages
+
+        By default this provides a list of all dependencies of the current project.
+
+        To see a list of all available BPM packages, run with --remote. Add --all to
+        see all possible (non-prerelease) versions and --pre to see prerelease versions.
+      LONGDESC
       method_option :remote,     :type => :boolean, :default => false, :aliases => ['-r'],
                                     :desc => 'List packages on remote server'
       method_option :all,        :type => :boolean, :default => false, :aliases => ['-a'],
-                                    :desc => 'List all versions available (remote only)'
+                                    :desc => 'List all (non-prerelease) versions available (remote only)'
       method_option :prerelease, :type => :boolean, :default => false, :aliases => ['--pre'],
                                     :desc => 'List prerelease versions available (remote only)'
       method_option :development, :type => :boolean, :default => false, :aliases => ['--dev'],
@@ -235,7 +345,18 @@ module BPM
         end
       end
 
-      desc "init [PATHS]", "Configure a project to use bpm for management"
+      desc "init [PATHS]", "Configure a project to use BPM for management"
+      long_desc <<-LONGDESC
+        Configure a project to use BPM for management
+
+        If the specified path does not exist it will be created with a basic BPM directory
+        structure. For existing directories, BPM does not create the full directory structure,
+        assuming that the current structure is adequate. In the event that you do want BPM to
+        create its full structure, pass --app.
+
+        By default, the app is given the same name as the directory it resides
+        in. If a different name is desired, pass the --name option.
+      LONGDESC
       method_option :name, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
       method_option :skip, :type => :boolean, :default => false, :desc => 'Skip any conflicting files'
       method_option :app, :type => :boolean, :default => false, :desc => 'Manage app files as well as packages. (Always true for new directories.)'
@@ -271,7 +392,15 @@ module BPM
         end
       end
 
-      desc "pack [PACKAGE]", "Build a bpm package from a package.json"
+      desc "pack [PACKAGE]", "Build a BPM package from a package.json"
+      long_desc <<-LONGDESC
+        Build a BPM package from a package.json
+
+        This provides a .bpkg file that can be distributed directly or via GetBPM.org.
+        If distributed directly, the package can be installed with `bpm add PACKAGE.bpkg`.
+        If using GetBPM.org, run `bpm push PACKAGE.bpkg` and it can then be installed
+        via a normal `bpm add NAME`.
+      LONGDESC
       method_option :email, :type => :string,  :default => nil,   :aliases => ['-e'],    :desc => 'Specify an author email address'
       def pack(package_path=nil)
         package_path ||= Dir.pwd
@@ -289,7 +418,14 @@ module BPM
         end
       end
 
-      desc "unpack [PACKAGE]", "Extract files from a bpm package"
+      desc "unpack [PACKAGE]", "Extract files from a BPM package"
+      long_desc <<-LONGDESC
+        Extract files from a BPM package
+
+        This is primarily useful for testing. If, for instance, a package
+        is not behaving as expected, it may be useful to unpack it to review
+        the contents.
+      LONGDESC
       method_option :target, :type => :string, :default => ".", :aliases => ['-t'], :desc => 'Unpack to given directory'
       def unpack(*paths)
         local = BPM::Local.new
@@ -305,7 +441,14 @@ module BPM
         end
       end
 
-      desc "debug [OPTION]", "Display various options for debugging.\n  build - Shows all project build settings\n  repair - Verify and repair project"
+      desc "debug [OPTION]", "Display various options for debugging"
+      long_desc <<-LONGDESC
+        Display various options for debugging.
+
+        * build - Shows all project build settings
+
+        * repair - Verify and repair project
+      LONGDESC
       method_option :project, :type => :string,  :default => nil, :aliases => ['-p'], :desc => 'Specify project location other than working directory'
       method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode'
       def debug(option)

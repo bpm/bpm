@@ -1,8 +1,6 @@
 module BPM::CLI
   class Owner < Thor
-    default_task :list
-
-    desc "list [PACKAGE]", "Display owners of a package"
+    desc "owner list [PACKAGE]", "Display owners of a package"
     def list(package)
       remote = BPM::Remote.new
       if remote.logged_in?
@@ -22,7 +20,7 @@ module BPM::CLI
       end
     end
 
-    desc "add [PACKAGE] [EMAIL]", "Allow another user to push new versions of your bpm package"
+    desc "owner add [PACKAGE] [EMAIL]", "Allow another user to push new versions of your BPM package"
     def add(package, email)
       remote = BPM::Remote.new
       if remote.logged_in?
@@ -32,7 +30,7 @@ module BPM::CLI
       end
     end
 
-    desc "remove [PACKAGE] [EMAIL]", "Remove user's permission to push new versions of your bpm package"
+    desc "owner remove [PACKAGE] [EMAIL]", "Remove user's permission to push new versions of your BPM package"
     def remove(package, email)
       remote = BPM::Remote.new
       if remote.logged_in?
