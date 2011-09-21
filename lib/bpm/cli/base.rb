@@ -79,12 +79,15 @@ LONGDESC
       long_desc <<-LONGDESC
         Fetch one or many bpm packages to local cache.
 
+        If no packages are specified, BPM will use the current project.
+
         Note: This command is used internally and should not normally need to be called directly.
       LONGDESC
       method_option :version,    :type => :string,  :default => ">= 0", :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
+      method_option :project,    :type => :string,  :default => nil,    :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       def fetch(*packages)
-        project = BPM::Project.nearest_project(Dir.pwd) if packages.empty?
+        project = find_project(false) if packages.empty?
         if project
           success = project.fetch_dependencies options[:verbose]
           if !success
@@ -504,17 +507,17 @@ LONGDESC
           self.class.handle_argument_error(self.class.tasks[name], nil)
         end
 
-        def find_project
+        def find_project(required=true)
           if options[:project]
             project_path = File.expand_path options[:project]
-            if !BPM::Project.is_project_root?(project_path)
+            if required && !BPM::Project.is_project_root?(project_path)
               abort "#{project_path} does not appear to be managed by bpm"
             else
               project = BPM::Project.new project_path
             end
           else
             project = BPM::Project.nearest_project Dir.pwd
-            if project.nil?
+            if required && project.nil?
               abort "You do not appear to be inside of a bpm project"
             end
           end
