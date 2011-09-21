@@ -98,7 +98,8 @@ module BPM
         pkgs.select do |p|
           begin
             p.load_json
-          rescue BPM::InvalidPackageError
+          rescue BPM::InvalidPackageError => e
+            raise e if ENV['DEBUG']
             false
           end
         end
