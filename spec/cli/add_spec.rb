@@ -206,3 +206,18 @@ describe "bpm add using a vendor directory" do
 
 end
 
+describe "bpm add with a package" do
+  before do
+    goto_home
+    set_host
+    start_fake(FakeGemServer.new)
+    FileUtils.cp_r(package_fixture('spade'), '.')
+    cd home('spade')
+  end
+
+  it "should add dependency to package.json" do
+    File.read(home('spade', 'package.json')).should_not include('jquery')
+    bpm 'add', 'jquery', '--package' and wait
+    File.read(home('spade', 'package.json')).should include('jquery')
+  end
+end

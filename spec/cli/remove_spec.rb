@@ -81,3 +81,23 @@ describe 'bpm remove' do
   it "should remove development dependencies"
 
 end
+
+describe "bpm remove with a package" do
+  before do
+    goto_home
+    set_host
+    start_fake(FakeGemServer.new)
+    FileUtils.cp_r(package_fixture('coffee-1.0.1.pre'), '.')
+    cd home('coffee-1.0.1.pre')
+
+    bpm 'fetch', '--package'
+    wait
+  end
+
+  it "should remove dependency from package.json" do
+    File.read(home('coffee-1.0.1.pre', 'package.json')).should include('jquery')
+    bpm 'remove', 'jquery', '--package'
+    puts stdout.read
+    File.read(home('coffee-1.0.1.pre', 'package.json')).should_not include('jquery')
+  end
+end

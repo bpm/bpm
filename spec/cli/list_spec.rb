@@ -114,3 +114,18 @@ describe "bpm list" do
   end
 
 end
+
+describe "bpm list with a package" do
+  before do
+    goto_home
+    set_host
+    start_fake(FakeGemServer.new)
+    FileUtils.cp_r(package_fixture('coffee-1.0.1.pre'), '.')
+    cd home('coffee-1.0.1.pre')
+  end
+
+  it "should list package dependencies" do
+    bpm 'list', '--package'
+    stdout.read.should include('jquery')
+  end
+end

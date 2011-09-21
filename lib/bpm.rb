@@ -14,6 +14,7 @@ module BPM
   autoload :Remote,               'bpm/remote'
   autoload :Repository,           'bpm/repository'
   autoload :Project,              'bpm/project'
+  autoload :PackageProject,       'bpm/package_project'
   autoload :Rack,                 'bpm/rack'
   autoload :Server,               'bpm/server'
   autoload :Pipeline,             'bpm/pipeline'

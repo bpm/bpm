@@ -141,3 +141,19 @@ describe 'bpm fetch' do
   end
 
 end
+
+describe "bpm fetch with a package" do
+  before do
+    goto_home
+    set_host
+    start_fake(FakeGemServer.new)
+    FileUtils.cp_r(package_fixture('coffee-1.0.1.pre'), '.')
+    cd home('coffee-1.0.1.pre')
+  end
+
+  it "should fetch dependencies" do
+    "jquery-1.4.3".should_not be_fetched
+    bpm 'fetch', '--package' and wait
+    "jquery-1.4.3".should be_fetched
+  end
+end

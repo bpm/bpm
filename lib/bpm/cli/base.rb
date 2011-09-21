@@ -86,6 +86,7 @@ LONGDESC
       method_option :version,    :type => :string,  :default => ">= 0", :aliases => ['-v'],    :desc => 'Specify a version to install'
       method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
       method_option :project,    :type => :string,  :default => nil,    :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      method_option :package,    :type => :boolean, :default => false,  :desc => "Fetch for a package, instead of a project"
       def fetch(*packages)
         project = find_project(false) if packages.empty?
         if project
@@ -145,6 +146,7 @@ LONGDESC
       method_option :prerelease,  :type => :boolean, :default => false, :aliases => ['--pre'], :desc => 'Install a prerelease version'
       method_option :development, :type => :boolean, :default => false, :aliases => ['--dev'], :desc => "Add as a development dependency"
       method_option :mode,        :type => :string,  :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
+      method_option :package,     :type => :boolean, :default => false, :desc => "Add to a package, instead of a project"
       def add(*package_names)
         # map to dependencies
         if package_names.empty?
@@ -181,6 +183,7 @@ LONGDESC
       LONGDESC
       method_option :project, :type => :string,  :default => nil,         :aliases => ['-p'], :desc => 'Specify project location other than working directory'
       method_option :mode,    :type => :string,  :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
+      method_option :package, :type => :boolean, :default => false,       :desc => "Remove from a package, instead of a project"
       def remove(*package_names)
 
         # map to dependencies
@@ -208,6 +211,7 @@ LONGDESC
       method_option :mode,    :type => :string,  :default => :debug, :aliases => ['-m'], :desc => 'Build mode for compile'
       method_option :project, :type => :string,  :default => nil,    :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :port,    :type => :string,  :default => '4020', :desc => "Port to host server on"
+      method_option :package, :type => :boolean, :default => false,  :desc => "Preview a package, instead of a project"
       def preview
         project = find_project
         project.verify_and_repair options[:mode], options[:verbose]
@@ -226,6 +230,7 @@ LONGDESC
       method_option :mode,    :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile'
       method_option :project, :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
       method_option :update,  :type => :boolean, :default => false, :aliases => ['-u'], :desc => 'Updates dependencies to latest compatible version'
+      method_option :package, :type => :boolean, :default => false, :desc => "Rebuild package, instead of a project"
       def rebuild
         find_project.fetch_dependencies(true) if options[:update]
         find_project.build options[:mode].to_sym, true
@@ -330,6 +335,8 @@ LONGDESC
                                     :desc => 'List prerelease versions available (remote only)'
       method_option :development, :type => :boolean, :default => false, :aliases => ['--dev'],
                                     :desc => 'List development dependencies instead of runtime (local only)'
+      method_option :package,     :type => :boolean, :default => false,
+                                    :desc => "List for a package, instead of a project"
       def list(*packages)
         if options[:remote]
           remote = BPM::Remote.new
@@ -508,15 +515,16 @@ LONGDESC
         end
 
         def find_project(required=true)
+          klass = options[:package] ? BPM::PackageProject : BPM::Project
           if options[:project]
             project_path = File.expand_path options[:project]
-            if required && !BPM::Project.is_project_root?(project_path)
+            if required && !klass.is_project_root?(project_path)
               abort "#{project_path} does not appear to be managed by BPM"
             else
-              project = BPM::Project.new project_path
+              project = klass.new project_path
             end
           else
-            project = BPM::Project.nearest_project Dir.pwd
+            project = klass.nearest_project Dir.pwd
             if required && project.nil?
               abort "You do not appear to be inside of a BPM project"
             end
