@@ -1,7 +1,7 @@
 require "spec_helper"
 require "json"
 describe 'bpm fetch' do
-  
+
   before do
     goto_home
     FileUtils.cp_r(project_fixture('hello_world'), '.')
@@ -16,7 +16,7 @@ describe 'bpm fetch' do
     package_info = JSON.load File.read(home('hello_world', 'hello_world.json'))
     package_info['dependencies']['custom_package'] = '>= 0'
     File.open(home('hello_world', 'hello_world.json'), 'w+') { |fd| fd << package_info.to_json }
-    
+
     bpm "fetch", '--verbose'
     out = stdout.read
     out.should include("Fetched dependent packages for hello_world")
@@ -28,7 +28,7 @@ describe 'bpm fetch' do
       package_name.should be_fetched
       package_name.should be_unpacked
     end
-    
+
   end
 
   it "fetches a valid package" do

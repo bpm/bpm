@@ -177,7 +177,7 @@ describe 'bpm add' do
       bpm "add", "custom_generator", "--dev" and wait
       output = stdout.read
       output.should include("Added development package 'custom_generator' (1.0)")
-      
+
       bpm 'rebuild', '--mode=debug' and wait
       has_development_dependency 'custom_generator', '1.0'
       no_dependency 'custom_generator', false
@@ -188,7 +188,7 @@ describe 'bpm add' do
 end
 
 describe "bpm add using a vendor directory" do
-  before do 
+  before do
     goto_home
     set_host
     start_fake(FakeGemServer.new)
@@ -197,12 +197,12 @@ describe "bpm add using a vendor directory" do
     FileUtils.cp_r project_fixture('hello_world'), home('hello_dev', 'vendor', 'hello_world')
     cd home('hello_dev')
   end
-  
+
   it "should include custom_package defined in a project found vendor" do
     bpm 'add', 'custom_package' and wait
-    
+
     File.read(home('hello_dev', 'assets', 'bpm_libs.js')).should include("custom_package (2.0.0)")
   end
-    
+
 end
 

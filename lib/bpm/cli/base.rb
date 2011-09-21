@@ -140,11 +140,11 @@ LONGDESC
 
         To remove a dependency just run `bpm remove`.
       LONGDESC
-      method_option :version,    :type => :string,  :default => nil, :aliases => ['-v'],    :desc => 'Specify a version to install'
-      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      method_option :prerelease, :type => :boolean, :default => false,  :aliases => ['--pre'], :desc => 'Install a prerelease version'
+      method_option :version,     :type => :string,  :default => nil,   :aliases => ['-v'],    :desc => 'Specify a version to install'
+      method_option :project,     :type => :string,  :default => nil,   :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      method_option :prerelease,  :type => :boolean, :default => false, :aliases => ['--pre'], :desc => 'Install a prerelease version'
       method_option :development, :type => :boolean, :default => false, :aliases => ['--dev'], :desc => "Add as a development dependency"
-      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
+      method_option :mode,        :type => :string,  :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
       def add(*package_names)
         # map to dependencies
         if package_names.empty?
@@ -179,8 +179,8 @@ LONGDESC
         This command will remove the dependency declaration from the project JSON.
         It will then rebuild the project without the depedency.
       LONGDESC
-      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
+      method_option :project, :type => :string,  :default => nil,         :aliases => ['-p'], :desc => 'Specify project location other than working directory'
+      method_option :mode,    :type => :string,  :default => :production, :aliases => ['-m'], :desc => "Build mode for compile"
       def remove(*package_names)
 
         # map to dependencies
@@ -205,9 +205,9 @@ LONGDESC
         Once you are satisfied with your project you will still need to run `bpm rebuild`
         to save your updated assets to disk.
       LONGDESC
-      method_option :mode, :type => :string, :default => :debug, :aliases => ['-m'], :desc => 'Build mode for compile'
-      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      method_option :port,       :type => :string,  :default => '4020', :desc => "Port to host server on"
+      method_option :mode,    :type => :string,  :default => :debug, :aliases => ['-m'], :desc => 'Build mode for compile'
+      method_option :project, :type => :string,  :default => nil,    :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      method_option :port,    :type => :string,  :default => '4020', :desc => "Port to host server on"
       def preview
         project = find_project
         project.verify_and_repair options[:mode], options[:verbose]
@@ -223,9 +223,9 @@ LONGDESC
         development, consider using `bpm preview`. Though remember that you will have to run
         `bpm rebuild` before deploying.
       LONGDESC
-      method_option :mode, :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile'
-      method_option :project,    :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
-      method_option :update, :type => :boolean, :default => false, :aliases => ['-u'], :desc => 'Updates dependencies to latest compatible version'
+      method_option :mode,    :type => :string, :default => :production, :aliases => ['-m'], :desc => 'Build mode for compile'
+      method_option :project, :type => :string,  :default => nil, :aliases => ['-p'],    :desc => 'Specify project location other than working directory'
+      method_option :update,  :type => :boolean, :default => false, :aliases => ['-u'], :desc => 'Updates dependencies to latest compatible version'
       def rebuild
         find_project.fetch_dependencies(true) if options[:update]
         find_project.build options[:mode].to_sym, true
@@ -360,9 +360,9 @@ LONGDESC
         By default, the app is given the same name as the directory it resides
         in. If a different name is desired, pass the --name option.
       LONGDESC
-      method_option :name, :type => :string, :default => nil, :desc => 'Specify a different name for the project'
+      method_option :name, :type => :string, :default => nil,    :desc => 'Specify a different name for the project'
       method_option :skip, :type => :boolean, :default => false, :desc => 'Skip any conflicting files'
-      method_option :app, :type => :boolean, :default => false, :desc => 'Manage app files as well as packages. (Always true for new directories.)'
+      method_option :app,  :type => :boolean, :default => false, :desc => 'Manage app files as well as packages. (Always true for new directories.)'
       #method_option :package, :type => :string, :default => nil, :desc => 'Specify a package template to build from'
       def init(*paths)
         paths = [Dir.pwd] if paths.empty?
