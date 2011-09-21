@@ -40,7 +40,7 @@ describe "bpm list" do
     it "should complain when called outside of a project" do
       cd home
       bpm "list", :track_stderr => true
-      stderr.read.should include("inside of a bpm project")
+      stderr.read.should include("inside of a BPM project")
     end
     
   end

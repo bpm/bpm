@@ -17,7 +17,7 @@ describe 'bpm add' do
   it "must be called from within a project" do
     cd home # outside of project
     bpm "add", "jquery", :track_stderr => true
-    stderr.read.should include("inside of a bpm project")
+    stderr.read.should include("inside of a BPM project")
   end
 
   it "should add a new hard dependency" do

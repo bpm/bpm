@@ -511,14 +511,14 @@ LONGDESC
           if options[:project]
             project_path = File.expand_path options[:project]
             if required && !BPM::Project.is_project_root?(project_path)
-              abort "#{project_path} does not appear to be managed by bpm"
+              abort "#{project_path} does not appear to be managed by BPM"
             else
               project = BPM::Project.new project_path
             end
           else
             project = BPM::Project.nearest_project Dir.pwd
             if required && project.nil?
-              abort "You do not appear to be inside of a bpm project"
+              abort "You do not appear to be inside of a BPM project"
             end
           end
 
