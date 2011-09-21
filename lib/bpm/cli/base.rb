@@ -526,7 +526,7 @@ LONGDESC
           else
             project = klass.nearest_project Dir.pwd
             if required && project.nil?
-              abort "You do not appear to be inside of a BPM project"
+              abort "You do not appear to be inside of a BPM #{options[:package] ? 'package' : 'project'}"
             end
           end
 
