@@ -13,5 +13,11 @@ module BPM
     def self.is_project_root?(path)
       !!project_file_path(path)
     end
+
+    def as_json
+      json = super
+      json.delete("bpm")
+      json
+    end
   end
 end
