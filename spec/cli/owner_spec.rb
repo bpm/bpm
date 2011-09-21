@@ -106,9 +106,4 @@ describe "bpm owner with wrong arguments" do
     stderr.read.should include("called incorrectly")
   end
 
-  it "requires a package name for list with default command" do
-    bpm "owner", :track_stderr => true
-
-    stderr.read.should include("called incorrectly")
-  end
 end
