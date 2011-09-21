@@ -91,14 +91,9 @@ module BPM
 
     def vendored_packages
       @vendored_packages ||= begin
-        # Packages path is deprecated
-        packages_path = File.join(@root_path, 'packages')
-        search_paths = [vendor_root, packages_path]
+        search_paths = [vendor_root, File.join(@root_path, 'packages')]
         paths = search_paths.map{|p| Dir.glob(File.join(p, '*')) }.flatten
         pkgs = paths.select{|p| Package.is_package_root?(p) }.map{|p| Package.new(p) }
-        if pkgs.any?{|p| p.root_path =~ /^#{Regexp.escape(packages_path)}\// }
-          BPM.deprecation_warning "Use the vendor directory instead of the packages directory for #{root_path}"
-        end
         pkgs += vendored_projects.map{|p| p.vendored_packages }.flatten
         pkgs.select do |p|
           begin
