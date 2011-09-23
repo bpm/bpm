@@ -1,7 +1,5 @@
 module BPM
   class Railtie < Rails::Railtie
-    railtie_name :bpm_rails
-
     config.preview_bpm_app = false
     config.bpm_app_dir = 'app'
 
