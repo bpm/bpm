@@ -131,10 +131,8 @@ module LibGems
           gems_and_sources.push(*found)
 
         rescue LibGems::RemoteFetcher::FetchError => e
-          if LibGems.configuration.really_verbose then
-            say "Error fetching remote data:\t\t#{e.message}"
-            say "Falling back to local-only install"
-          end
+          say "Error fetching remote data:\t\t#{e.message}"
+          say "Falling back to local-only install"
           @domain = :local
         end
       end
