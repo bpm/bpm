@@ -305,8 +305,9 @@ module BPM
         else
           $stdout << "~ Building #{asset.logical_path}..." if verbose
           File.open(dst_path, 'w+') { |fd| fd << asset.to_s }
+          Zlib::GzipWriter.open("#{dst_path}.gz") { |fd| fd << asset.to_s }
           if verbose
-            gzip_size = LibGems.gzip(asset.to_s).bytesize
+            gzip_size = File.size("#{dst_path}.gz")
             gzip_size = gzip_size < 1024 ? "#{gzip_size} bytes" : "#{gzip_size / 1024} Kb"
             $stdout << " (gzipped size: #{gzip_size})\n"
           end
@@ -331,6 +332,7 @@ module BPM
         next unless File.exists? asset_path
         say "~ Removing #{asset.logical_path}" if verbose
         FileUtils.rm asset_path
+        FileUtils.rm "asset_path.gz"
 
         # cleanup empty directories
         while !File.exists?(asset_path)
