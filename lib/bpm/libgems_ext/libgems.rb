@@ -2,11 +2,11 @@ require 'libgems'
 
 module LibGems
   def self.default_sources
-    %w[https://getbpm.org/]
+    %w[https://www.getbpm.org/]
   end
 
   def self.host
-    @host ||= "https://getbpm.org"
+    @host ||= "https://www.getbpm.org"
   end
 
   def self.default_dir
