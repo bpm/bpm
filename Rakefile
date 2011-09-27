@@ -6,7 +6,7 @@ begin
     t.version = BPM::VERSION
     t.domain = "strobecorp.com"
     t.bin_files = ["bpm"]
-    t.resource_files = ["README.md"]
+    t.resource_files = ["README.md", "support", "templates"]
   end
 rescue LoadError
 end
