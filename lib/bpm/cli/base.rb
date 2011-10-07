@@ -7,7 +7,6 @@ module BPM
     LOGIN_MESSAGE = "Please login first with `bpm login`."
 
     class Base < Thor
-
       class_option :verbose, :type => :boolean, :default => false,
         :aliases => ['-V'],
         :desc => 'Show additional debug information while running'
@@ -70,6 +69,14 @@ LONGDESC
         else
           super
         end
+      end
+
+      map '-v'        => 'version'
+      map '--version' => 'version'
+
+      desc "version", "Print the version number"
+      def version
+        shell.say BPM::VERSION
       end
 
       desc "owner", "Manage users for a package"
