@@ -52,14 +52,16 @@ LONGDESC
         end
 
         def start(given_args=ARGV, config={})
-          if given_args.include?('--verbose') || given_args.include?('-V')
+          if given_args.include?('--version') || given_args.include?('-v')
+            puts BPM::VERSION
+          elsif given_args.include?('--verbose') || given_args.include?('-V')
             BPM.show_deprecations = true
-          end
+          else
+            super
 
-          super
-
-          if BPM.deprecation_count > 0
-            puts "[WARN] #{BPM.deprecation_count} deprecation warnings were hidden. Run with --verbose to see them."
+            if BPM.deprecation_count > 0
+              puts "[WARN] #{BPM.deprecation_count} deprecation warnings were hidden. Run with --verbose to see them."
+            end
           end
         end
       end
