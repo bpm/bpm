@@ -39,7 +39,7 @@ thing there.
 
 Install via RubyGems:
 
-  `gem install bpm --pre`
+  `gem install bpm`
 
 WARNING: Make sure you have the most recent version of RubyGems and the
 most recent version of RVM if you are using that.
