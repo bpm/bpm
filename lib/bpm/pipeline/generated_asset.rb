@@ -87,6 +87,9 @@ module BPM
           DATA = #{data.to_json};
         end_eval
 
+        ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
+        plugin_ctx = ic.iconv(plugin_ctx)
+
         ctx = BPM.compile_js(plugin_ctx);
         data = ctx.eval("BPM_PLUGIN.minify(DATA, CTX)")
 
