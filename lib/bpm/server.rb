@@ -32,7 +32,7 @@ module BPM
       cur_mode    = @mode
 
       @app ||= ::Rack::Builder.new do
-        (use BPM::RackProxy, cur_project, :mode => cur_mode) unless cur_project.preview_proxy.empty?
+        (use BPM::RackProxy, cur_project, :mode => cur_mode) unless cur_project.bpm_preview_proxy.empty?
         use BPM::Rack, cur_project, :mode => cur_mode
         run ::Rack::Directory.new cur_project.root_path
       end.to_app

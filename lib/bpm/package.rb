@@ -24,7 +24,7 @@ module BPM
       "bpm:build"         => :hash,
       "bpm:use:transport" => :string,
       "bpm:provides"      => :hash,
-      "preview_proxy"     => :hash
+      "bpm:preview_proxy"        => :hash
     }
 
     PLUGIN_TYPES = %w[minifier]
