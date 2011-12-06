@@ -1,4 +1,5 @@
 require 'rack'
+require 'rack-rewrite'
 require 'sprockets'
 require 'thin'
 
@@ -33,6 +34,9 @@ module BPM
 
       @app ||= ::Rack::Builder.new do
         use BPM::Rack, cur_project, :mode => cur_mode
+        use ::Rack::Rewrite do
+          rewrite /^(.*)\/$/, '$1/index.html'
+        end
         run ::Rack::Directory.new cur_project.root_path
       end.to_app
     end
