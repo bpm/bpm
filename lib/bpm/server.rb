@@ -33,6 +33,7 @@ module BPM
       cur_mode    = @mode
 
       @app ||= ::Rack::Builder.new do
+        (use BPM::RackProxy, cur_project, :mode => cur_mode) unless cur_project.bpm_preview_proxy.empty?
         use BPM::Rack, cur_project, :mode => cur_mode
         use ::Rack::Rewrite do
           rewrite /^(.*)\/$/, '$1/index.html'

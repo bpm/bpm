@@ -23,7 +23,8 @@ module BPM
       "dependencies:development" => :hash,
       "bpm:build"         => :hash,
       "bpm:use:transport" => :string,
-      "bpm:provides"      => :hash
+      "bpm:provides"      => :hash,
+      "bpm:preview_proxy"        => :hash
     }
 
     PLUGIN_TYPES = %w[minifier]

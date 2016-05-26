@@ -16,6 +16,7 @@ module BPM
   autoload :Project,              'bpm/project'
   autoload :PackageProject,       'bpm/package_project'
   autoload :Rack,                 'bpm/rack'
+  autoload :RackProxy,            'bpm/rack_proxy'
   autoload :Server,               'bpm/server'
   autoload :Pipeline,             'bpm/pipeline'
   autoload :DirectiveProcessor,   'bpm/pipeline/directive_processor'
